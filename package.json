@@ -1,22 +1,39 @@
 {
-  "name": "testquery",
+  "name": "leopard-internal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "setup": "bash scripts/setup.sh",
+    "dev": "yarn && NODE_EXTRA_CA_CERTS=\"$(cat ./certs/.capath)\" node server.js",
+    "build": "next build && next export",
+    "start": "NODE_ENV=production NODE_EXTRA_CA_CERTS=\"$(cat ./certs/.capath)\" node server.js",
+    "lint": "next lint",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@ContextLogic/atlas-ui": "^0.0.1-1681155840",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.12.0",
+    "@types/js-cookie": "^3.0.3",
     "@types/node": "18.15.10",
-    "@types/react": "18.0.29",
-    "@types/react-dom": "18.0.11",
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
     "eslint": "8.36.0",
-    "eslint-config-next": "13.2.4",
-    "next": "13.2.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "typescript": "5.0.2"
+    "js-cookie": "^3.0.1",
+    "next": "^13.2.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.3",
+    "urql": "^4.0.0"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^13.3.0",
+    "devcert": "^1.2.2",
+    "eslint-config-next": "^13.2.4"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

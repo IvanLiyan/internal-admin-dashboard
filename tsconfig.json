@@ -13,9 +13,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
+    "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@/*": ["./*"]
+      "@app/*": ["src/app/*"],
+      "@schema": ["src/app/schema"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
