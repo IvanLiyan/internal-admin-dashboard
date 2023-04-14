@@ -8,4 +8,14 @@ interface MenuItemProps {
   subMenuItems: SubMenuItemProps[];
 }
 
-export const MenuData: MenuItemProps[] = [];
+export const MenuData: MenuItemProps[] = [
+  {
+    text: "Infractions",
+    subMenuItems: [
+      {
+        text: "Action Required",
+        href: "/internal-admin/infractions/awaiting-admin",
+      },
+    ],
+  },
+];
