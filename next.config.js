@@ -3,7 +3,7 @@ const MD_URL = process.env.NEXT_PUBLIC_MD_URL || "";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  basePath: "/md-admin",
+  basePath: "/internal-admin",
   transpilePackages: ["@ContextLogic/lego", "recharts"],
   compiler: {
     emotion: true,
