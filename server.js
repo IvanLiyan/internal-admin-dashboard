@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { createServer } = require("https");
 const next = require("next");
 const fs = require("fs");
@@ -17,7 +18,7 @@ const options = {
 app.prepare().then(() => {
   createServer(options, (req, res) => handle(req, res)).listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Ready on https://${hostname}:${port}/md-admin`);
-    console.log(`> Log in through https://${hostname}:${port}/md-admin/dev-login`);
+    console.log(`> Ready on https://${hostname}:${port}/internal-admin`);
+    console.log(`> Log in through https://${hostname}:${port}/internal-admin/dev-login`);
   });
 });

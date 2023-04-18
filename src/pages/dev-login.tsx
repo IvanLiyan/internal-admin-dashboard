@@ -44,13 +44,11 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
   const loading = Boolean(loading_);
   const [errorBody, errorOpen, setError, closeError] = useError(null);
   const [currentUser, setCurrentUser] = useState("none");
-  const [currentMerchant, setCurrentMerchant] = useState("none");
-  // const [mid, setMid] = useState<string | undefined>();
 
   const loginAsAdmin = async () => {
     setLoading((cur) => cur + 1);
     try {
-      const resp = await fetch("/md-admin/api/dev-login");
+      const resp = await fetch("/internal-admin/api/dev-login");
       if (!resp.ok) {
         setError(
           "An error occurred while logging you in. Please see the console for more details.",
@@ -111,11 +109,6 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
       setCurrentUser(
         jsonResponse.data.currentUser
           ? String(jsonResponse.data.currentUser.id)
-          : "none"
-      );
-      setCurrentMerchant(
-        jsonResponse.data.currentMerchant
-          ? String(jsonResponse.data.currentMerchant.id)
           : "none"
       );
     } catch (e) {

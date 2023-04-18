@@ -3,6 +3,8 @@ import Cookies from "js-cookie";
 import type { AppProps } from "next/app";
 import { cacheExchange, createClient, fetchExchange, Provider } from "urql";
 import { AtlasThemeProvider } from "@ContextLogic/atlas-ui";
+import { NavigationBar } from "@app/navigation/NavigationBar";
+import { Container } from "@mui/material";
 
 const client = createClient({
   url: `/api/graphql`,
@@ -19,10 +21,13 @@ const client = createClient({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <AtlasThemeProvider>
+    // <AtlasThemeProvider>
       <Provider value={client}>
-        <Component {...pageProps} />
+        <NavigationBar />
+        <Container maxWidth={false} sx={{ mt: 2 }}>
+          <Component {...pageProps} />
+        </Container>
       </Provider>
-    </AtlasThemeProvider>
+    // </AtlasThemeProvider>
   );
 }
