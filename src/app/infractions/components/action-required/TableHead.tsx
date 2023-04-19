@@ -19,7 +19,7 @@ interface EnhancedTableProps {
   rowCount: number;
 }
 
-const AwaitingAdminTableHead: React.FC<EnhancedTableProps> = ({
+const ActionRequiredTableHead: React.FC<EnhancedTableProps> = ({
   onSelectAllClick,
   order,
   orderBy,
@@ -56,4 +56,4 @@ const AwaitingAdminTableHead: React.FC<EnhancedTableProps> = ({
   );
 };
 
-export default AwaitingAdminTableHead;
+export default ActionRequiredTableHead;

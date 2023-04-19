@@ -1,4 +1,4 @@
-import AwaitingAdminTableHead from "@app/infractions/components/awaiting-admin/TableHead";
+import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
 import {
   Data,
   MockActionRequiredData,
@@ -80,7 +80,7 @@ const PageContent: React.FC = () => {
 
       <TableContainer>
         <Table size={"medium"}>
-          <AwaitingAdminTableHead
+          <ActionRequiredTableHead
             numSelected={selected.length}
             order={order}
             orderBy={orderBy}

@@ -14,7 +14,7 @@ export const MenuData: MenuItemProps[] = [
     subMenuItems: [
       {
         text: "Action Required",
-        href: "/internal-admin/infractions/awaiting-admin",
+        href: "/infractions/action-required",
       },
     ],
   },

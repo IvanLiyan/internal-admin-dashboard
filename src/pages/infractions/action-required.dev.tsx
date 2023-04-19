@@ -1,11 +1,11 @@
-import PageContent from "@app/infractions/components/awaiting-admin/PageContent";
+import PageContent from "@app/infractions/components/action-required/PageContent";
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import { NextPage } from "next";
 
 /**
  * Scaffolding for Awaiting Admin page
  */
-const AwaitingAdminPage: React.FC = () => {
+const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   return (
     <Box>
       <Typography variant="h4">Infractions Action Required</Typography>
@@ -14,4 +14,4 @@ const AwaitingAdminPage: React.FC = () => {
   );
 };
 
-export default AwaitingAdminPage;
+export default ActionRequiredPage;
