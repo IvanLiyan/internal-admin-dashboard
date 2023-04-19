@@ -19,8 +19,8 @@ export interface Data {
 }
 function createData(): Data {
   return {
-    created: 1681830156000,
-    lastUpdate: 1681830156000,
+    created: 1681830156000000,
+    lastUpdate: 1681830156000000,
     mid: "dddddd",
     infractionID: `${Math.random() * 1000 % 1000}`,
     reasons: "reason",
