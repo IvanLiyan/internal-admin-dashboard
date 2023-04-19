@@ -1,5 +1,10 @@
-import { Data, Order } from "@app/infractions/toolkit/types";
-import { MockActionRequiredData } from "@app/infractions/toolkit/mocks";
+import { Heading } from "@ContextLogic/atlas-ui";
+import AwaitingAdminTableHead from "@app/infractions/components/awaiting-admin/TableHead";
+import {
+  Data,
+  MockActionRequiredData,
+  Order,
+} from "@app/infractions/toolkit/mocks";
 import { Box } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import Paper from "@mui/material/Paper";
@@ -9,8 +14,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import RequiresReviewTableHead from "@app/infractions/components/requires-review/TableHead";
-import { Heading } from "@ContextLogic/atlas-ui";
 import React, { useEffect, useState } from "react";
 
 const DEFAULT_ORDER = "asc";
@@ -83,7 +86,7 @@ const AwaitingAdminPage: React.FC = () => {
 
         <TableContainer>
           <Table size={"medium"}>
-            <RequiresReviewTableHead
+            <AwaitingAdminTableHead
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
