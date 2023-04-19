@@ -1,0 +1,10 @@
+stages:
+  - install
+
+install dependencies:
+  stage: install
+  image: node:18
+  script:
+    - yarn install --frozen-lockfile
+    - yarn lint
+    - yarn build
