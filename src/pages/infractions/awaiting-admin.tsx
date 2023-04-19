@@ -1,6 +1,5 @@
-import { Heading } from "@ContextLogic/atlas-ui";
 import PageContent from "@app/infractions/components/awaiting-admin/PageContent";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React from "react";
 
 /**
@@ -9,7 +8,7 @@ import React from "react";
 const AwaitingAdminPage: React.FC = () => {
   return (
     <Box>
-      <Heading variant="h4">Infractions Action Required</Heading>
+      <Typography variant="h4">Infractions Action Required</Typography>
       <PageContent />
     </Box>
   );

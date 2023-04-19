@@ -85,7 +85,6 @@ const PageContent: React.FC = () => {
             order={order}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
-            // onRequestSort={() => {}}
             rowCount={MockActionRequiredData.length}
           />
           <TableBody>
