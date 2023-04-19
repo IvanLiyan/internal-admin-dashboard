@@ -11,7 +11,6 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
-    "@ContextLogic/atlas-ui": "^0.0.1-1681155840",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@mui/icons-material": "^5.11.16",

@@ -1,7 +1,6 @@
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { Button } from "@ContextLogic/atlas-ui";
 import {
   CssBaseline,
   Box,
@@ -10,6 +9,7 @@ import {
   Divider,
   Snackbar,
   Alert,
+  Button,
 } from "@mui/material";
 
 const useError = (
@@ -143,64 +143,22 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
 
           <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
 
-          {/* lliepert: temp removing tooltip while atlas tooltip is finalized */}
-          {/* <Tooltip
-            content={() => (
-              <Box sx={{ maxWidth: 300 }}>
-                Log in to Merch-FE as your admin account, stored in .env.local.
-              </Box>
-            )}
-            placement="right"
-          > */}
           <Button
-            primary
+            variant="contained"
             onClick={loginAsAdmin}
             style={{ display: "block", width: "100%", margin: "10px 0px" }}
             disabled={loading}
           >
             Login as Admin
           </Button>
-          {/* </Tooltip>
-          <Tooltip
-            content={() => (
-              <Box sx={{ maxWidth: 300 }}>
-                Log into Merch-FE as your admin account, if not yet logged in,
-                then as the MID specified in your .env.local file via \go.
-              </Box>
-            )}
-            placement="right"
-          > */}
-          {/* <TextField
-            value={mid}
-            fullWidth
-            onChange={(e) => {
-              setMid(e.target.value);
-            }}
-            placeholder="MID"
-          /> */}
-          {/* <Button
-            primary
-            onClick={loginAsMerchant}
-            style={{ display: "block", width: "100%", margin: "10px 0px" }}
-            disabled={loading}
-          >
-            Login as Merchant
-          </Button> */}
-          {/* </Tooltip>
-
-          <Tooltip
-            content={() => <Box>Log out of Merch-FE via /logout.</Box>}
-            placement="right"
-          > */}
           <Button
-            primary
+            variant="contained"
             onClick={logout}
             style={{ display: "block", width: "100%", margin: "10px 0px" }}
             disabled={loading}
           >
             Logout
           </Button>
-          {/* </Tooltip> */}
 
           <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
 
