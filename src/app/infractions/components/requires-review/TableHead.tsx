@@ -1,5 +1,7 @@
-import { MockActionRequiredDataColumn } from "@app/infractions/toolkit/mocks";
-import { Order } from "@app/infractions/toolkit/types";
+import {
+  MockActionRequiredDataColumn,
+  Order,
+} from "@app/infractions/toolkit/mocks";
 import {
   Checkbox,
   TableCell,
