@@ -1,9 +1,6 @@
 import { MenuData } from "@app/navigation/menu";
-import { Button } from "@mui/material";
-import AppBar from "@mui/material/AppBar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Toolbar from "@mui/material/Toolbar";
+import { AppBar, Menu, MenuItem, Toolbar } from "@mui/material";
+import Link from "next/link";
 import React, { useState } from "react";
 
 export const NavigationBar: React.FC = () => {
@@ -23,12 +20,17 @@ export const NavigationBar: React.FC = () => {
   return (
     <AppBar position="sticky">
       <Toolbar>
-        <Button
-          variant="text"
+        <MenuItem
+          component="a"
           href="/"
+          sx={{
+            ":visited": {
+              color: "white",
+            },
+          }}
         >
           Home
-        </Button>
+        </MenuItem>
         {MenuData.map((item, index) => (
           <div key={`menu-item-${index}`}>
             <MenuItem
@@ -45,11 +47,9 @@ export const NavigationBar: React.FC = () => {
               {item.subMenuItems.map((subItem, subIndex) => (
                 <MenuItem
                   key={`submenu-item-${subIndex}`}
-                  component="a"
-                  href={subItem.href}
                   onClick={handleClose}
                 >
-                  {subItem.text}
+                  <Link href={subItem.href}>{subItem.text}</Link>
                 </MenuItem>
               ))}
             </Menu>
