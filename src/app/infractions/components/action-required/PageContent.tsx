@@ -1,3 +1,4 @@
+import BulkActionDialog from "@app/infractions/components/BulkActionDialog";
 import ClaimFilter from "@app/infractions/components/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
 import CounterfeitSubreasonFilter from "@app/infractions/components/CounterfeitSubreasonFilter";
@@ -9,6 +10,7 @@ import {
   Order,
 } from "@app/infractions/toolkit/mocks";
 import {
+  Button,
   Checkbox,
   Paper,
   Stack,
@@ -26,6 +28,7 @@ const DEFAULT_ORDER_BY: keyof Data = "created";
 const DEFAULT_ROWS_PER_PAGE = 25;
 
 const PageContent: React.FC = () => {
+  const [bulkActionOpen, setBulkActionOpen] = useState(false);
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -83,7 +86,11 @@ const PageContent: React.FC = () => {
             setRowsPerPage(parseInt(event.target.value));
           }}
         />
-        <Stack direction={"row-reverse"}>{/* Place buttons here */}</Stack>
+        <Stack direction={"row-reverse"} spacing={1} useFlexGap mx={1} my={1}>
+          <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
+            Take further action
+          </Button>
+        </Stack>
         <Stack direction={"row"} spacing={1} useFlexGap mx={1}>
           {/* Place filters here */}
           <ClaimFilter
@@ -159,6 +166,15 @@ const PageContent: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <BulkActionDialog
+        approveAction
+        declineAction
+        open={bulkActionOpen}
+        handleClose={() => setBulkActionOpen(false)}
+        infractions={
+          visibleRows?.filter((r) => selected.includes(r.infractionID)) || []
+        }
+      />
     </Paper>
   );
 };
