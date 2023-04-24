@@ -1,3 +1,7 @@
+import ClaimFilter from "@app/infractions/components/ClaimFilter";
+import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
+import CounterfeitSubreasonFilter from "@app/infractions/components/CounterfeitSubreasonFilter";
+import ReasonFilter from "@app/infractions/components/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
 import {
   Data,
@@ -7,6 +11,7 @@ import {
 import {
   Checkbox,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -64,20 +69,45 @@ const PageContent: React.FC = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
   return (
     <Paper>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={MockActionRequiredData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={(_, page) => {
-          setPage(page);
-        }}
-        onRowsPerPageChange={(event) => {
-          setRowsPerPage(parseInt(event.target.value));
-        }}
-      />
-
+      <Stack>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component={"div"}
+          count={MockActionRequiredData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, page) => {
+            setPage(page);
+          }}
+          onRowsPerPageChange={(event) => {
+            setRowsPerPage(parseInt(event.target.value));
+          }}
+        />
+        <Stack direction={"row-reverse"}>{/* Place buttons here */}</Stack>
+        <Stack direction={"row"} spacing={1} useFlexGap mx={1}>
+          {/* Place filters here */}
+          <ClaimFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+          <ReasonFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+          <CounterfeitReasonFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+          <CounterfeitSubreasonFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+        </Stack>
+      </Stack>
       <TableContainer>
         <Table size={"medium"}>
           <ActionRequiredTableHead
