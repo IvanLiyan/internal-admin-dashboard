@@ -1,10 +1,88 @@
 stages:
   - install
+  - test
+  - deploy
 
 install dependencies:
   stage: install
   image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
   script:
     - yarn install --frozen-lockfile
+  artifacts:
+    paths:
+      - node_modules/
+  except:
+    - schedules
+
+# test:
+#   stage: test
+#   image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+#   script:
+#     - yarn test-ci
+#   dependencies:
+#     - install dependencies
+
+lint:
+  stage: test
+  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  script:
     - yarn lint
+  dependencies:
+    - install dependencies
+
+build staging:
+  stage: test
+  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  script:
+    # we want the `development` configs on staging, even though we are optimizing the build for prod
+    - cp .env.development .env.production
     - yarn build
+  artifacts:
+    when: always
+    paths:
+      - out
+  dependencies:
+    - install dependencies
+
+build prod:
+  stage: test
+  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  script:
+    - yarn build
+  artifacts:
+    when: always
+    paths:
+      - out
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  dependencies:
+    - install dependencies
+
+deploy staging:
+  stage: deploy
+  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  script:
+    - sh scripts/deploy.sh -s=internal-admin-tools-staging
+  environment:
+    name: staging
+  when: manual
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags: [leopard-staging]
+  dependencies:
+    - build staging
+
+deploy production:
+  stage: deploy
+  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  script:
+    - sh scripts/deploy.sh -s=internal-admin-tools-production
+  environment:
+    name: production
+  when: manual
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags: [leopard]
+  dependencies:
+    - build prod
+
