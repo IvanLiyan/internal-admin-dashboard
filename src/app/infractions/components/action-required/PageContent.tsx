@@ -1,3 +1,4 @@
+import Searchbox from "@app/core/components/Searchbox";
 import BulkActionDialog from "@app/infractions/components/BulkActionDialog";
 import ClaimFilter from "@app/infractions/components/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
@@ -9,10 +10,14 @@ import {
   MockActionRequiredData,
   Order,
 } from "@app/infractions/toolkit/mocks";
+import { Search } from "@mui/icons-material";
 import {
   Button,
   Checkbox,
+  InputAdornment,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Table,
   TableBody,
@@ -20,6 +25,7 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
@@ -73,19 +79,31 @@ const PageContent: React.FC = () => {
   return (
     <Paper>
       <Stack>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component={"div"}
-          count={MockActionRequiredData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(_, page) => {
-            setPage(page);
-          }}
-          onRowsPerPageChange={(event) => {
-            setRowsPerPage(parseInt(event.target.value));
-          }}
-        />
+        <Stack
+          direction={"row"}
+          justifyContent={"space-between"}
+          alignItems="center"
+        >
+          <Searchbox
+            onConfirm={(token) => {console.log(token)}}
+            size="small"
+            placeholder="Infraction ID, merchant ID, Product ID, Order ID, Display name"
+            sx={{ minWidth: 400, mx: 1 }}
+          />
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component={"div"}
+            count={MockActionRequiredData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(_, page) => {
+              setPage(page);
+            }}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value));
+            }}
+          />
+        </Stack>
         <Stack direction={"row-reverse"} spacing={1} useFlexGap mx={1} my={1}>
           <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
             Take further action
