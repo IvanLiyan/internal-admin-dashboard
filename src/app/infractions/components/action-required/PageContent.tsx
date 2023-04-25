@@ -85,7 +85,9 @@ const PageContent: React.FC = () => {
           alignItems="center"
         >
           <Searchbox
-            onConfirm={(token) => {console.log(token)}}
+            onConfirm={(token) => {
+              console.log(token);
+            }}
             size="small"
             placeholder="Infraction ID, merchant ID, Product ID, Order ID, Display name"
             sx={{ minWidth: 400, mx: 1 }}
@@ -104,12 +106,14 @@ const PageContent: React.FC = () => {
             }}
           />
         </Stack>
-        <Stack direction={"row-reverse"} spacing={1} useFlexGap mx={1} my={1}>
+        <Stack direction={"row-reverse"} spacing={1} useFlexGap m={1}>
           <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
             Take further action
           </Button>
+          <Button variant="text">Claim selected</Button>
+          <Button variant="text">Dump selected claim</Button>
         </Stack>
-        <Stack direction={"row"} spacing={1} useFlexGap mx={1}>
+        <Stack direction={"row"} spacing={1} useFlexGap m={1}>
           {/* Place filters here */}
           <ClaimFilter
             onConfirm={() => {
