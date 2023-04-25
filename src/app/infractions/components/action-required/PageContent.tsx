@@ -106,14 +106,14 @@ const PageContent: React.FC = () => {
             }}
           />
         </Stack>
-        <Stack direction={"row-reverse"} spacing={1} useFlexGap m={1}>
+        <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
+          <Button variant="text">Dump selected claim</Button>
+          <Button variant="text">Claim selected</Button>
           <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
             Take further action
           </Button>
-          <Button variant="text">Claim selected</Button>
-          <Button variant="text">Dump selected claim</Button>
         </Stack>
-        <Stack direction={"row"} spacing={1} useFlexGap m={1}>
+        <Stack direction={"row"} spacing={1} m={1}>
           {/* Place filters here */}
           <ClaimFilter
             onConfirm={() => {
