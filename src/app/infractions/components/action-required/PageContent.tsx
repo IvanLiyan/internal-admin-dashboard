@@ -1,18 +1,31 @@
+import Searchbox from "@app/core/components/Searchbox";
+import BulkActionDialog from "@app/infractions/components/BulkActionDialog";
+import ClaimFilter from "@app/infractions/components/ClaimFilter";
+import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
+import CounterfeitSubreasonFilter from "@app/infractions/components/CounterfeitSubreasonFilter";
+import ReasonFilter from "@app/infractions/components/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
 import {
   Data,
   MockActionRequiredData,
   Order,
 } from "@app/infractions/toolkit/mocks";
+import { Search } from "@mui/icons-material";
 import {
+  Button,
   Checkbox,
+  InputAdornment,
+  MenuItem,
   Paper,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TablePagination,
   TableRow,
+  TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
@@ -21,6 +34,7 @@ const DEFAULT_ORDER_BY: keyof Data = "created";
 const DEFAULT_ROWS_PER_PAGE = 25;
 
 const PageContent: React.FC = () => {
+  const [bulkActionOpen, setBulkActionOpen] = useState(false);
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -64,20 +78,65 @@ const PageContent: React.FC = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
   return (
     <Paper>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={MockActionRequiredData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={(_, page) => {
-          setPage(page);
-        }}
-        onRowsPerPageChange={(event) => {
-          setRowsPerPage(parseInt(event.target.value));
-        }}
-      />
-
+      <Stack>
+        <Stack
+          direction={"row"}
+          justifyContent={"space-between"}
+          alignItems="center"
+        >
+          <Searchbox
+            onConfirm={(token) => {
+              console.log(token);
+            }}
+            size="small"
+            placeholder="Infraction ID, merchant ID, Product ID, Order ID, Display name"
+            sx={{ minWidth: 400, mx: 1 }}
+          />
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component={"div"}
+            count={MockActionRequiredData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(_, page) => {
+              setPage(page);
+            }}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value));
+            }}
+          />
+        </Stack>
+        <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
+          <Button variant="text">Dump selected claim</Button>
+          <Button variant="text">Claim selected</Button>
+          <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
+            Take further action
+          </Button>
+        </Stack>
+        <Stack direction={"row"} spacing={1} m={1}>
+          {/* Place filters here */}
+          <ClaimFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+          <ReasonFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+          <CounterfeitReasonFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+          <CounterfeitSubreasonFilter
+            onConfirm={() => {
+              return;
+            }}
+          />
+        </Stack>
+      </Stack>
       <TableContainer>
         <Table size={"medium"}>
           <ActionRequiredTableHead
@@ -129,6 +188,15 @@ const PageContent: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <BulkActionDialog
+        approveAction
+        declineAction
+        open={bulkActionOpen}
+        handleClose={() => setBulkActionOpen(false)}
+        infractions={
+          visibleRows?.filter((r) => selected.includes(r.infractionID)) || []
+        }
+      />
     </Paper>
   );
 };

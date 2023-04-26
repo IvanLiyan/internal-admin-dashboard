@@ -22,7 +22,7 @@ function createData(): Data {
     created: 1681830156000000,
     lastUpdate: 1681830156000000,
     mid: "dddddd",
-    infractionID: `${Math.random() * 1000 % 1000}`,
+    infractionID: `${(Math.random() * 1000) % 1000}`,
     reasons: "reason",
     parentCategory: "pcat",
     subCategory: "scat",
@@ -32,7 +32,9 @@ function createData(): Data {
   };
 }
 
-export const MockActionRequiredData = Array.from({ length: 100 }, () => createData());
+export const MockActionRequiredData = Array.from({ length: 100 }, () =>
+  createData()
+);
 
 export const MockActionRequiredDataColumn: readonly HeadCell[] = [
   {

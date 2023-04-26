@@ -22,10 +22,10 @@ export type Scalars = {
   Int: number;
   Float: number;
   ObjectIdType: string;
-  DateTime: unknown;
+  DateTime: any;
   BigInt: number;
   JSONString: string;
-  GenericScalar: unknown;
+  GenericScalar: any;
 };
 
 export type AcceptDeComplianceTermsOfService = {
@@ -576,6 +576,9 @@ export type AttributeExtractionTaggerJobSchema = {
   readonly query?: Maybe<Scalars["String"]>;
   readonly tagSubmissions?: Maybe<
     ReadonlyArray<AttributeExtractionTagSubmissionSchema>
+  >;
+  readonly preloadingResult?: Maybe<
+    ReadonlyArray<AttributeFieldTagResultSchema>
   >;
 };
 
@@ -3655,7 +3658,9 @@ export type ErrorCode =
   | "ERROR_CODE_INVALID_MERCHANT_ID"
   | "ERROR_CODE_INVALID_PRODUCT_ID"
   | "ERROR_CODE_RATE_LIMIT"
-  | "ERROR_CODE_INTERNAL_SERVER_ERROR";
+  | "ERROR_CODE_INTERNAL_SERVER_ERROR"
+  | "ERROR_CODE_BOTH_PRODUCT_ID_AND_L1_CATEGORY_ID_SPECIFIED"
+  | "ERROR_CODE_NO_PRODUCT_ID_OR_L1_CATEGORY_ID_SPECIFIED";
 
 export type EuComplianceAddressInput = {
   readonly name: Scalars["String"];
@@ -4823,11 +4828,24 @@ export type InjunctionMerchantFreezeCreateFreezeInput = {
   readonly fineType: FineReason;
   readonly notes: Scalars["String"];
   readonly troNumber: Scalars["Int"];
-  readonly referenceTicketId: Scalars["String"];
   readonly freezeType: InjunctionMerchantFreezeType;
   readonly creationTimestamp: DatetimeInput;
   readonly isCascading: Scalars["Boolean"];
   readonly useFullAccountBalance: Scalars["Boolean"];
+};
+
+export type InjunctionMerchantFreezeExportCsv = {
+  readonly __typename?: "InjunctionMerchantFreezeExportCSV";
+  readonly ok: Scalars["Boolean"];
+  readonly message?: Maybe<Scalars["String"]>;
+};
+
+export type InjunctionMerchantFreezeFilterInput = {
+  readonly freezeIds?: Maybe<ReadonlyArray<Scalars["ObjectIdType"]>>;
+  readonly merchantIds?: Maybe<ReadonlyArray<Scalars["ObjectIdType"]>>;
+  readonly troNumbers?: Maybe<ReadonlyArray<Scalars["Int"]>>;
+  readonly states?: Maybe<ReadonlyArray<InjunctionMerchantFreezeState>>;
+  readonly freezeTypes?: Maybe<ReadonlyArray<InjunctionMerchantFreezeType>>;
 };
 
 export type InjunctionMerchantFreezeFinePaymentInput = {
@@ -4841,7 +4859,6 @@ export type InjunctionMerchantFreezeFineReversalInput = {
   readonly fineId: Scalars["ObjectIdType"];
   readonly reversal: CurrencyInput;
   readonly notes: Scalars["String"];
-  readonly referenceTicketId: Scalars["String"];
   readonly shouldCascadeFunds: Scalars["Boolean"];
 };
 
@@ -4853,6 +4870,7 @@ export type InjunctionMerchantFreezeMutations = {
   readonly bulkReverseFreezes?: Maybe<InjunctionMerchantFreezeBulkReverseFreezes>;
   readonly createFreeze?: Maybe<InjunctionMerchantFreezeCreateFreeze>;
   readonly reverseFreeze?: Maybe<InjunctionMerchantFreezeReverseFreeze>;
+  readonly exportCsv?: Maybe<InjunctionMerchantFreezeExportCsv>;
 };
 
 export type InjunctionMerchantFreezeMutationsResolveFreezeArgs = {
@@ -4872,11 +4890,15 @@ export type InjunctionMerchantFreezeMutationsBulkReverseFreezesArgs = {
 };
 
 export type InjunctionMerchantFreezeMutationsCreateFreezeArgs = {
-  input: InjunctionMerchantFreezeCreateFreezeInput;
+  input: ReadonlyArray<InjunctionMerchantFreezeCreateFreezeInput>;
 };
 
 export type InjunctionMerchantFreezeMutationsReverseFreezeArgs = {
   input: InjunctionMerchantFreezeReverseFreezeInput;
+};
+
+export type InjunctionMerchantFreezeMutationsExportCsvArgs = {
+  input: InjunctionMerchantFreezeFilterInput;
 };
 
 export type InjunctionMerchantFreezeResolveFreeze = {
@@ -4889,6 +4911,12 @@ export type InjunctionMerchantFreezeResolveFreezeInput = {
   readonly freezeId: Scalars["ObjectIdType"];
 };
 
+export type InjunctionMerchantFreezeReversalRequestInput = {
+  readonly reversalType: FreezeReversalType;
+  readonly reversalInput?: Maybe<InjunctionMerchantFreezeFineReversalInput>;
+  readonly paymentInput?: Maybe<InjunctionMerchantFreezeFinePaymentInput>;
+};
+
 export type InjunctionMerchantFreezeReverseFreeze = {
   readonly __typename?: "InjunctionMerchantFreezeReverseFreeze";
   readonly ok: Scalars["Boolean"];
@@ -4896,9 +4924,8 @@ export type InjunctionMerchantFreezeReverseFreeze = {
 };
 
 export type InjunctionMerchantFreezeReverseFreezeInput = {
-  readonly reversalType: FreezeReversalType;
-  readonly reversalInput?: Maybe<InjunctionMerchantFreezeFineReversalInput>;
-  readonly paymentInput?: Maybe<InjunctionMerchantFreezeFinePaymentInput>;
+  readonly requests: ReadonlyArray<InjunctionMerchantFreezeReversalRequestInput>;
+  readonly useBackend?: Maybe<Scalars["Boolean"]>;
 };
 
 export type InjunctionMerchantFreezeSchema = {
@@ -5899,6 +5926,7 @@ export type MarkProductTaxonomyCategoryDisputeUpdatedInput = {
   readonly categoryTreeVersion: Scalars["String"];
   readonly categoryTreeId: Scalars["Int"];
   readonly categoryPath: Scalars["String"];
+  readonly l1CategoryIdApproved: Scalars["Int"];
 };
 
 export type MerchantAnnouncementCategory =
@@ -7679,6 +7707,7 @@ export type MerchantWarningReplySchema = {
   readonly translatedMessage?: Maybe<Scalars["String"]>;
   readonly type?: Maybe<MerchantWarningReplyType>;
   readonly files?: Maybe<ReadonlyArray<MerchantFileSchema>>;
+  readonly idFiles?: Maybe<ReadonlyArray<MerchantFileSchema>>;
   readonly images?: Maybe<ReadonlyArray<Scalars["String"]>>;
 };
 
@@ -7741,7 +7770,7 @@ export type MerchantWarningSchema = {
   readonly productTrueTagInfo?: Maybe<ProductTrueTagInfoSchema>;
   readonly takedownRequest?: Maybe<TakedownRequestSchema>;
   readonly replies?: Maybe<ReadonlyArray<MerchantWarningReplySchema>>;
-  readonly resolved?: Maybe<Scalars["Boolean"]>;
+  readonly resolved: Scalars["Boolean"];
 };
 
 export type MerchantWarningSchemaFineAmountArgs = {
@@ -7805,6 +7834,7 @@ export type MerchantWishSellerStandardDetails = {
   readonly fulfillmentInfractionWindowEndDate?: Maybe<Datetime>;
   readonly deepDive?: Maybe<WssPerformanceDeepDiveHub>;
   readonly recentStats?: Maybe<ReadonlyArray<WishSellerStandardStats>>;
+  readonly isInactiveToBan?: Maybe<Scalars["Boolean"]>;
 };
 
 export type MerchantWishSellerStandardDetailsRecentStatsArgs = {
@@ -11279,6 +11309,8 @@ export type ProductVideoContentReviewTraits = {
   readonly hasMale?: Maybe<Scalars["Boolean"]>;
   readonly hasFemale?: Maybe<Scalars["Boolean"]>;
   readonly hasMinor?: Maybe<Scalars["Boolean"]>;
+  readonly hasSexualWellness?: Maybe<Scalars["Boolean"]>;
+  readonly hasWeapon?: Maybe<Scalars["Boolean"]>;
   readonly refersConsumerOffPlatform?: Maybe<Scalars["Boolean"]>;
   readonly containsMoreThanOneProduct?: Maybe<Scalars["Boolean"]>;
   readonly isFactoryVideo?: Maybe<Scalars["Boolean"]>;
@@ -13568,6 +13600,7 @@ export type SubmitCategoryManualOverrideInput = {
   readonly categoryTreeVersion: Scalars["String"];
   readonly categoryId: Scalars["Int"];
   readonly categoryPath: Scalars["String"];
+  readonly l1CategoryId: Scalars["Int"];
 };
 
 export type SubmitProductVideoContentManualReview = {
@@ -13800,6 +13833,7 @@ export type TaggingViolationSubReasonCode =
   | "RACIAL_CLEANSING"
   | "HIDDEN_SEX_TOYS"
   | "PLANTS"
+  | "CLAIM_FREE_PRODUCT_OFFERS"
   | "VITAMINS_AND_SUPPLEMENTS"
   | "FOOD"
   | "NON_CLINICAL_CONTENT"
@@ -13817,6 +13851,7 @@ export type TaggingViolationSubReasonCode =
   | "HUMAN_BY_PRODUCTS"
   | "COUNTERFEIT_CURRENCY"
   | "VIRTUAL_MONEY"
+  | "CATHETERS"
   | "MARIJUANA"
   | "TIRE_SPIKES"
   | "BLUE_RAY"
@@ -13879,6 +13914,7 @@ export type TaggingViolationSubReasonCode =
   | "PLANT_SEED_WITH_IMPOSSIBLE_CLAIM_V2"
   | "MISLEADING_WIG"
   | "IMAGE_NOT_PRODUCT"
+  | "OXIMETERS"
   | "EYELASH_GROWTH_SERUM"
   | "FEEDBACK_ABOUT_NO_PRODUCT"
   | "CIGARETTE"
@@ -14511,7 +14547,7 @@ export type TrackingDisputeSchema = {
   readonly warningId?: Maybe<Scalars["ObjectIdType"]>;
 };
 
-export type TrackingDisputeSearchType = "ORDER_ID";
+export type TrackingDisputeSearchType = "ORDER_ID" | "INFRACTION_ID";
 
 export type TrackingDisputeState =
   | "AWAITING_ADMIN"
