@@ -9,7 +9,7 @@ module.exports = (phase, { defaultConfig }) => {
   /** @type {import('next').NextConfig} */
   const nextConfig = {
     reactStrictMode: true,
-    basePath: "/internal-admin",
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH,
     transpilePackages: ["@ContextLogic/lego", "recharts"],
     compiler: {
       emotion: true,
@@ -41,8 +41,8 @@ module.exports = (phase, { defaultConfig }) => {
             },
             {
               // used for xsrf check
-              source: "/",
-              destination: `${MD_URL}/`,
+              source: "/md/login",
+              destination: `${MD_URL}/md/login`,
               basePath: false,
             },
           ]

@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { cacheExchange, createClient, fetchExchange, Provider } from "urql";
 import { NavigationBar } from "@app/navigation/NavigationBar";
 import { Container } from "@mui/material";
+import AuthProvider from "@app/core/auth/AuthProvider";
 
 const client = createClient({
   url: `/api/graphql`,
@@ -18,13 +19,25 @@ const client = createClient({
   },
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+const independentSubpaths = ["/dev-login", "/go", "/login"];
+
+export default function App({ Component, pageProps, router }: AppProps) {
+  if (independentSubpaths.some((path) => router.pathname.includes(path))) {
+    return (
+      <Provider value={client}>
+        <Component {...pageProps} />
+      </Provider>
+    );
+  }
+
   return (
     <Provider value={client}>
-      <NavigationBar />
-      <Container maxWidth={false} sx={{ mt: 2 }}>
-        <Component {...pageProps} />
-      </Container>
+      <AuthProvider>
+        <NavigationBar />
+        <Container maxWidth={false} sx={{ mt: 2 }}>
+          <Component {...pageProps} />
+        </Container>
+      </AuthProvider>
     </Provider>
   );
 }

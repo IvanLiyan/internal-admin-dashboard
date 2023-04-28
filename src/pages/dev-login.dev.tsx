@@ -1,134 +1,101 @@
-import { NextPage } from "next";
-import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import {
-  CssBaseline,
-  Box,
-  Paper,
-  Typography,
-  Divider,
-  Snackbar,
+  AuthenticationMutationsLoginArgs,
+  LoginMutation,
+  UserSchema,
+} from "@app/schema";
+import {
   Alert,
+  Box,
   Button,
+  Divider,
+  Paper,
+  Snackbar,
+  Typography,
 } from "@mui/material";
+import Cookies from "js-cookie";
+import { NextPage } from "next";
+import { useEffect, useState } from "react";
+import { gql, useMutation, useQuery } from "urql";
 
-const useError = (
-  initialState: string | null
-): [
-  errorBody: string | null,
-  errorOpen: boolean,
-  setError: (error: string, ...rest: unknown[]) => void,
-  closeError: () => void
-] => {
-  const [errorBody, setErrorBody] = useState<string | null>(initialState);
-  const [errorOpen, setErrorOpen] = useState(false);
+const LoginMutation = gql<LoginResponseType, AuthenticationMutationsLoginArgs>`
+  mutation Authentication_LoginMutation($input: LoginMutationInput!) {
+    authentication {
+      login(input: $input) {
+        loginOk
+        error
+        errorState
+      }
+    }
+  }
+`;
 
-  const onError = (errorProp: string, ...rest: unknown[]) => {
-    setErrorBody(errorProp);
-    setErrorOpen(true);
-    console.log(errorProp, ...rest);
+type LoginResponseType = {
+  readonly authentication: {
+    readonly login?: Pick<LoginMutation, "loginOk" | "error" | "errorState">;
   };
-
-  const onClose = () => {
-    setErrorOpen(false);
-  };
-
-  return [errorBody, errorOpen, onError, onClose];
 };
 
+type GetUserResponse = {
+  readonly currentUser?: Pick<UserSchema, "id">;
+};
+
+const GetUserQuery = gql<GetUserResponse, void>`
+  query AuthQuery {
+    currentUser {
+      id
+    }
+  }
+`;
+
 const DevLoginPage: NextPage<Record<string, never>> = () => {
-  // use numbers to emulate a stack of requests that need to complete before
-  // loading is finished
-  const [loading_, setLoading] = useState(0);
-  const loading = Boolean(loading_);
-  const [errorBody, errorOpen, setError, closeError] = useError(null);
-  const [currentUser, setCurrentUser] = useState("none");
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
 
-  const loginAsAdmin = async () => {
-    setLoading((cur) => cur + 1);
-    try {
-      const resp = await fetch("/internal-admin/api/dev-login");
-      if (!resp.ok) {
-        setError(
-          "An error occurred while logging you in. Please see the console for more details.",
-          resp
-        );
-        return;
-      }
-      void fetchCurrentUser();
-    } finally {
-      setLoading((cur) => cur - 1);
-    }
-  };
-
-  const logout = async () => {
-    setLoading((cur) => cur + 1);
-    try {
-      const resp = await fetch("/logout");
-      if (!resp.ok && !resp.redirected) {
-        setError(
-          "An error occurred while logging you in. Please see the console for more details.",
-          resp
-        );
-        return;
-      }
-      void fetchCurrentUser();
-    } finally {
-      setLoading((cur) => cur - 1);
-    }
-  };
-
-  const fetchCurrentUser = async () => {
-    setLoading((cur) => cur + 1);
-    try {
-      const xsrf = Cookies.get("_xsrf");
-
-      if (xsrf === undefined) {
-        setError(
-          "XSRF cookie is missing, aborting /api/graphql fetch. Have you logged into the dashboard via dev-login yet? If not, try that."
-        );
-        return;
-      }
-
-      const resp = await fetch("/api/graphql", {
-        body: '{"operationName":null,"variables":{},"query":"{\\n  currentMerchant {\\n    id\\n  }\\n  currentUser {\\n    id\\n  }\\n}\\n"}',
-        method: "POST",
-        headers: {
-          "cache-control": "no-cache",
-          "content-type": "application/json",
-          accept: "application/json",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-origin",
-          "x-xsrftoken": xsrf,
-        },
-        mode: "cors",
-        credentials: "include",
-      });
-      const jsonResponse = await resp.json();
-      setCurrentUser(
-        jsonResponse.data.currentUser
-          ? String(jsonResponse.data.currentUser.id)
-          : "none"
-      );
-    } catch (e) {
-      setError(
-        "An error occurred while fetching api/graphql. Have you logged into the dashboard via dev-login yet? If not, try that. (You can view the full error in the console.)",
-        e
-      );
-    } finally {
-      setLoading((cur) => cur - 1);
-    }
-  };
+  const [loginResult, login] = useMutation(LoginMutation);
+  const [userResult, getUser] = useQuery({
+    query: GetUserQuery,
+    pause: true,
+    requestPolicy: "network-only",
+  });
 
   useEffect(() => {
-    void fetchCurrentUser();
-    // only want to run on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const xsrf = Cookies.get("_xsrf");
+    if (xsrf == undefined) {
+      fetch(`/md/login`)
+        .then(() => {
+          getUser();
+        })
+        .catch((e) => {
+          setToastOpen(true);
+          setToastMsg(e);
+        });
+    } else {
+      getUser();
+    }
+  }, [getUser]);
+
+  useEffect(() => {
+    if (!loginResult.data?.authentication.login?.loginOk) {
+      return;
+    }
+    getUser();
+  }, [getUser, loginResult]);
+
+  useEffect(() => {
+    if (loginResult.error?.message != null) {
+      setToastOpen(true);
+      setToastMsg(loginResult.error.message);
+    }
+  }, [loginResult?.error?.message]);
+
+  const logout = () => {
+    fetch("/logout", { redirect: "manual" }).then(() => {
+      getUser();
+    });
+  };
 
   return (
     <>
-      <CssBaseline />
       <Box
         sx={{
           height: "100vh",
@@ -138,24 +105,31 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
       >
         <Paper variant="outlined" sx={{ padding: 4, margin: "auto" }}>
           <Typography variant="h4" component="h1">
-            Developer Login
+            Admin Login
           </Typography>
 
           <Divider sx={{ marginTop: 1, marginBottom: 1 }} />
 
           <Button
             variant="contained"
-            onClick={loginAsAdmin}
+            onClick={() =>
+              login({
+                input: {
+                  username: process.env.NEXT_PUBLIC_USERNAME || "",
+                  password: process.env.NEXT_PUBLIC_PASSWORD || "",
+                },
+              })
+            }
             style={{ display: "block", width: "100%", margin: "10px 0px" }}
-            disabled={loading}
+            disabled={loginResult.fetching || userResult.fetching}
           >
-            Login as Admin
+            Login
           </Button>
           <Button
             variant="contained"
             onClick={logout}
             style={{ display: "block", width: "100%", margin: "10px 0px" }}
-            disabled={loading}
+            disabled={loginResult.fetching || userResult.fetching}
           >
             Logout
           </Button>
@@ -166,7 +140,7 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
             <Typography component={"div"}>
               Current User ID:{" "}
               <Typography fontFamily="monospace" component="span">
-                {currentUser}
+                {userResult.data?.currentUser?.id || "None"}
               </Typography>
             </Typography>
 
@@ -181,12 +155,11 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
       </Box>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={errorOpen}
-        onClose={closeError}
-        message={errorBody}
+        open={toastOpen}
+        autoHideDuration={6000}
       >
         <Alert variant="filled" severity="error">
-          {errorBody}
+          {toastMsg}
         </Alert>
       </Snackbar>
     </>
