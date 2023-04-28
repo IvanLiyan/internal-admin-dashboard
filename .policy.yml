@@ -1,6 +1,6 @@
 policy:
   approval:
-    - and
+    - or:
       - peer_review
 
 approval_rules:
