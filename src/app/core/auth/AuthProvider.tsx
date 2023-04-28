@@ -28,7 +28,7 @@ export const useAuth = () => useContext(AuthContext);
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [{ data, fetching }] = useQuery({ query: AuthQuery });
-  const path = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
   if (fetching) {
     return (
@@ -40,7 +40,7 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   if (data?.currentUser?.roles == null) {
     if (
       typeof window !== undefined &&
-      window.location.pathname.includes(path)
+      window.location.pathname.includes(basePath)
     ) {
       window.location.assign("/login");
     }
@@ -59,7 +59,7 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   ) {
     if (
       typeof window !== undefined &&
-      window.location.pathname.includes(path)
+      window.location.pathname.includes(basePath)
     ) {
       window.location.assign("/login");
     }
