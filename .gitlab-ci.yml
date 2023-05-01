@@ -60,7 +60,7 @@ build prod:
 
 deploy staging:
   stage: deploy
-  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  image: registry-gitlab.i.wish.com/contextlogic/internal-admin-dashboard/aws-base-with-brotli:latest
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-staging
   environment:
@@ -74,7 +74,7 @@ deploy staging:
 
 deploy production:
   stage: deploy
-  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  image: registry-gitlab.i.wish.com/contextlogic/internal-admin-dashboard/aws-base-with-brotli:latest
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-production
   environment:
