@@ -60,7 +60,7 @@ build prod:
 
 deploy staging:
   stage: deploy
-  image: amazon/aws-cli
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-staging
   environment:
@@ -74,7 +74,7 @@ deploy staging:
 
 deploy production:
   stage: deploy
-  image: amazon/aws-cli
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-production
   environment:
