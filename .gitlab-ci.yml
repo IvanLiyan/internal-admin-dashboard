@@ -68,7 +68,7 @@ deploy staging:
   when: manual
   # rules:
   #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  tags: [leopard-staging]
+  tags: ["internal-admin-dashboard-staging"]
   dependencies:
     - build staging
 
@@ -82,7 +82,7 @@ deploy production:
   when: manual
   # rules:
   #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  tags: [leopard]
+  tags: ["internal-admin-dashboard"]
   dependencies:
     - build prod
 
