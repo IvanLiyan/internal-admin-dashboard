@@ -60,7 +60,7 @@ build prod:
 
 deploy staging:
   stage: deploy
-  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  image: amazon/aws-cli
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-staging
   environment:
@@ -74,7 +74,7 @@ deploy staging:
 
 deploy production:
   stage: deploy
-  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  image: amazon/aws-cli
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-production
   environment:
