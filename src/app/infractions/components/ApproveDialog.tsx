@@ -6,6 +6,7 @@ import {
   DialogContentText,
   DialogProps,
   DialogTitle,
+  Typography,
 } from "@mui/material";
 
 type Props = Pick<DialogProps, "open"> & {
@@ -25,7 +26,16 @@ const ApproveDialog: React.FC<Props> = ({
       <DialogTitle>Approve Disputes</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to <strong>approve {infractionsCount}</strong>{" "}
+          Are you sure you want to{" "}
+          <Typography
+            sx={{
+              fontWeight: "bold",
+              display: "inline",
+              color: (theme) => theme.palette.success.main,
+            }}
+          >
+            approve {infractionsCount}
+          </Typography>{" "}
           infraction disputes?
         </DialogContentText>
       </DialogContent>
