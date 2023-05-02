@@ -6,6 +6,7 @@ import {
   DialogContentText,
   DialogProps,
   DialogTitle,
+  Typography,
 } from "@mui/material";
 
 type Props = Pick<DialogProps, "open"> & {
@@ -25,7 +26,16 @@ const DeclineDialog: React.FC<Props> = ({
       <DialogTitle>Decline Disputes</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to <strong>decline {infractionsCount}</strong>{" "}
+          Are you sure you want to{" "}
+          <Typography
+            sx={{
+              fontWeight: "bold",
+              display: "inline",
+              color: (theme) => theme.palette.error.main,
+            }}
+          >
+            decline {infractionsCount}
+          </Typography>{" "}
           infraction disputes?
         </DialogContentText>
       </DialogContent>

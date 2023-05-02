@@ -1,5 +1,6 @@
 import ApproveDialog from "@app/infractions/components/ApproveDialog";
 import DeclineDialog from "@app/infractions/components/DeclineDialog";
+import MessagePreviewDialog from "@app/infractions/components/MessagePreviewDialog";
 import ReverseDialog from "@app/infractions/components/ReverseDialog";
 import { Data } from "@app/infractions/toolkit/mocks";
 import { BulkActionModalSchema } from "@app/infractions/toolkit/validation";
@@ -45,6 +46,11 @@ const BulkActionDialog: React.FC<Props> = ({
   const [approveOpen, setApproveOpen] = useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
   const [reverseOpen, setReverseOpen] = useState(false);
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [previewInfractionId, setPreviewInfractionId] = useState<string | null>(
+    null
+  );
+
   const [rows, setRows] = useState<ReadonlyArray<Data>>([]);
 
   const {
@@ -108,6 +114,14 @@ const BulkActionDialog: React.FC<Props> = ({
         handleClose={() => setReverseOpen(false)}
         handleConfirm={handleReverse}
       />
+      <MessagePreviewDialog
+        infractionId={previewInfractionId}
+        open={messageOpen}
+        handleClose={() => {
+          setMessageOpen(false);
+          setPreviewInfractionId(null);
+        }}
+      />
       <form>
         <DialogTitle>Bulk Action</DialogTitle>
         <DialogContent>
@@ -168,7 +182,12 @@ const BulkActionDialog: React.FC<Props> = ({
                         )}
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton>
+                        <IconButton
+                          onClick={() => {
+                            setPreviewInfractionId(row.infractionID);
+                            setMessageOpen(true);
+                          }}
+                        >
                           <Visibility />
                         </IconButton>
                         <IconButton
@@ -194,6 +213,7 @@ const BulkActionDialog: React.FC<Props> = ({
           <Button onClick={onClose}>Cancel</Button>
           {!!declineAction && (
             <Button
+              color="error"
               disabled={!rows.length || !isValid}
               onClick={() => setDeclineOpen(true)}
             >
@@ -202,6 +222,7 @@ const BulkActionDialog: React.FC<Props> = ({
           )}
           {!!approveAction && (
             <Button
+              color="success"
               disabled={!rows.length || !isValid}
               onClick={() => setApproveOpen(true)}
             >
@@ -210,6 +231,7 @@ const BulkActionDialog: React.FC<Props> = ({
           )}
           {!!reverseAction && (
             <Button
+              color="warning"
               disabled={!rows.length || !isValid}
               onClick={() => setReverseOpen(true)}
             >
