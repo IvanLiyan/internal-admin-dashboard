@@ -3,7 +3,6 @@ import Searchbox from "@app/core/components/Searchbox";
 import BulkActionDialog from "@app/infractions/components/BulkActionDialog";
 import ClaimFilter from "@app/infractions/components/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
-import CounterfeitSubreasonFilter from "@app/infractions/components/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/DateFilter";
 import ReasonFilter from "@app/infractions/components/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
@@ -34,7 +33,7 @@ const DEFAULT_ROWS_PER_PAGE = 25;
 /**
  * Scaffolding for Awaiting Admin page
  */
-const ActionRequiredPage: NextPage<Record<string, never>> = () => {
+const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
@@ -79,7 +78,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return (
-    <PageRoot title="Infractions Action Required">
+    <PageRoot title="Infractions Require Admin Approval">
       <Paper>
         <Stack>
           <Stack
@@ -92,7 +91,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
                 console.log(token);
               }}
               size="small"
-              placeholder="Infraction ID, merchant ID, Product ID, Order ID, Display name"
+              placeholder="Infraction ID, Product ID, Order ID"
               sx={{ minWidth: 400, mx: 1 }}
             />
             <TablePagination
@@ -137,11 +136,6 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
               }}
             />
             <CounterfeitReasonFilter
-              onConfirm={() => {
-                return;
-              }}
-            />
-            <CounterfeitSubreasonFilter
               onConfirm={() => {
                 return;
               }}
@@ -215,4 +209,4 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   );
 };
 
-export default ActionRequiredPage;
+export default RequiresReviewPage;
