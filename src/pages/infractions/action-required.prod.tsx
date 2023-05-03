@@ -1,11 +1,10 @@
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
-import BulkActionDialog from "@app/infractions/components/BulkActionDialog";
-import ClaimFilter from "@app/infractions/components/ClaimFilter";
-import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
-import CounterfeitSubreasonFilter from "@app/infractions/components/CounterfeitSubreasonFilter";
-import DateFilter from "@app/infractions/components/DateFilter";
-import ReasonFilter from "@app/infractions/components/ReasonFilter";
+import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
+import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
+import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
+import DateFilter from "@app/infractions/components/filters/DateFilter";
+import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
 import {
   Data,
@@ -24,8 +23,10 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
+import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
 
 const DEFAULT_ORDER = "asc";
 const DEFAULT_ORDER_BY: keyof Data = "created";
@@ -176,16 +177,10 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
                       />
                     </TableCell>
                     <TableCell align="right">
-                      {new Intl.DateTimeFormat("en-us", {
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                      }).format(new Date(row.created / 1000))}
+                      {dayjs.unix(row.created).format("lll")}
                     </TableCell>
                     <TableCell align="right">
-                      {new Intl.DateTimeFormat("en-us", {
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                      }).format(new Date(row.lastUpdate / 1000))}
+                      {dayjs.unix(row.lastUpdate).format("lll")}
                     </TableCell>
                     <TableCell align="right">{row.mid}</TableCell>
                     <TableCell align="right">{row.infractionID}</TableCell>
@@ -195,6 +190,10 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
                     <TableCell align="right">{row.bdReps}</TableCell>
                     <TableCell align="right">{row.geo}</TableCell>
                     <TableCell align="right">{row.wssTier}</TableCell>
+                    <TableCell align="center">
+                      <Button size="small">View</Button>
+                      <Button size="small">Claim</Button>
+                    </TableCell>
                   </TableRow>
                 );
               })}

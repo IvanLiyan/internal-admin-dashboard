@@ -1,10 +1,9 @@
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
-import BulkActionDialog from "@app/infractions/components/BulkActionDialog";
-import ClaimFilter from "@app/infractions/components/ClaimFilter";
-import CounterfeitReasonFilter from "@app/infractions/components/CounterfeitReasonFilter";
-import DateFilter from "@app/infractions/components/DateFilter";
-import ReasonFilter from "@app/infractions/components/ReasonFilter";
+import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
+import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
+import DateFilter from "@app/infractions/components/filters/DateFilter";
+import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
 import {
   Data,
@@ -23,6 +22,7 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 
@@ -31,10 +31,9 @@ const DEFAULT_ORDER_BY: keyof Data = "created";
 const DEFAULT_ROWS_PER_PAGE = 25;
 
 /**
- * Scaffolding for Awaiting Admin page
+ * Scaffolding for Requires Review page
  */
 const RequiresReviewPage: NextPage<Record<string, never>> = () => {
-  const [bulkActionOpen, setBulkActionOpen] = useState(false);
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -111,9 +110,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
             <Button variant="text">Dump selected claim</Button>
             <Button variant="text">Claim selected</Button>
-            <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
-              Take further action
-            </Button>
+            <Button variant="text">Confirm</Button>
+            <Button variant="text">Delete</Button>
           </Stack>
           <Stack direction={"row"} spacing={1} m={1}>
             {/* Place filters here */}
@@ -170,16 +168,10 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                       />
                     </TableCell>
                     <TableCell align="right">
-                      {new Intl.DateTimeFormat("en-us", {
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                      }).format(new Date(row.created / 1000))}
+                      {dayjs.unix(row.created).format("lll")}
                     </TableCell>
                     <TableCell align="right">
-                      {new Intl.DateTimeFormat("en-us", {
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                      }).format(new Date(row.lastUpdate / 1000))}
+                      {dayjs.unix(row.lastUpdate).format("lll")}
                     </TableCell>
                     <TableCell align="right">{row.mid}</TableCell>
                     <TableCell align="right">{row.infractionID}</TableCell>
@@ -189,21 +181,18 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                     <TableCell align="right">{row.bdReps}</TableCell>
                     <TableCell align="right">{row.geo}</TableCell>
                     <TableCell align="right">{row.wssTier}</TableCell>
+                    <TableCell align="center">
+                      <Button size="small">Edit</Button>
+                      <Button size="small">Delete</Button>
+                      <Button size="small">Confirm</Button>
+                      <Button size="small">Claim</Button>
+                    </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
         </TableContainer>
-        <BulkActionDialog
-          approveAction
-          declineAction
-          open={bulkActionOpen}
-          handleClose={() => setBulkActionOpen(false)}
-          infractions={
-            visibleRows?.filter((r) => selected.includes(r.infractionID)) || []
-          }
-        />
       </Paper>
     </PageRoot>
   );

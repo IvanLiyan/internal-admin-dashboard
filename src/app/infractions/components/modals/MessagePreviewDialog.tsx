@@ -14,7 +14,7 @@ type Props = Pick<DialogProps, "open"> & {
   readonly handleClose: () => void;
 };
 
-const MOCK_DATE = 1683052681000;
+const MOCK_DATE = 1683052681;
 const MOCK_SENDER_NAME = "Wish Merchant Service";
 const MOCK_MSG_CONTENT =
   "temp copy explaining infractions temp copy explaining infractions temp copy explaining infractions";

@@ -1,4 +1,5 @@
 import { Box, BoxProps, Typography } from "@mui/material";
+import dayjs from "dayjs";
 
 type Props = BoxProps & {
   readonly content: string;
@@ -23,10 +24,7 @@ const MessageBubble: React.FC<Props> = ({
         From {senderName}
       </Typography>
       <Typography color={"gray"} variant="caption" display={"block"}>
-        {new Intl.DateTimeFormat(undefined, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(new Date(unix))}
+        {dayjs.unix(unix).format('lll')}
       </Typography>
     </Box>
   );
