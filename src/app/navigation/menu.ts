@@ -32,6 +32,10 @@ export const MenuData: MenuItemProps[] = [
         text: "Closed",
         href: "/infractions/closed",
       },
+      {
+        text: "All",
+        href: "/infractions/all",
+      },
     ],
   },
 ];
