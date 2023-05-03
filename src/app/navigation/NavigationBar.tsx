@@ -1,9 +1,10 @@
 import { MenuData } from "@app/navigation/menu";
 import { AppBar, Menu, MenuItem, Toolbar } from "@mui/material";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 export const NavigationBar: React.FC = () => {
+  const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
@@ -47,9 +48,12 @@ export const NavigationBar: React.FC = () => {
               {item.subMenuItems.map((subItem, subIndex) => (
                 <MenuItem
                   key={`submenu-item-${subIndex}`}
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    router.push(subItem.href);
+                  }}
                 >
-                  <Link href={subItem.href}>{subItem.text}</Link>
+                  {subItem.text}
                 </MenuItem>
               ))}
             </Menu>
