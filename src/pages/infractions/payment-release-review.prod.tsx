@@ -109,8 +109,12 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button variant="text">Dump selected claim</Button>
-            <Button variant="text">Claim selected</Button>
+            <Button size="small" variant="text">
+              Dump selected claim
+            </Button>
+            <Button size="small" variant="text">
+              Claim selected
+            </Button>
           </Stack>
           <Stack direction={"row"} spacing={1} m={1}>
             {/* Place filters here */}

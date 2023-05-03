@@ -28,6 +28,10 @@ export const MenuData: MenuItemProps[] = [
         text: "Awaiting Merchant",
         href: "/infractions/awaiting-merchant",
       },
+      {
+        text: "Closed",
+        href: "/infractions/closed",
+      },
     ],
   },
 ];

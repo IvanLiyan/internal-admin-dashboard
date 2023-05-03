@@ -32,8 +32,9 @@ function createData(): Data {
   };
 }
 
-export const MockActionRequiredData = Array.from({ length: 100 }, () =>
-  createData()
+export const MockActionRequiredData: ReadonlyArray<Data> = Array.from(
+  { length: 100 },
+  () => createData()
 );
 
 export const MockActionRequiredDataColumn: readonly HeadCell[] = [

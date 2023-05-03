@@ -111,9 +111,17 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button variant="text">Dump selected claim</Button>
-            <Button variant="text">Claim selected</Button>
-            <Button variant="contained" onClick={() => setBulkActionOpen(true)}>
+            <Button size="small" variant="text">
+              Dump selected claim
+            </Button>
+            <Button size="small" variant="text">
+              Claim selected
+            </Button>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => setBulkActionOpen(true)}
+            >
               Take further action
             </Button>
           </Stack>

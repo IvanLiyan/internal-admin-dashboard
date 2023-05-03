@@ -108,10 +108,18 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button variant="text">Dump selected claim</Button>
-            <Button variant="text">Claim selected</Button>
-            <Button variant="text">Confirm</Button>
-            <Button variant="text">Delete</Button>
+            <Button size="small" variant="text">
+              Dump selected claim
+            </Button>
+            <Button size="small" variant="text">
+              Claim selected
+            </Button>
+            <Button size="small" variant="text">
+              Confirm
+            </Button>
+            <Button size="small" variant="text">
+              Delete
+            </Button>
           </Stack>
           <Stack direction={"row"} spacing={1} m={1}>
             {/* Place filters here */}

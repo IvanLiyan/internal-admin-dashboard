@@ -26,17 +26,15 @@ import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
-import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
 
 const DEFAULT_ORDER = "asc";
 const DEFAULT_ORDER_BY: keyof Data = "created";
 const DEFAULT_ROWS_PER_PAGE = 25;
 
 /**
- * Scaffolding for Awaiting Merchant page
+ * Scaffolding for Closed page
  */
-const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
-  const [bulkActionOpen, setBulkActionOpen] = useState(false);
+const ClosedPage: NextPage<Record<string, never>> = () => {
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -80,7 +78,7 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return (
-    <PageRoot title="Infractions Awaiting Merchant Response">
+    <PageRoot title="Closed Merchant Infractions">
       <Paper>
         <Stack>
           <Stack
@@ -111,19 +109,9 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button size="small" variant="text">
-              Dump selected claim
-            </Button>
-            <Button size="small" variant="text">
-              Claim selected
-            </Button>
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => setBulkActionOpen(true)}
-            >
-              Take further action
-            </Button>
+            <Button size="small" variant="text">Dump selected claim</Button>
+            <Button size="small" variant="text">Claim selected</Button>
+            <Button size="small" variant="contained">Export CSV</Button>
           </Stack>
           <Stack direction={"row"} spacing={1} m={1}>
             {/* Place filters here */}
@@ -208,17 +196,9 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <BulkActionDialog
-          reverseAction
-          open={bulkActionOpen}
-          handleClose={() => setBulkActionOpen(false)}
-          infractions={
-            visibleRows?.filter((r) => selected.includes(r.infractionID)) || []
-          }
-        />
       </Paper>
     </PageRoot>
   );
 };
 
-export default AwaitingMerchantPage;
+export default ClosedPage;
