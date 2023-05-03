@@ -2,7 +2,6 @@ import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
 import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
-import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
@@ -26,6 +25,7 @@ import {
 import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
+import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
 
 const DEFAULT_ORDER = "asc";
@@ -33,9 +33,9 @@ const DEFAULT_ORDER_BY: keyof Data = "created";
 const DEFAULT_ROWS_PER_PAGE = 25;
 
 /**
- * Scaffolding for Awaiting Admin page
+ * Scaffolding for Awaiting Merchant page
  */
-const ActionRequiredPage: NextPage<Record<string, never>> = () => {
+const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
@@ -80,7 +80,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return (
-    <PageRoot title="Infractions Action Required">
+    <PageRoot title="Infractions Awaiting Merchant Response">
       <Paper>
         <Stack>
           <Stack
@@ -93,7 +93,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
                 console.log(token);
               }}
               size="small"
-              placeholder="Infraction ID, merchant ID, Product ID, Order ID, Display name"
+              placeholder="Infraction ID, Product ID, Order ID"
               sx={{ minWidth: 400, mx: 1 }}
             />
             <TablePagination
@@ -209,8 +209,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
           </Table>
         </TableContainer>
         <BulkActionDialog
-          approveAction
-          declineAction
+          reverseAction
           open={bulkActionOpen}
           handleClose={() => setBulkActionOpen(false)}
           infractions={
@@ -222,4 +221,4 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   );
 };
 
-export default ActionRequiredPage;
+export default AwaitingMerchantPage;

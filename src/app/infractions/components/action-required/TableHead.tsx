@@ -51,6 +51,7 @@ const ActionRequiredTableHead: React.FC<EnhancedTableProps> = ({
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell align="center">Actions</TableCell>
       </TableRow>
     </TableHead>
   );

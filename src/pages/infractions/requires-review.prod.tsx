@@ -2,7 +2,6 @@ import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
 import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
-import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
@@ -26,17 +25,15 @@ import {
 import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
-import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
 
 const DEFAULT_ORDER = "asc";
 const DEFAULT_ORDER_BY: keyof Data = "created";
 const DEFAULT_ROWS_PER_PAGE = 25;
 
 /**
- * Scaffolding for Awaiting Admin page
+ * Scaffolding for Requires Review page
  */
-const ActionRequiredPage: NextPage<Record<string, never>> = () => {
-  const [bulkActionOpen, setBulkActionOpen] = useState(false);
+const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [order] = useState<Order>(DEFAULT_ORDER);
   const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -80,7 +77,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return (
-    <PageRoot title="Infractions Action Required">
+    <PageRoot title="Infractions Require Admin Approval">
       <Paper>
         <Stack>
           <Stack
@@ -93,7 +90,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
                 console.log(token);
               }}
               size="small"
-              placeholder="Infraction ID, merchant ID, Product ID, Order ID, Display name"
+              placeholder="Infraction ID, Product ID, Order ID"
               sx={{ minWidth: 400, mx: 1 }}
             />
             <TablePagination
@@ -117,12 +114,11 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
             <Button size="small" variant="text">
               Claim selected
             </Button>
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => setBulkActionOpen(true)}
-            >
-              Take further action
+            <Button size="small" variant="text">
+              Confirm
+            </Button>
+            <Button size="small" variant="text">
+              Delete
             </Button>
           </Stack>
           <Stack direction={"row"} spacing={1} m={1}>
@@ -146,11 +142,6 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
               }}
             />
             <CounterfeitReasonFilter
-              onConfirm={() => {
-                return;
-              }}
-            />
-            <CounterfeitSubreasonFilter
               onConfirm={() => {
                 return;
               }}
@@ -199,7 +190,9 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
                     <TableCell align="right">{row.geo}</TableCell>
                     <TableCell align="right">{row.wssTier}</TableCell>
                     <TableCell align="center">
-                      <Button size="small">View</Button>
+                      <Button size="small">Edit</Button>
+                      <Button size="small">Delete</Button>
+                      <Button size="small">Confirm</Button>
                       <Button size="small">Claim</Button>
                     </TableCell>
                   </TableRow>
@@ -208,18 +201,9 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <BulkActionDialog
-          approveAction
-          declineAction
-          open={bulkActionOpen}
-          handleClose={() => setBulkActionOpen(false)}
-          infractions={
-            visibleRows?.filter((r) => selected.includes(r.infractionID)) || []
-          }
-        />
       </Paper>
     </PageRoot>
   );
 };
 
-export default ActionRequiredPage;
+export default RequiresReviewPage;

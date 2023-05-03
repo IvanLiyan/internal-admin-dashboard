@@ -1,7 +1,7 @@
-import ApproveDialog from "@app/infractions/components/ApproveDialog";
-import DeclineDialog from "@app/infractions/components/DeclineDialog";
-import MessagePreviewDialog from "@app/infractions/components/MessagePreviewDialog";
-import ReverseDialog from "@app/infractions/components/ReverseDialog";
+import ApproveDialog from "@app/infractions/components/modals/ApproveDialog";
+import DeclineDialog from "@app/infractions/components/modals/DeclineDialog";
+import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
+import ReverseDialog from "@app/infractions/components/modals/ReverseDialog";
 import { Data } from "@app/infractions/toolkit/mocks";
 import { BulkActionModalSchema } from "@app/infractions/toolkit/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -24,6 +24,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -177,9 +178,7 @@ const BulkActionDialog: React.FC<Props> = ({
                       <TableCell align="left">{row.infractionID}</TableCell>
                       <TableCell align="left">{row.reasons}</TableCell>
                       <TableCell align="left">
-                        {new Intl.DateTimeFormat("en-us").format(
-                          new Date(row.lastUpdate / 1000)
-                        )}
+                        {dayjs(row.lastUpdate / 1000).format("lll")}
                       </TableCell>
                       <TableCell align="center">
                         <IconButton
