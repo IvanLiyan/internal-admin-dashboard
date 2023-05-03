@@ -20,6 +20,10 @@ export const MenuData: MenuItemProps[] = [
         text: "Requires Review",
         href: "/infractions/requires-review",
       },
+      {
+        text: "Payment Release Review",
+        href: "/infractions/paymenet-release-review",
+      },
     ],
   },
 ];
