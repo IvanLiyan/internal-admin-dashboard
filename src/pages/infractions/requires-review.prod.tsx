@@ -32,6 +32,7 @@ import {
   createTheme,
 } from "@mui/material";
 import {
+  MerchantWarningClaimStatus,
   MerchantWarningReason,
   MerchantWarningState,
   SortOrderType,
@@ -55,6 +56,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [reasons, setReasons] = useState<
     MerchantWarningReason[] | null | undefined
   >(null);
+  const [claimStatus, setClaimStatus] =
+    useState<MerchantWarningClaimStatus | null>(null);
 
   const offset = page * limit;
   const gqlOrderBy = OrderBy[orderBy];
@@ -77,6 +80,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
           : undefined,
       issueDateEnd: issueDateEnd != null ? { unix: issueDateEnd } : undefined,
       reasons,
+      claimStatus,
       ...searchVars,
     },
   });
@@ -175,8 +179,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
               }}
             />
             <ClaimFilter
-              onConfirm={() => {
-                return;
+              onConfirm={(status) => {
+                setClaimStatus(status);
               }}
             />
             <ReasonFilter

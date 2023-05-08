@@ -1,55 +1,36 @@
 import { Autocomplete, TextField } from "@mui/material";
+import { MerchantWarningClaimStatus } from "@schema";
 import { useState } from "react";
 
 interface ClaimFilterProps {
-  readonly onConfirm: (claim: OptionType) => void;
+  readonly onConfirm: (claim: MerchantWarningClaimStatus | null) => void;
 }
 
-type OptionType = {
-  id: number;
-  label: string;
+const Label: { [T in MerchantWarningClaimStatus]: string } = {
+  ALL: "All",
+  CLAIMED: "Claimed",
+  CLAIMED_BY_ME: "Claimed by Me",
+  NOT_CLAIMED: "Not Claimed",
 };
 
-const options: ReadonlyArray<OptionType> = [
-  {
-    id: 1,
-    label: "Claimed",
-  },
-  {
-    id: 2,
-    label: "Not Claimed",
-  },
-  {
-    id: 3,
-    label: "Claimed by Me",
-  },
-  {
-    id: 4,
-    label: "All",
-  },
-];
-
 const ClaimFilter: React.FC<ClaimFilterProps> = ({ onConfirm }) => {
-  const [selectedOptions, setSelectedOptions] = useState<OptionType | null>(
-    null
-  );
+  const [selectedOptions, setSelectedOptions] =
+    useState<MerchantWarningClaimStatus | null>(null);
 
   return (
     <Autocomplete
       size="small"
       fullWidth
-      options={options}
+      options={["ALL", "CLAIMED", "CLAIMED_BY_ME", "NOT_CLAIMED"] as const}
+      getOptionLabel={(option) => Label[option]}
       value={selectedOptions}
       onChange={(_, newValue) => {
         setSelectedOptions(newValue);
-        if (newValue != null) {
-          onConfirm(newValue);
-        }
+        onConfirm(newValue);
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Claim"} />
       )}
-      isOptionEqualToValue={(option, value) => option.id == value.id}
     />
   );
 };
