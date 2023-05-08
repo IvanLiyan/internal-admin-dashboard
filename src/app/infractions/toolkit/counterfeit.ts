@@ -1,4 +1,4 @@
-import { CounterfeitReason } from "@app/schema";
+import { CounterfeitReason } from "@schema";
 
 type MisleadingTaggingReasons = ExtractStrict<
   CounterfeitReason,

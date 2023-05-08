@@ -13,12 +13,12 @@ export const MenuData: MenuItemProps[] = [
     text: "Infractions",
     subMenuItems: [
       {
-        text: "Action Required",
-        href: "/infractions/action-required",
-      },
-      {
         text: "Requires Review",
         href: "/infractions/requires-review",
+      },
+      {
+        text: "Action Required",
+        href: "/infractions/action-required",
       },
       {
         text: "Payment Release Review",

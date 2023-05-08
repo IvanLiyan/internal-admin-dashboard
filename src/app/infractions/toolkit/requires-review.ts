@@ -1,0 +1,15 @@
+export const TableColumns = [
+  "infractionId",
+  "created",
+  "creator",
+  "merchantName",
+  "bdRep",
+  "geo",
+  "reason",
+  "parentCategory",
+  "ban",
+  "gmv7Day",
+  "gmv7DayPercentage",
+  "gmvLifetime",
+  "orderCount30Day",
+] as const;

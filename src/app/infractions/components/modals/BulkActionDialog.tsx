@@ -2,7 +2,6 @@ import ApproveDialog from "@app/infractions/components/modals/ApproveDialog";
 import DeclineDialog from "@app/infractions/components/modals/DeclineDialog";
 import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
 import ReverseDialog from "@app/infractions/components/modals/ReverseDialog";
-import { Data } from "@app/infractions/toolkit/mocks";
 import { BulkActionModalSchema } from "@app/infractions/toolkit/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Delete, Visibility } from "@mui/icons-material";
@@ -24,12 +23,19 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { MerchantWarningSchema } from "@schema";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+type InfractionData = Pick<MerchantWarningSchema, "id" | "adminReasonText"> & {
+  readonly lastUpdate: {
+    readonly unix: number;
+  };
+};
+
 type Props = Pick<DialogProps, "open"> & {
-  readonly infractions: ReadonlyArray<Data>;
+  readonly infractions: ReadonlyArray<InfractionData>;
   readonly handleClose: () => void;
   readonly approveAction?: boolean;
   readonly declineAction?: boolean;
@@ -52,7 +58,7 @@ const BulkActionDialog: React.FC<Props> = ({
     null
   );
 
-  const [rows, setRows] = useState<ReadonlyArray<Data>>([]);
+  const [rows, setRows] = useState<ReadonlyArray<InfractionData>>([]);
 
   const {
     reset,
@@ -96,7 +102,7 @@ const BulkActionDialog: React.FC<Props> = ({
   };
 
   return (
-    <Dialog {...props} maxWidth={"sm"} fullWidth onClose={onClose}>
+    <Dialog {...props} maxWidth={"md"} fullWidth onClose={onClose}>
       <ApproveDialog
         open={approveOpen}
         infractionsCount={rows.length}
@@ -174,16 +180,18 @@ const BulkActionDialog: React.FC<Props> = ({
                 </TableHead>
                 <TableBody>
                   {rows.map((row) => (
-                    <TableRow key={row.infractionID}>
-                      <TableCell align="left">{row.infractionID}</TableCell>
-                      <TableCell align="left">{row.reasons}</TableCell>
+                    <TableRow key={row.id}>
+                      <TableCell align="left">{row.id}</TableCell>
                       <TableCell align="left">
-                        {dayjs(row.lastUpdate / 1000).format("lll")}
+                        {row.adminReasonText ?? "N/A"}
+                      </TableCell>
+                      <TableCell align="left">
+                        {dayjs.unix(row.lastUpdate.unix).format("lll")}
                       </TableCell>
                       <TableCell align="center">
                         <IconButton
                           onClick={() => {
-                            setPreviewInfractionId(row.infractionID);
+                            setPreviewInfractionId(row.id);
                             setMessageOpen(true);
                           }}
                         >
@@ -192,9 +200,7 @@ const BulkActionDialog: React.FC<Props> = ({
                         <IconButton
                           onClick={() => {
                             setRows((prev) =>
-                              prev.filter(
-                                (r) => r.infractionID !== row.infractionID
-                              )
+                              prev.filter((r) => r.id !== row.id)
                             );
                           }}
                         >

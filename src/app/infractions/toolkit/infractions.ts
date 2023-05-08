@@ -1,4 +1,4 @@
-import { MerchantWarningReason } from "@app/schema";
+import { MerchantWarningReason } from "@schema";
 
 type MerchantInfractions = ExtractStrict<
   MerchantWarningReason,

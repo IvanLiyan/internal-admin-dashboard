@@ -14,6 +14,12 @@ module.exports = (phase, { defaultConfig }) => {
     compiler: {
       emotion: true,
     },
+    experimental: {
+      swcPlugins: [
+        "@graphql-codegen/client-preset-swc-plugin",
+        { artifactDirectory: "./src/schema", gqlTagName: "graphql" },
+      ],
+    },
     pageExtensions: ["tsx", "ts", "jsx", "js"]
       .map((ext) =>
         phase === PHASE_DEVELOPMENT_SERVER

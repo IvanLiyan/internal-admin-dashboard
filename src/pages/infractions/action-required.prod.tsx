@@ -1,16 +1,20 @@
+import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
+import TableHeading from "@app/infractions/components/TableHeading";
 import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
 import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
-import ActionRequiredTableHead from "@app/infractions/components/action-required/TableHead";
+import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
+import { TableColumns } from "@app/infractions/toolkit/action-required";
 import {
-  Data,
-  MockActionRequiredData,
-  Order,
-} from "@app/infractions/toolkit/mocks";
+  BulkDisputeQuery,
+  OrderBy,
+  useInfractionTableData,
+} from "@app/infractions/toolkit/table";
+import { InfractionTableThemeOptions } from "@app/infractions/toolkit/theme";
 import {
   Button,
   Checkbox,
@@ -22,59 +26,56 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
-import dayjs from "dayjs";
+import { MerchantWarningState, SortOrderType } from "@schema";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
+import { useState } from "react";
+import { useQuery } from "urql";
 
-const DEFAULT_ORDER = "asc";
-const DEFAULT_ORDER_BY: keyof Data = "created";
-const DEFAULT_ROWS_PER_PAGE = 25;
-
-/**
- * Scaffolding for Awaiting Admin page
- */
 const ActionRequiredPage: NextPage<Record<string, never>> = () => {
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
-  const [order] = useState<Order>(DEFAULT_ORDER);
-  const [orderBy] = useState<keyof Data>(DEFAULT_ORDER_BY);
+  const [order] = useState<SortOrderType>("ASC");
+  const [orderBy] = useState<(typeof TableColumns)[number]>("lastUpdated");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [page, setPage] = useState(0);
-  const [visibleRows, setVisibleRows] = useState<Data[] | null>(null);
-  const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
+  const [limit, setLimit] = useState(10);
+  const [states] = useState<MerchantWarningState[]>(["AWAITING_ADMIN"]);
 
-  useEffect(() => {
-    setVisibleRows(MockActionRequiredData.slice(0, rowsPerPage));
-  }, [rowsPerPage]);
+  const offset = page * limit;
+  const gqlOrderBy = OrderBy[orderBy];
+
+  const [{ data, fetching }] = useQuery({
+    query: BulkDisputeQuery,
+    variables: {
+      limit,
+      offset,
+      states,
+      sort:
+        gqlOrderBy == null ? undefined : { field: gqlOrderBy, order: order },
+    },
+  });
+
+  const tableData = useInfractionTableData(TableColumns, data);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = MockActionRequiredData.map((n) => n.infractionID);
-      setSelected(newSelected);
+      setSelected(tableData.map((n) => n.infractionId));
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
+  const handleClick = (
+    event: React.MouseEvent<unknown>,
+    infractionId: string
+  ) => {
+    if (selected.includes(infractionId)) {
+      setSelected((prev) => prev.filter((i) => i !== infractionId));
+      return;
     }
-
-    setSelected(newSelected);
+    setSelected((prev) => [...prev, infractionId]);
   };
 
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
@@ -97,16 +98,16 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
               sx={{ minWidth: 400, mx: 1 }}
             />
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
+              rowsPerPageOptions={[10, 50, 100]}
               component={"div"}
-              count={MockActionRequiredData.length}
-              rowsPerPage={rowsPerPage}
+              count={data?.policy?.merchantWarningCount || 0}
+              rowsPerPage={limit}
               page={page}
               onPageChange={(_, page) => {
                 setPage(page);
               }}
               onRowsPerPageChange={(event) => {
-                setRowsPerPage(parseInt(event.target.value));
+                setLimit(parseInt(event.target.value));
               }}
             />
           </Stack>
@@ -157,64 +158,68 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
         </Stack>
-        <TableContainer>
-          <Table size={"medium"}>
-            <ActionRequiredTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              rowCount={MockActionRequiredData.length}
-            />
-            <TableBody>
-              {visibleRows?.map((row) => {
-                const isItemSelected = isSelected(row.infractionID);
-                return (
-                  <TableRow
-                    hover
-                    tabIndex={-1}
-                    key={row.infractionID}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={isItemSelected}
-                        onClick={(event) =>
-                          handleClick(event, row.infractionID)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      {dayjs.unix(row.created).format("lll")}
-                    </TableCell>
-                    <TableCell align="right">
-                      {dayjs.unix(row.lastUpdate).format("lll")}
-                    </TableCell>
-                    <TableCell align="right">{row.mid}</TableCell>
-                    <TableCell align="right">{row.infractionID}</TableCell>
-                    <TableCell align="right">{row.reasons}</TableCell>
-                    <TableCell align="right">{row.parentCategory}</TableCell>
-                    <TableCell align="right">{row.subCategory}</TableCell>
-                    <TableCell align="right">{row.bdReps}</TableCell>
-                    <TableCell align="right">{row.geo}</TableCell>
-                    <TableCell align="right">{row.wssTier}</TableCell>
-                    <TableCell align="center">
-                      <Button size="small">View</Button>
-                      <Button size="small">Claim</Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {fetching ? (
+          <LoadingIndicator />
+        ) : (
+          <ThemeProvider
+            theme={(theme) =>
+              createTheme({ ...theme, ...InfractionTableThemeOptions })
+            }
+          >
+            <TableContainer>
+              <Table>
+                <TableHeading
+                  columns={TableColumns}
+                  numSelected={selected.length}
+                  order={order == "ASC" ? "asc" : "desc"}
+                  orderBy={orderBy}
+                  onSelectAllClick={handleSelectAllClick}
+                  rowCount={tableData.length}
+                />
+                <TableBody>
+                  {tableData?.map((row) => {
+                    const isItemSelected = isSelected(row.infractionId);
+                    return (
+                      <TableRow
+                        hover
+                        tabIndex={-1}
+                        key={row.infractionId}
+                        selected={isItemSelected}
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isItemSelected}
+                            onClick={(event) =>
+                              handleClick(event, row.infractionId)
+                            }
+                          />
+                        </TableCell>
+                        {TableColumns.map((col) => (
+                          <TableCell key={col} align="right">
+                            {row[col]}
+                          </TableCell>
+                        ))}
+                        <TableCell align="center">
+                          <Button size="small">View</Button>
+                          <Button size="small">Claim</Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </ThemeProvider>
+        )}
         <BulkActionDialog
           approveAction
           declineAction
           open={bulkActionOpen}
           handleClose={() => setBulkActionOpen(false)}
           infractions={
-            visibleRows?.filter((r) => selected.includes(r.infractionID)) || []
+            data?.policy?.merchantWarnings?.filter((r) =>
+              selected.includes(r.id)
+            ) || []
           }
         />
       </Paper>

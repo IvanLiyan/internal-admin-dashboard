@@ -1,9 +1,4 @@
 import {
-  AuthenticationMutationsLoginArgs,
-  LoginMutation,
-  UserSchema,
-} from "@app/schema";
-import {
   Alert,
   Box,
   Button,
@@ -12,12 +7,14 @@ import {
   Snackbar,
   Typography,
 } from "@mui/material";
+import { UserSchema } from "@schema";
 import Cookies from "js-cookie";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
+import { graphql } from "src/schema";
 import { gql, useMutation, useQuery } from "urql";
 
-const LoginMutation = gql<LoginResponseType, AuthenticationMutationsLoginArgs>`
+const loginMutation = graphql(`
   mutation Authentication_LoginMutation($input: LoginMutationInput!) {
     authentication {
       login(input: $input) {
@@ -27,20 +24,14 @@ const LoginMutation = gql<LoginResponseType, AuthenticationMutationsLoginArgs>`
       }
     }
   }
-`;
-
-type LoginResponseType = {
-  readonly authentication: {
-    readonly login?: Pick<LoginMutation, "loginOk" | "error" | "errorState">;
-  };
-};
+`);
 
 type GetUserResponse = {
   readonly currentUser?: Pick<UserSchema, "id">;
 };
 
 const GetUserQuery = gql<GetUserResponse, void>`
-  query AuthQuery {
+  query {
     currentUser {
       id
     }
@@ -51,7 +42,7 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
-  const [loginResult, login] = useMutation(LoginMutation);
+  const [loginResult, login] = useMutation(loginMutation);
   const [userResult, getUser] = useQuery({
     query: GetUserQuery,
     pause: true,
@@ -75,7 +66,7 @@ const DevLoginPage: NextPage<Record<string, never>> = () => {
   }, [getUser]);
 
   useEffect(() => {
-    if (!loginResult.data?.authentication.login?.loginOk) {
+    if (!loginResult.data?.authentication?.login?.loginOk) {
       return;
     }
     getUser();

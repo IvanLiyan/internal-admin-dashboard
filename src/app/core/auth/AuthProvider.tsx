@@ -1,5 +1,5 @@
-import { RoleSchema, UserSchema } from "@app/schema";
 import { Box, CircularProgress } from "@mui/material";
+import { RoleSchema, UserSchema } from "@schema";
 import { PropsWithChildren, createContext, useContext } from "react";
 import { gql, useQuery } from "urql";
 

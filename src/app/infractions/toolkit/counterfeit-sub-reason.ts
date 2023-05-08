@@ -1,4 +1,4 @@
-import { CounterfeitReason, TaggingViolationSubReasonCode } from "@app/schema";
+import { CounterfeitReason, TaggingViolationSubReasonCode } from "@schema";
 
 type CategoryWithSubreasons = ExtractStrict<
   CounterfeitReason,

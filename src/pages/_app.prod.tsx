@@ -1,12 +1,10 @@
-import "src/styles/global.css";
+import AuthProvider from "@app/core/auth/AuthProvider";
+import { NavigationBar } from "@app/navigation/NavigationBar";
+import { Container, ThemeProvider, createTheme } from "@mui/material";
 import Cookies from "js-cookie";
 import type { AppProps } from "next/app";
+import "src/styles/global.css";
 import { cacheExchange, createClient, fetchExchange, Provider } from "urql";
-import { NavigationBar } from "@app/navigation/NavigationBar";
-import { Container } from "@mui/material";
-import AuthProvider from "@app/core/auth/AuthProvider";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const client = createClient({
   url: `/api/graphql`,
@@ -31,17 +29,26 @@ export default function App({ Component, pageProps, router }: AppProps) {
       </Provider>
     );
   }
+  const theme = createTheme({
+    typography: {
+      fontFamily: "Proxima",
+      fontWeightLight: 400,
+      fontWeightRegular: 400,
+      fontWeightMedium: 600,
+      fontWeightBold: 700,
+    },
+  });
 
   return (
     <Provider value={client}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AuthProvider>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
           <NavigationBar />
           <Container maxWidth={false} sx={{ mt: 2 }}>
             <Component {...pageProps} />
           </Container>
-        </AuthProvider>
-      </LocalizationProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </Provider>
   );
 }

@@ -18,7 +18,7 @@
     "incremental": true,
     "paths": {
       "@app/*": ["src/app/*"],
-      "@schema": ["src/app/schema"]
+      "@schema": ["src/schema/graphql"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
