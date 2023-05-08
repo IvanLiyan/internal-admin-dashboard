@@ -10,6 +10,10 @@ import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
 import { TableColumns } from "@app/infractions/toolkit/awaiting-merchant";
 import {
+  SearchTypes,
+  useInfractionSearch,
+} from "@app/infractions/toolkit/search";
+import {
   BulkDisputeQuery,
   OrderBy,
   useInfractionTableData,
@@ -41,6 +45,8 @@ import { useQuery } from "urql";
 
 const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
   const [order] = useState<SortOrderType>("ASC");
   const [orderBy] = useState<(typeof TableColumns)[number]>("lastUpdated");
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -55,6 +61,8 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
 
   const offset = page * limit;
   const gqlOrderBy = OrderBy[orderBy];
+
+  const searchVars = useInfractionSearch(searchBy, search);
 
   const [{ data, fetching }] = useQuery({
     query: BulkDisputeQuery,
@@ -72,6 +80,7 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
           : undefined,
       issueDateEnd: issueDateEnd != null ? { unix: issueDateEnd } : undefined,
       reasons,
+      ...searchVars,
     },
   });
 
@@ -109,11 +118,16 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
           >
             <Searchbox
               onConfirm={(token) => {
-                console.log(token);
+                setSearch(token);
               }}
               size="small"
-              placeholder="Infraction ID, Product ID, Order ID"
+              placeholder="Search"
               sx={{ minWidth: 400, mx: 1 }}
+              searchBy={{
+                keys: ["ID", "Merchant Name"],
+                onSearchByChange: (searchBy) => setSearchBy(searchBy),
+                defaultKey: "ID",
+              }}
             />
             <TablePagination
               showFirstButton

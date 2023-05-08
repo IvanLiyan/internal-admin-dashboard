@@ -8,6 +8,10 @@ import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import { TableColumns } from "@app/infractions/toolkit/requires-review";
 import {
+  SearchTypes,
+  useInfractionSearch,
+} from "@app/infractions/toolkit/search";
+import {
   BulkDisputeQuery,
   OrderBy,
   useInfractionTableData,
@@ -38,6 +42,8 @@ import { useState } from "react";
 import { useQuery } from "urql";
 
 const RequiresReviewPage: NextPage<Record<string, never>> = () => {
+  const [search, setSearch] = useState("");
+  const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
   const [order] = useState<SortOrderType>("ASC");
   const [orderBy] = useState<(typeof TableColumns)[number]>("created");
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -52,6 +58,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
 
   const offset = page * limit;
   const gqlOrderBy = OrderBy[orderBy];
+
+  const searchVars = useInfractionSearch(searchBy, search);
 
   const [{ data, fetching }] = useQuery({
     query: BulkDisputeQuery,
@@ -69,6 +77,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
           : undefined,
       issueDateEnd: issueDateEnd != null ? { unix: issueDateEnd } : undefined,
       reasons,
+      ...searchVars,
     },
   });
 
@@ -106,11 +115,16 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
           >
             <Searchbox
               onConfirm={(token) => {
-                console.log(token);
+                setSearch(token);
               }}
               size="small"
-              placeholder="Infraction ID, Product ID, Order ID"
+              placeholder="Search"
               sx={{ minWidth: 400, mx: 1 }}
+              searchBy={{
+                keys: ["ID", "Merchant Name"],
+                onSearchByChange: (searchBy) => setSearchBy(searchBy),
+                defaultKey: "ID",
+              }}
             />
             <TablePagination
               showFirstButton
