@@ -5,13 +5,17 @@ type MerchantInfractions = ExtractStrict<
   | "REQUEST_USER_EMAIL"
   | "REQUEST_MONEY"
   | "BAD_CUSTOMER_SERVICE"
+  | "DISINGENUOUS_CUSTOMER_SERVICE"
   | "TAKE_USER_OUTSIDE_WISH"
   | "VIOLATE_POLICY"
   | "SUSPECTED_FRAUD"
   | "REPEAT_IP_INFRINGEMENT_ON_BRAND_OWNER"
   | "MERCHANT_CONTACT_INFO_INVALID"
+  | "RESPOND_TO_ADMIN"
   | "WISHPOST_NEGATIVE_BALANCE"
   | "HIGH_IP_INFRINGEMENT"
+  | "VIOLATE_TS_POLICY"
+  | "BAN_EARLY_STAGE_MERCHANT"
   | "INACTIVE_ACCOUNT"
   | "WISH_STANDARDS_BAN"
 >;
@@ -104,264 +108,289 @@ const CategorizedInfractionsDictionary: {
     | OrderInfractions
     | DeprecatedInfractions]: {
     readonly category: InfractionCategory<T>;
-    readonly text: T;
+    readonly text: string;
   };
 } = {
   BAD_CUSTOMER_SERVICE: {
     category: "Merchant Infractions",
-    text: "BAD_CUSTOMER_SERVICE",
+    text: "Discourteous customer service",
+  },
+  BAN_EARLY_STAGE_MERCHANT: {
+    category: "Merchant Infractions",
+    text: "Violated Merchant Policy",
+  },
+  DISINGENUOUS_CUSTOMER_SERVICE: {
+    category: "Merchant Infractions",
+    text: "Disingenuous to customer",
+  },
+  RESPOND_TO_ADMIN: {
+    category: "Merchant Infractions",
+    text: "Wish Admin message response needed",
+  },
+  VIOLATE_TS_POLICY: {
+    category: "Merchant Infractions",
+    text: "Wish merchant policy violation",
   },
   BRANDED_PRODUCT_GEOBLOCK: {
     category: "Listing Infractions",
-    text: "BRANDED_PRODUCT_GEOBLOCK",
+    text: "Proof of authorization needed to use IP in specific regions",
   },
   CN_PROHIBITED_PRODUCTS: {
     category: "Listing Infractions",
-    text: "CN_PROHIBITED_PRODUCTS",
+    text: "Import/export of product prohibited from China",
   },
   CONFIRMED_DELIVERY_POLICY: {
     category: "Deprecated Infractions",
-    text: "CONFIRMED_DELIVERY_POLICY",
+    text: "Merchant is not meeting Confirmed Delivery Policy requirements",
   },
   COUNTERFEIT_GOODS: {
     category: "Deprecated Infractions",
-    text: "COUNTERFEIT_GOODS",
+    text: "Wish requires proof of authorization to use intellectual property",
   },
   CS_LATE_RESPONSE_RATE: {
     category: "Deprecated Infractions",
-    text: "CS_LATE_RESPONSE_RATE",
+    text: "Long customer ticket response times",
   },
   CS_LOW_CSAT_SCORE: {
     category: "Deprecated Infractions",
-    text: "CS_LOW_CSAT_SCORE",
+    text: "Low customer satisfaction score",
   },
   DECEPTIVE_FULFILLMENT: {
     category: "Deprecated Infractions",
-    text: "DECEPTIVE_FULFILLMENT",
+    text: "Store is violating Deceptive Fulfillment Policy",
   },
   DUPLICATE_ACCOUNTS: {
     category: "Deprecated Infractions",
-    text: "DUPLICATE_ACCOUNTS",
+    text: "Multiple merchant accounts",
   },
   DUPLICATE_PRODUCTS: {
     category: "Deprecated Infractions",
-    text: "DUPLICATE_PRODUCTS",
+    text: "Duplicate listing",
   },
   EMPTY_PACKAGES: {
     category: "Deprecated Infractions",
-    text: "EMPTY_PACKAGES",
+    text: "Empty packages sent to consumers",
   },
-  FAKE_RATING: { category: "Deprecated Infractions", text: "FAKE_RATING" },
-  FAKE_TRACKING: { category: "Order Infractions", text: "FAKE_TRACKING" },
+  FAKE_RATING: {
+    category: "Deprecated Infractions",
+    text: "Manipulated ratings and reviews",
+  },
+  FAKE_TRACKING: { category: "Order Infractions", text: "Misleading tracking" },
   FINE_FOR_COUNTERFEIT_GOODS: {
     category: "Listing Infractions",
-    text: "FINE_FOR_COUNTERFEIT_GOODS",
+    text: "Intellectual Property Violation",
   },
   FINE_PRODUCT_SWAPPED: {
     category: "Listing Infractions",
-    text: "FINE_PRODUCT_SWAPPED",
+    text: "Material listing change",
   },
   FINE_WISH_EXPRESS_POLICY_VIOLATION: {
     category: "Deprecated Infractions",
-    text: "FINE_WISH_EXPRESS_POLICY_VIOLATION",
+    text: "Wish Express late fulfillment",
   },
   HIGH_AUTO_REFUND: {
     category: "Deprecated Infractions",
-    text: "HIGH_AUTO_REFUND",
+    text: "Store has auto refund ratio >= 10%",
   },
   HIGH_CHARGEBACK_AND_FRAUD_REFUND_RATIO: {
     category: "Deprecated Infractions",
-    text: "HIGH_CHARGEBACK_AND_FRAUD_REFUND_RATIO",
+    text: "Store has combined chargeback and fraud refund ratio >= 10%",
   },
   HIGH_CHARGEBACK_RATIO: {
     category: "Deprecated Infractions",
-    text: "HIGH_CHARGEBACK_RATIO",
+    text: "Store has chargeback ratio >= 5%",
   },
   HIGH_GMV_FROM_GAMING_AUDIT: {
     category: "Deprecated Infractions",
-    text: "HIGH_GMV_FROM_GAMING_AUDIT",
+    text: "High share of sales from misleading listings and/or tracking",
   },
   HIGH_GMV_FROM_GAMING_BAN: {
     category: "Deprecated Infractions",
-    text: "HIGH_GMV_FROM_GAMING_BAN",
+    text: "High share of sales from misleading listings and/or tracking",
   },
   HIGH_GMV_FROM_GAMING_FREEZE: {
     category: "Deprecated Infractions",
-    text: "HIGH_GMV_FROM_GAMING_FREEZE",
+    text: "High share of sales from misleading listings and/or tracking",
   },
   HIGH_IP_INFRINGEMENT: {
     category: "Merchant Infractions",
-    text: "HIGH_IP_INFRINGEMENT",
+    text: "Suspension: Large number of IP infringements",
   },
   HIGH_REFUND_RATIO: {
     category: "Deprecated Infractions",
-    text: "HIGH_REFUND_RATIO",
+    text: "Store has an extremely high refund ratio",
   },
   INACTIVE_ACCOUNT: {
     category: "Merchant Infractions",
-    text: "INACTIVE_ACCOUNT",
+    text: "Inactive Account",
   },
   INVALID_EU_RESPONSIBLE_PERSON: {
     category: "Deprecated Infractions",
-    text: "INVALID_EU_RESPONSIBLE_PERSON",
+    text: "Invalid EU responsible person",
   },
   INVALID_TRACKING_NUMBERS: {
     category: "Deprecated Infractions",
-    text: "INVALID_TRACKING_NUMBERS",
+    text: "Store is using invalid tracking numbers",
   },
   LATE_CONFIRMED_FULFILLMENT_VIOLATION: {
     category: "Order Infractions",
-    text: "LATE_CONFIRMED_FULFILLMENT_VIOLATION",
+    text: "Late confirmed fulfillment",
   },
   LATE_FULFILLMENT_RATE: {
     category: "Deprecated Infractions",
-    text: "LATE_FULFILLMENT_RATE",
+    text: "Store has an extremely high late confirmed fulfillment rate",
   },
   LEGAL_TRO_TAKEDOWN: {
     category: "Listing Infractions",
-    text: "LEGAL_TRO_TAKEDOWN",
+    text: "Intellectual Property Violation",
   },
   MERCHANT_CANCELLATION_VIOLATION: {
     category: "Order Infractions",
-    text: "MERCHANT_CANCELLATION_VIOLATION",
+    text: "Order cancellation",
   },
   MERCHANT_CONTACT_INFO_INVALID: {
     category: "Merchant Infractions",
-    text: "MERCHANT_CONTACT_INFO_INVALID",
+    text: "Invalid merchant contact information",
   },
   MERCHANT_HARASSMENT: {
     category: "Deprecated Infractions",
-    text: "MERCHANT_HARASSMENT",
+    text: "Harassment of Wish employees or property",
   },
   MERCHANT_HIGH_CANCEL_ORDER_RATE: {
     category: "Deprecated Infractions",
-    text: "MERCHANT_HIGH_CANCEL_ORDER_RATE",
+    text: "Store has high order cancellation rate",
   },
   MERCHANT_HIGH_QUALITY_REFUND_RATIO: {
     category: "Deprecated Infractions",
-    text: "MERCHANT_HIGH_QUALITY_REFUND_RATIO",
+    text: "Merchant has an extremely high refund rate from quality-related reasons",
   },
   MERCHANT_HIGH_REFUND_EAT_COST: {
     category: "Deprecated Infractions",
-    text: "MERCHANT_HIGH_REFUND_EAT_COST",
+    text: "Store has a high refund ratio",
   },
   MISLEADING_VARIATION: {
     category: "Listing Infractions",
-    text: "MISLEADING_VARIATION",
+    text: "Misleading product variation in listing",
   },
   ORDER_NOT_DELIVERED: {
     category: "Order Infractions",
-    text: "ORDER_NOT_DELIVERED",
+    text: "Order not delivered",
   },
   PENALTY_FOR_AUTO_REFUND: {
     category: "Deprecated Infractions",
-    text: "PENALTY_FOR_AUTO_REFUND",
+    text: "High number of unfulfilled orders for product listing.",
   },
   PRODUCT_GEOBLOCK: {
     category: "Listing Infractions",
-    text: "PRODUCT_GEOBLOCK",
+    text: "Regionally Restricted Product Listing",
   },
   PRODUCT_HIGH_CANCEL_ORDER_RATE: {
     category: "Deprecated Infractions",
-    text: "PRODUCT_HIGH_CANCEL_ORDER_RATE",
+    text: "Product has high order cancellation rate",
   },
   PRODUCT_HIGH_QUALITY_REFUND_RATIO: {
     category: "Deprecated Infractions",
-    text: "PRODUCT_HIGH_QUALITY_REFUND_RATIO",
+    text: "High product quality-related refund rate",
   },
   PRODUCT_HIGH_REFUND_RATIO: {
     category: "Order Infractions",
-    text: "PRODUCT_HIGH_REFUND_RATIO",
+    text: "High refund rate - Product quality",
   },
   PRODUCT_HIGH_REFUND_RATIO_NO_REMOVE: {
     category: "Deprecated Infractions",
-    text: "PRODUCT_HIGH_REFUND_RATIO_NO_REMOVE",
+    text: "High refund rate - Product quality",
   },
   PRODUCT_IS_INAPPROPRIATE: {
     category: "Listing Infractions",
-    text: "PRODUCT_IS_INAPPROPRIATE",
+    text: "Inappropriate Content",
   },
   PRODUCT_LOW_RATING: {
     category: "Deprecated Infractions",
-    text: "PRODUCT_LOW_RATING",
+    text: "Low rated product",
   },
   PRODUCT_LOW_RATING_NO_REMOVE: {
     category: "Deprecated Infractions",
-    text: "PRODUCT_LOW_RATING_NO_REMOVE",
+    text: "Low rated product",
   },
   RELATED_ACCOUNT_IS_BANNED: {
     category: "Deprecated Infractions",
-    text: "RELATED_ACCOUNT_IS_BANNED",
+    text: "Related merchant account suspended",
   },
   REPEAT_IP_INFRINGEMENT_ON_BRAND_OWNER: {
     category: "Merchant Infractions",
-    text: "REPEAT_IP_INFRINGEMENT_ON_BRAND_OWNER",
+    text: "Repeat IP Infringement",
   },
-  REQUEST_MONEY: { category: "Merchant Infractions", text: "REQUEST_MONEY" },
+  REQUEST_MONEY: {
+    category: "Merchant Infractions",
+    text: "Payment from customer requested outside Wish",
+  },
   REQUEST_USER_EMAIL: {
     category: "Merchant Infractions",
-    text: "REQUEST_USER_EMAIL",
+    text: "Personal information of customer requested",
   },
   STORE_VALIDATION_INCOMPLETE: {
     category: "Deprecated Infractions",
-    text: "STORE_VALIDATION_INCOMPLETE",
+    text: "Incomplete store validation",
   },
   STRIKE_BASED_HIGH_RISK_PROHIBITED: {
     category: "Listing Infractions",
-    text: "STRIKE_BASED_HIGH_RISK_PROHIBITED",
+    text: "High Risk Prohibited Content Strike",
   },
   SUSPECTED_FRAUD: {
     category: "Merchant Infractions",
-    text: "SUSPECTED_FRAUD",
+    text: "Suspected Fraud",
   },
   TAKE_USER_OUTSIDE_WISH: {
     category: "Merchant Infractions",
-    text: "TAKE_USER_OUTSIDE_WISH",
+    text: "Directing customers off of Wish",
   },
   TAX_SETTING_NOT_UPDATED: {
     category: "Deprecated Infractions",
-    text: "TAX_SETTING_NOT_UPDATED",
+    text: "Tax setting update required",
   },
   UNCONFIRMED_TRACKING_NUMBERS: {
     category: "Deprecated Infractions",
-    text: "UNCONFIRMED_TRACKING_NUMBERS",
+    text: "Store is using unconfirmed tracking numbers",
   },
   UNFULFILLED_ORDER: {
     category: "Order Infractions",
-    text: "UNFULFILLED_ORDER",
+    text: "Unfulfilled order",
   },
   US_TAX_INFO_UNVALIDATED: {
     category: "Deprecated Infractions",
-    text: "US_TAX_INFO_UNVALIDATED",
+    text: "U.S. Tax Identity Information UnvalidatedU.S. Tax Identity Information Unvalidated",
   },
-  VIOLATE_POLICY: { category: "Merchant Infractions", text: "VIOLATE_POLICY" },
+  VIOLATE_POLICY: {
+    category: "Merchant Infractions",
+    text: "Wish merchant policy violation",
+  },
   WAREHOUSE_FULFILLMENT_POLICY_VIOLATION: {
     category: "Order Infractions",
-    text: "WAREHOUSE_FULFILLMENT_POLICY_VIOLATION",
+    text: "Order delivered later than merchant-set Max Delivery Days",
   },
   WISH_EXPRESS_POLICY_MERCHANT: {
     category: "Deprecated Infractions",
-    text: "WISH_EXPRESS_POLICY_MERCHANT",
+    text: "Wish Express Terms of Service violation: Merchant",
   },
   WISH_EXPRESS_POLICY_PRODUCT: {
     category: "Deprecated Infractions",
-    text: "WISH_EXPRESS_POLICY_PRODUCT",
+    text: "Wish Express Terms of Service violation: Product",
   },
   WISH_EXPRESS_POLICY_VIOLATION: {
     category: "Deprecated Infractions",
-    text: "WISH_EXPRESS_POLICY_VIOLATION",
+    text: "Wish Express late confirmed delivery",
   },
   WISH_STANDARDS_BAN: {
     category: "Merchant Infractions",
-    text: "WISH_STANDARDS_BAN",
+    text: "Wish standards ban",
   },
   WISHPOST_ID_NOT_COMPLETE_FACE_RECOGNITION: {
     category: "Deprecated Infractions",
-    text: "WISHPOST_ID_NOT_COMPLETE_FACE_RECOGNITION",
+    text: "Face recognition incomplete for wishpost ID",
   },
   WISHPOST_NEGATIVE_BALANCE: {
     category: "Merchant Infractions",
-    text: "WISHPOST_NEGATIVE_BALANCE",
+    text: "WishPost negative account balance",
   },
 };
 

@@ -3,8 +3,8 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 
 interface DateFilterProps {
-  readonly onChangeStartDate: (date: Date) => void;
-  readonly onChangeEndDate: (date: Date) => void;
+  readonly onChangeStartDate: (date: Date | null) => void;
+  readonly onChangeEndDate: (date: Date | null) => void;
 }
 
 const DateFilter: React.FC<DateFilterProps> = ({
@@ -18,6 +18,7 @@ const DateFilter: React.FC<DateFilterProps> = ({
     <>
       <DatePicker
         label={"Creation Date From"}
+        format="YYYY-MM-DD"
         slotProps={{ textField: { size: "small", fullWidth: true } }}
         value={startDate}
         shouldDisableDate={(day) => {
@@ -28,11 +29,12 @@ const DateFilter: React.FC<DateFilterProps> = ({
         }}
         onChange={(newValue) => {
           setStartDate(newValue);
-          onChangeStartDate(dayjs(newValue).toDate());
+          onChangeStartDate(newValue == null ? null : dayjs(newValue).toDate());
         }}
       />
       <DatePicker
         label={"Creation Date To"}
+        format="YYYY-MM-DD"
         slotProps={{ textField: { size: "small", fullWidth: true } }}
         value={endDate}
         shouldDisableDate={(day) => {
@@ -43,7 +45,7 @@ const DateFilter: React.FC<DateFilterProps> = ({
         }}
         onChange={(newValue) => {
           setEndDate(newValue);
-          onChangeEndDate(dayjs(endDate).toDate());
+          onChangeEndDate(newValue == null ? null : dayjs(newValue).toDate());
         }}
       />
     </>

@@ -27,7 +27,12 @@ import {
   ThemeProvider,
   createTheme,
 } from "@mui/material";
-import { MerchantWarningState, SortOrderType } from "@schema";
+import {
+  MerchantWarningReason,
+  MerchantWarningState,
+  SortOrderType,
+} from "@schema";
+import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useState } from "react";
 import { useQuery } from "urql";
@@ -39,6 +44,11 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [states] = useState<MerchantWarningState[]>(["REQUIRES_ADMIN_REVIEW"]);
+  const [issueDateStart, setIssueDateStart] = useState<number | null>(null);
+  const [issueDateEnd, setIssueDateEnd] = useState<number | null>(null);
+  const [reasons, setReasons] = useState<
+    MerchantWarningReason[] | null | undefined
+  >(null);
 
   const offset = page * limit;
   const gqlOrderBy = OrderBy[orderBy];
@@ -51,6 +61,14 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
       states,
       sort:
         gqlOrderBy == null ? undefined : { field: gqlOrderBy, order: order },
+      issueDateStart:
+        issueDateStart != null
+          ? {
+              unix: issueDateStart,
+            }
+          : undefined,
+      issueDateEnd: issueDateEnd != null ? { unix: issueDateEnd } : undefined,
+      reasons,
     },
   });
 
@@ -95,6 +113,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
               sx={{ minWidth: 400, mx: 1 }}
             />
             <TablePagination
+              showFirstButton
+              showLastButton
               rowsPerPageOptions={[10, 50, 100]}
               component={"div"}
               count={data?.policy?.merchantWarningCount || 0}
@@ -125,11 +145,19 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
           <Stack direction={"row"} spacing={1} m={1}>
             {/* Place filters here */}
             <DateFilter
-              onChangeStartDate={() => {
-                return;
+              onChangeStartDate={(startDate) => {
+                if (startDate == null) {
+                  setIssueDateStart(null);
+                  return;
+                }
+                setIssueDateStart(dayjs(startDate).unix());
               }}
-              onChangeEndDate={() => {
-                return;
+              onChangeEndDate={(endDate) => {
+                if (endDate == null) {
+                  setIssueDateEnd(null);
+                  return;
+                }
+                setIssueDateEnd(dayjs(endDate).unix());
               }}
             />
             <ClaimFilter
@@ -138,8 +166,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
               }}
             />
             <ReasonFilter
-              onConfirm={() => {
-                return;
+              onConfirm={(reason) => {
+                setReasons(reason);
               }}
             />
             <CounterfeitReasonFilter

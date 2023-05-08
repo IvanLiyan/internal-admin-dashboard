@@ -6,10 +6,14 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
 
 interface ReasonFilterProps {
-  readonly onConfirm: (claim: OptionType) => void;
+  readonly onConfirm: (claim: InfractionType[] | null | undefined) => void;
 }
 
-type OptionType = (typeof InfractionOptions)[number];
+type InfractionType = (typeof InfractionOptions)[number];
+type OptionType = {
+  type: InfractionType[];
+  label: string;
+};
 
 const ReasonFilter: React.FC<ReasonFilterProps> = ({ onConfirm }) => {
   const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
@@ -18,9 +22,22 @@ const ReasonFilter: React.FC<ReasonFilterProps> = ({ onConfirm }) => {
     <Autocomplete
       size="small"
       fullWidth
-      options={InfractionOptions.slice().sort((a, b) => {
-        const categoryA = InfractionsDictionary[a].category;
-        const categoryB = InfractionsDictionary[b].category;
+      options={InfractionOptions.reduce<OptionType[]>((acc, infraction) => {
+        const label = InfractionsDictionary[infraction].text;
+        const dup = acc.find((e) => e.label === label);
+        if (dup != null) {
+          return [
+            ...acc.filter((r) => r.label !== label),
+            {
+              type: [...dup.type, infraction],
+              label: label,
+            },
+          ];
+        }
+        return [...acc, { type: [infraction], label: label }];
+      }, []).sort((a, b) => {
+        const categoryA = InfractionsDictionary[a.type[0]].category;
+        const categoryB = InfractionsDictionary[b.type[0]].category;
         if (categoryA == "Deprecated Infractions") {
           return 1;
         }
@@ -29,14 +46,13 @@ const ReasonFilter: React.FC<ReasonFilterProps> = ({ onConfirm }) => {
         }
         return categoryA.localeCompare(categoryB);
       })}
-      getOptionLabel={(option) => InfractionsDictionary[option].text}
+      getOptionLabel={(option) => option.label}
       value={selectedOption}
-      groupBy={(option) => InfractionsDictionary[option].category}
+      isOptionEqualToValue={(option, value) => option.label == value.label}
+      groupBy={(option) => InfractionsDictionary[option.type[0]].category}
       onChange={(_, newValue) => {
         setSelectedOption(newValue);
-        if (newValue != null) {
-          onConfirm(newValue);
-        }
+        onConfirm(newValue?.type);
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Reason"} />

@@ -114,12 +114,16 @@ export const BulkDisputeQuery = graphql(`
     $claimStatus: MerchantWarningClaimStatus
     $reasons: [MerchantWarningReason!]
     $sort: MerchantWarningSort
+    $issueDateStart: DatetimeInput
+    $issueDateEnd: DatetimeInput
   ) {
     policy {
       merchantWarningCount(
         states: $states
         claimStatus: $claimStatus
         reasons: $reasons
+        issueDateStart: $issueDateStart
+        issueDateEnd: $issueDateEnd
       )
       merchantWarnings(
         id: $id
@@ -129,6 +133,8 @@ export const BulkDisputeQuery = graphql(`
         claimStatus: $claimStatus
         reasons: $reasons
         sort: $sort
+        issueDateStart: $issueDateStart
+        issueDateEnd: $issueDateEnd
       ) {
         id
         creatorName
