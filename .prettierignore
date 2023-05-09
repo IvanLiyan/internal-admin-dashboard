@@ -1,0 +1,6 @@
+# build output
+.next
+build
+out
+src/schema
+src/schema.graphql

@@ -24,7 +24,7 @@ const MessageBubble: React.FC<Props> = ({
         From {senderName}
       </Typography>
       <Typography color={"gray"} variant="caption" display={"block"}>
-        {dayjs.unix(unix).format('lll')}
+        {dayjs.unix(unix).format("lll")}
       </Typography>
     </Box>
   );
