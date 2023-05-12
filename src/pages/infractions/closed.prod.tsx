@@ -7,13 +7,13 @@ import CounterfeitReasonFilter from "@app/infractions/components/filters/Counter
 import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
-import { TableColumns } from "@app/infractions/toolkit/closed";
 import {
   SearchTypes,
   useInfractionSearch,
 } from "@app/infractions/toolkit/search";
 import {
   BulkDisputeQuery,
+  ClosedInfractionTableColumns,
   OrderBy,
   useInfractionTableData,
 } from "@app/infractions/toolkit/table";
@@ -47,7 +47,8 @@ const ClosedPage: NextPage<Record<string, never>> = () => {
   const [search, setSearch] = useState("");
   const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
   const [order] = useState<SortOrderType>("ASC");
-  const [orderBy] = useState<(typeof TableColumns)[number]>("lastUpdated");
+  const [orderBy] =
+    useState<(typeof ClosedInfractionTableColumns)[number]>("lastUpdated");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -86,7 +87,7 @@ const ClosedPage: NextPage<Record<string, never>> = () => {
     },
   });
 
-  const tableData = useInfractionTableData(TableColumns, data);
+  const tableData = useInfractionTableData(ClosedInfractionTableColumns, data);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -209,7 +210,7 @@ const ClosedPage: NextPage<Record<string, never>> = () => {
             <TableContainer>
               <Table size={"medium"}>
                 <TableHeading
-                  columns={TableColumns}
+                  columns={ClosedInfractionTableColumns}
                   numSelected={selected.length}
                   order={order == "ASC" ? "asc" : "desc"}
                   orderBy={orderBy}
@@ -234,7 +235,7 @@ const ClosedPage: NextPage<Record<string, never>> = () => {
                             }
                           />
                         </TableCell>
-                        {TableColumns.map((col) => (
+                        {ClosedInfractionTableColumns.map((col) => (
                           <TableCell key={col} align="right">
                             {row[col]}
                           </TableCell>

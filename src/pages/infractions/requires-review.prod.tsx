@@ -6,7 +6,6 @@ import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
-import { TableColumns } from "@app/infractions/toolkit/requires-review";
 import {
   SearchTypes,
   useInfractionSearch,
@@ -14,6 +13,7 @@ import {
 import {
   BulkDisputeQuery,
   OrderBy,
+  RequiresReviewTableColumns,
   useInfractionTableData,
 } from "@app/infractions/toolkit/table";
 import { InfractionTableThemeOptions } from "@app/infractions/toolkit/theme";
@@ -46,7 +46,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [search, setSearch] = useState("");
   const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
   const [order] = useState<SortOrderType>("ASC");
-  const [orderBy] = useState<(typeof TableColumns)[number]>("created");
+  const [orderBy] =
+    useState<(typeof RequiresReviewTableColumns)[number]>("created");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -85,7 +86,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
     },
   });
 
-  const tableData = useInfractionTableData(TableColumns, data);
+  const tableData = useInfractionTableData(RequiresReviewTableColumns, data);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -206,7 +207,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
             <TableContainer>
               <Table size={"small"}>
                 <TableHeading
-                  columns={TableColumns}
+                  columns={RequiresReviewTableColumns}
                   numSelected={selected.length}
                   order={order == "ASC" ? "asc" : "desc"}
                   orderBy={orderBy}
@@ -231,7 +232,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                             }
                           />
                         </TableCell>
-                        {TableColumns.map((col) => (
+                        {RequiresReviewTableColumns.map((col) => (
                           <TableCell key={col} align="right">
                             {row[col]}
                           </TableCell>

@@ -7,7 +7,6 @@ import CounterfeitReasonFilter from "@app/infractions/components/filters/Counter
 import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
-import { TableColumns } from "@app/infractions/toolkit/payment-release-review";
 import {
   SearchTypes,
   useInfractionSearch,
@@ -15,6 +14,7 @@ import {
 import {
   BulkDisputeQuery,
   OrderBy,
+  PaymentReleaseReviewTableColumns,
   useInfractionTableData,
 } from "@app/infractions/toolkit/table";
 import { InfractionTableThemeOptions } from "@app/infractions/toolkit/theme";
@@ -47,7 +47,8 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
   const [search, setSearch] = useState("");
   const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
   const [order] = useState<SortOrderType>("ASC");
-  const [orderBy] = useState<(typeof TableColumns)[number]>("lastUpdated");
+  const [orderBy] =
+    useState<(typeof PaymentReleaseReviewTableColumns)[number]>("lastUpdated");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -86,7 +87,10 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
     },
   });
 
-  const tableData = useInfractionTableData(TableColumns, data);
+  const tableData = useInfractionTableData(
+    PaymentReleaseReviewTableColumns,
+    data
+  );
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -206,7 +210,7 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
             <TableContainer>
               <Table size={"medium"}>
                 <TableHeading
-                  columns={TableColumns}
+                  columns={PaymentReleaseReviewTableColumns}
                   numSelected={selected.length}
                   order={order == "ASC" ? "asc" : "desc"}
                   orderBy={orderBy}
@@ -231,7 +235,7 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
                             }
                           />
                         </TableCell>
-                        {TableColumns.map((col) => (
+                        {PaymentReleaseReviewTableColumns.map((col) => (
                           <TableCell key={col} align="right">
                             {row[col]}
                           </TableCell>

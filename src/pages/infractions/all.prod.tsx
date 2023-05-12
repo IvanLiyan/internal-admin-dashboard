@@ -8,12 +8,12 @@ import CounterfeitSubreasonFilter from "@app/infractions/components/filters/Coun
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
-import { TableColumns } from "@app/infractions/toolkit/all";
 import {
   SearchTypes,
   useInfractionSearch,
 } from "@app/infractions/toolkit/search";
 import {
+  AllInfractionTableColumns,
   BulkDisputeQuery,
   OrderBy,
   useInfractionTableData,
@@ -49,7 +49,8 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
   const [search, setSearch] = useState("");
   const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
   const [order] = useState<SortOrderType>("ASC");
-  const [orderBy] = useState<(typeof TableColumns)[number]>("lastUpdated");
+  const [orderBy] =
+    useState<(typeof AllInfractionTableColumns)[number]>("lastUpdated");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -96,7 +97,7 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
     },
   });
 
-  const tableData = useInfractionTableData(TableColumns, data);
+  const tableData = useInfractionTableData(AllInfractionTableColumns, data);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -223,7 +224,7 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
             <TableContainer>
               <Table size={"medium"}>
                 <TableHeading
-                  columns={TableColumns}
+                  columns={AllInfractionTableColumns}
                   numSelected={selected.length}
                   order={order == "ASC" ? "asc" : "desc"}
                   orderBy={orderBy}
@@ -248,7 +249,7 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
                             }
                           />
                         </TableCell>
-                        {TableColumns.map((col) => (
+                        {AllInfractionTableColumns.map((col) => (
                           <TableCell key={col} align="right">
                             {row[col]}
                           </TableCell>

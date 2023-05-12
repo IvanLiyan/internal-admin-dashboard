@@ -25,10 +25,6 @@ export const InfractionsTableColumns = {
   correspondenceStatus: "Correspondence Status",
 } as const;
 
-export type InfractionTableData = {
-  readonly [T in keyof typeof InfractionsTableColumns]: string;
-};
-
 export const OrderBy: {
   [T in keyof typeof InfractionsTableColumns]: MerchantWarningSortFieldType | null;
 } = {
@@ -104,6 +100,102 @@ export const useInfractionTableData = <
     }, {} as { [K in T[number]]: string });
   });
 };
+
+export const ActionRequiredTableColumns = [
+  "created",
+  "creator",
+  "lastUpdated",
+  "merchantName",
+  "merchantId",
+  "infractionId",
+  "reason",
+  "parentCategory",
+  "subCategory",
+  "bdRep",
+  "geo",
+  "wssTier",
+  "wssImpact",
+  "correspondenceStatus",
+] as const;
+
+export const AllInfractionTableColumns = [
+  "created",
+  "creator",
+  "lastUpdated",
+  "merchantName",
+  "merchantId",
+  "infractionId",
+  "reason",
+  "parentCategory",
+  "subCategory",
+  "bdRep",
+  "geo",
+  "wssTier",
+  "wssImpact",
+] as const;
+
+export const AwaitingMerchantTableColumns = [
+  "created",
+  "creator",
+  "lastUpdated",
+  "merchantName",
+  "merchantId",
+  "infractionId",
+  "reason",
+  "parentCategory",
+  "subCategory",
+  "bdRep",
+  "geo",
+  "wssTier",
+  "wssImpact",
+] as const;
+
+export const ClosedInfractionTableColumns = [
+  "created",
+  "creator",
+  "lastUpdated",
+  "merchantName",
+  "merchantId",
+  "infractionId",
+  "reason",
+  "parentCategory",
+  "subCategory",
+  "bdRep",
+  "geo",
+  "wssTier",
+] as const;
+
+export const PaymentReleaseReviewTableColumns = [
+  "created",
+  "creator",
+  "lastUpdated",
+  "merchantName",
+  "merchantId",
+  "infractionId",
+  "reason",
+  "parentCategory",
+  "subCategory",
+  "bdRep",
+  "geo",
+  "wssTier",
+  "wssImpact",
+] as const;
+
+export const RequiresReviewTableColumns = [
+  "infractionId",
+  "created",
+  "creator",
+  "merchantName",
+  "bdRep",
+  "geo",
+  "reason",
+  "parentCategory",
+  "ban",
+  "gmv7Day",
+  "gmv7DayPercentage",
+  "gmvLifetime",
+  "orderCount30Day",
+] as const;
 
 export const BulkDisputeQuery = graphql(`
   query BulkDisputes_Infractions(
