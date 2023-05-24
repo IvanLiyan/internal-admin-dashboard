@@ -36,6 +36,10 @@ export const MenuData: MenuItemProps[] = [
         text: "All",
         href: "/infractions/all",
       },
+      {
+        text: "Bulk Processing Status",
+        href: "/infractions/bulk-status",
+      },
     ],
   },
 ];

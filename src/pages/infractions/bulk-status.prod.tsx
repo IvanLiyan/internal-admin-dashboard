@@ -1,7 +1,9 @@
+import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
-import BulkStatusRow from "@app/infractions/components/BulkStatusRow";
+import BulkProcessRequestRow from "@app/infractions/components/BulkProcessRequestRow";
 import {
+  BulkProcessingStatusQuery,
   ColumnLabels,
   TableColumns,
   useTableData,
@@ -20,19 +22,25 @@ import {
 } from "@mui/material";
 import { NextPage } from "next";
 import { useState } from "react";
+import { useQuery } from "urql";
 
-/**
- * Scaffolding for bulk process status page
- */
 const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
   const [, setSearch] = useState("");
   const [orderBy] = useState<(typeof TableColumns)[number]>("submitted");
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
 
-  // const offset = page * limit;
+  const offset = page * limit;
 
-  const tableData = useTableData();
+  const [{ data, fetching }] = useQuery({
+    query: BulkProcessingStatusQuery,
+    variables: {
+      limit,
+      offset,
+    },
+  });
+
+  const tableData = useTableData(data);
 
   return (
     <PageRoot title="Bulk Infraction Requests">
@@ -56,7 +64,7 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
               showLastButton
               rowsPerPageOptions={[10, 50, 100]}
               component={"div"}
-              count={0}
+              count={0} // TODO GQL not ready
               rowsPerPage={limit}
               page={page}
               onPageChange={(_, page) => {
@@ -71,40 +79,48 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
             {/* Place filters here */}
           </Stack>
         </Stack>
-        <TableContainer>
-          <Table size={"medium"}>
-            <TableHead>
-              <TableRow>
-                <TableCell />
+        {fetching ? (
+          <LoadingIndicator />
+        ) : (
+          <TableContainer>
+            <Table size={"medium"}>
+              <TableHead>
+                <TableRow>
+                  <TableCell />
 
-                {TableColumns.map((headCell) => {
-                  const key = headCell;
-                  const label = ColumnLabels[headCell];
-                  return (
-                    <TableCell
-                      key={key}
-                      align={"right"}
-                      sortDirection={orderBy === key ? "asc" : false}
-                    >
-                      <TableSortLabel
-                        active={orderBy === key}
-                        direction={orderBy === key && "asc" ? "asc" : undefined}
+                  {TableColumns.map((headCell) => {
+                    const key = headCell;
+                    const label = ColumnLabels[headCell];
+                    return (
+                      <TableCell
+                        key={key}
+                        align={"right"}
+                        sortDirection={orderBy === key ? "asc" : false}
                       >
-                        {label}
-                      </TableSortLabel>
-                    </TableCell>
+                        <TableSortLabel
+                          active={orderBy === key}
+                          direction={
+                            orderBy === key && "asc" ? "asc" : undefined
+                          }
+                        >
+                          {label}
+                        </TableSortLabel>
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {tableData?.map((row) => {
+                  return (
+                    <BulkProcessRequestRow key={row.requestId} row={row} />
                   );
                 })}
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {tableData?.map((row) => {
-                return <BulkStatusRow key={row.requestId} row={row} />;
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
     </PageRoot>
   );

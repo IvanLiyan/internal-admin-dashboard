@@ -43,6 +43,15 @@ input AcceptTermsOfServiceInput {
   tosRegion: TermsOfServiceRegionType
 }
 
+type AcceptTos {
+  ok: Boolean!
+  message: String
+}
+
+input AcceptTosInput {
+  country: CountryCode!
+}
+
 enum AccountBalanceType {
   CONFIRMED
   PENDING
@@ -725,6 +734,46 @@ enum BalanceUpdateReason {
   ISSUING_CREDITS
 }
 
+type BankAccountDocumentSchema {
+  id: ObjectIdType!
+  documentFile: MerchantFileSchema
+  uploadedAt: Datetime!
+  state: BankAccountVerificationStatus!
+  comment: String
+  documentType: BankAccountDocumentType
+  reviewedAt: Datetime
+  reviewer: UserSchema
+}
+
+enum BankAccountDocumentType {
+  GOVERNMENT_DOCUMENT
+  UNIDENTIFIED
+  BANK_DOCUMENT
+}
+
+type BankAccountVerificationMerchantMutations {
+  uploadDocument(input: UploadBankAccountDocumentInput!): UploadBankAccountDocument!
+}
+
+type BankAccountVerificationReviewerMutations {
+  reviewDocument(input: ReviewBankAccountDocumentInput!): ReviewBankAccountDocument
+}
+
+type BankAccountVerificationSchema {
+  id: ObjectIdType!
+  state: BankAccountVerificationStatus!
+  lastReviewedAt: Datetime
+  lastUploadedAt: Datetime
+  bankAccountDocuments: [BankAccountDocumentSchema!]
+}
+
+enum BankAccountVerificationStatus {
+  SUBMITTED
+  REJECTED
+  APPROVED
+  PENDING
+}
+
 type BdSignupCodeInfo {
   valid: Boolean!
   bdName: String
@@ -1067,8 +1116,8 @@ type BrandPartnerUserMutations {
 }
 
 type BrandProtection {
-  injunctionMerchantFreezes(imfIds: [ObjectIdType!], merchantIds: [ObjectIdType!], troNumbers: [Int!], state: [InjunctionMerchantFreezeState!], freezeTypes: [InjunctionMerchantFreezeType!], offset: Int = 0, count: Int = 50): [InjunctionMerchantFreezeSchema!]!
-  numInjunctionMerchantFreezes(imfIds: [ObjectIdType!], merchantIds: [ObjectIdType!], troNumbers: [Int!], state: [InjunctionMerchantFreezeState!], freezeTypes: [InjunctionMerchantFreezeType!]): Int!
+  injunctionMerchantFreezes(imfIds: [ObjectIdType!], merchantIds: [ObjectIdType!], troNumbers: [Int!], state: [InjunctionMerchantFreezeState!], freezeTypes: [InjunctionMerchantFreezeType!], fineIds: [ObjectIdType!], legalStartDateUnix: Int, legalEndDateUnix: Int, updatedStartDateUnix: Int, updatedEndDateUnix: Int, offset: Int = 0, count: Int = 50): [InjunctionMerchantFreezeSchema!]!
+  numInjunctionMerchantFreezes(imfIds: [ObjectIdType!], merchantIds: [ObjectIdType!], troNumbers: [Int!], state: [InjunctionMerchantFreezeState!], freezeTypes: [InjunctionMerchantFreezeType!], fineIds: [ObjectIdType!], legalStartDateUnix: Int, legalEndDateUnix: Int, updatedStartDateUnix: Int, updatedEndDateUnix: Int): Int!
   canManageFreezes: Boolean!
 }
 
@@ -1168,6 +1217,15 @@ type BrandingSchema {
   latestDateWithBrandData: Datetime
 }
 
+enum BulkMerchantWarningAction {
+  DECLINE
+  REVERSE
+  CONFIRM
+  DECLINE_AND_CLOSE
+  APPROVE
+  DELETE
+}
+
 input BulkReviewInput {
   merchantIds: [ObjectIdType!]!
   reviewState: SanctionScreeningHitStateType!
@@ -1181,6 +1239,18 @@ type BulkReviewMutation {
   totalToUpdate: Int!
   successfullyUpdated: Int!
   errorMessage: String
+}
+
+type BulkUpsertMerchantWarning {
+  ok: Boolean!
+  message: String
+}
+
+input BulkUpsertMerchantWarningInput {
+  action: BulkMerchantWarningAction!
+  warningIds: [ObjectIdType!]!
+  message: String
+  comment: String
 }
 
 enum BusinessDocTypes {
@@ -1280,6 +1350,12 @@ type CSVValidationSchema {
   columnMapping: [CsvColumnMappingEntrySchema!]!
 }
 
+enum CalculatedShippingAccountConfigType {
+  ACCOUNT_LEVEL_OFF
+  ACCOUNT_LEVEL_ON
+  USE_PRODUCT_LEVEL_CONFIG
+}
+
 type CampaignEventInfo {
   id: ObjectIdType!
   name: String!
@@ -1334,6 +1410,10 @@ type CancelChargeTransactionMutation {
   message: String
 }
 
+input CancelInfractionInput {
+  reason: CancelReason!
+}
+
 type CancelMFPCampaign {
   ok: Boolean!
   message: String
@@ -1343,6 +1423,17 @@ input CancelMFPCampaignInput {
   campaignId: ObjectIdType!
   cancelReason: MFPCampaignCancelReason!
   comment: String
+}
+
+enum CancelReason {
+  ALREADY_DELETED
+  POLICY_UPDATE
+  WHITE_GLOVE_WISH_X_STRAT_MERCH
+  AGENT_ERROR
+  INCORRECT_DATA
+  OFFENDING_CONTENT_REMOVED
+  EXPIRED
+  PASSED_AUTHORIZATION_TAGGING
 }
 
 type CancelReturn {
@@ -1430,6 +1521,16 @@ type CategoryClassificationTaggerJobSchema {
   treeVersion: String
   merchantGeneratedCategory: TaxonomyCategorySchema
   modelGeneratedCategory: TaxonomyCategorySchema
+}
+
+type CategoryEprSchema {
+  id: ObjectIdType
+  category: Int!
+  categoryName: String!
+  uin: String
+  responsibleEntityName: String
+  status: EPRStatus
+  inScopePidCount: Int!
 }
 
 input ChangeDisplayNameInput {
@@ -1649,6 +1750,10 @@ type ChromeSchema {
   objectSearch(objectId: ObjectIdType!, currentPath: String): NavigationResultSchema
 }
 
+input ClaimInfractionInput {
+  warningIds: [ObjectIdType!]
+}
+
 type ClearAllUIState {
   ok: Boolean!
   message: String
@@ -1666,6 +1771,7 @@ type ClearVacationSettingsMutation {
 
 enum ClientWritableBucket {
   BRAND_LOGO
+  BANK_ACCOUNT_DOCUMENTS
   RACC_SOURCE_ASSETS
   TEMP_UPLOADS
   REGULATOR_REPORT_FILE_UPLOADS
@@ -2284,6 +2390,15 @@ enum CountryCode {
   TV
 }
 
+type CountryEPRSchema {
+  country: Country!
+  categoriesWithoutEpr: Int!
+  categoriesWithEpr: Int!
+  categories: [CategoryEprSchema!]!
+  tos: String!
+  hasAcceptedTos: Boolean!
+}
+
 input CountryShippingInput {
   countryCode: CountryCode!
   enabled: Boolean
@@ -2397,6 +2512,17 @@ input CreateProductTaxonomyCategoryDisputeInput {
   merchantNote: String
 }
 
+input CreateProductsDownloadJobInput {
+  promotionType: MFPCampaignPromotionType!
+  eventId: ObjectIdType
+}
+
+type CreateProductsDownloadJobMutation {
+  jobId: ObjectIdType
+  ok: Boolean!
+  message: String
+}
+
 type CreateShippingPlan {
   ok: Boolean!
   message: String
@@ -2440,6 +2566,18 @@ input CreateTakedownRequestInput {
   typeOfInfringement: TypeOfInfringement!
   productIds: [ObjectIdType!]!
   notes: String
+}
+
+type CreateUin {
+  ok: Boolean!
+  message: String
+}
+
+input CreateUinInput {
+  country: CountryCode!
+  category: Int!
+  responsibleEntityName: String!
+  uin: String!
 }
 
 input CreateWhitelistProductsInput {
@@ -2715,6 +2853,46 @@ type DeciderKeySchema {
   decideForName(name: String!): Boolean!
 }
 
+type DedupImageLibraryHub {
+  imageCount(imageType: DedupImageType!, query: String, lastUpdateTimeStart: DatetimeInput, lastUpdateTimeEnd: DatetimeInput): Int!
+  images(offset: Int = 0, limit: Int = 25, imageType: DedupImageType!, query: String, lastUpdateTimeStart: DatetimeInput, lastUpdateTimeEnd: DatetimeInput, sort: DedupImageSort): [DedupImageSchema!]!
+}
+
+type DedupImageSchema {
+  id: ObjectIdType!
+  imageType: DedupImageType!
+  imagePhash: String!
+  inappropriateReason: CounterfeitReasonCode
+  inappropriateSubcategory: TaggingViolationSubReasonCode
+  counterfeitReason: CounterfeitReasonCode
+  counterfeitSubcategory: TaggingViolationSubReasonCode
+  brand: BrandSchema
+  sampleImageUrl: String
+  updateTime: Datetime!
+  source: DedupSource
+}
+
+input DedupImageSort {
+  field: DedupImageSortFieldType!
+  order: SortOrderType!
+}
+
+enum DedupImageSortFieldType {
+  CREATED_TIME
+  LAST_UPDATE
+  BRAND_NAME
+}
+
+enum DedupImageType {
+  IP_VIOLATION
+  INAPPROPRIATE
+}
+
+enum DedupSource {
+  MANUALLY_ADDED
+  AUDIT_FEEDBACK
+}
+
 input DefaultShippingInput {
   warehouseId: ObjectIdType!
   price: CurrencyInput!
@@ -2739,6 +2917,15 @@ type DeleteBrandEnrollment {
 
 input DeleteBrandEnrollmentInput {
   brandInfoId: ObjectIdType!
+}
+
+type DeleteDedupImage {
+  ok: Boolean!
+  message: String
+}
+
+input DeleteDedupImageInput {
+  imageIds: [ObjectIdType!]!
 }
 
 input DeleteDeviceInput {
@@ -2775,6 +2962,15 @@ type DeleteProductPostsMutation {
   ok: Boolean!
   message: String
   errorCode: ProductPostErrorCode
+}
+
+type DeleteUin {
+  ok: Boolean!
+  message: String
+}
+
+input DeleteUinInput {
+  id: ObjectIdType!
 }
 
 type DeleteWebhookSubscription {
@@ -3094,17 +3290,36 @@ type DownloadAllProductsCSV {
 input DownloadAllProductsCSVInput {
   includeRejected: Boolean = false
   warehouseId: ObjectIdType
+  templateType: ProductsCSVTemplateType = 1
+  categoryIds: [Int!]
 }
 
 input DownloadAllProductsInput {
   fileType: FileType = csv
   includeRejected: Boolean = false
   warehouseId: ObjectIdType
+  templateType: ProductsCSVTemplateType = 1
+  categoryIds: [Int!]
 }
 
 type DownloadEUComplianceProductLinks {
   ok: Boolean!
   errorMessage: String
+}
+
+type EPRMutations {
+  createUin(input: CreateUinInput!): CreateUin
+  updateUin(input: UpdateUinInput!): UpdateUin
+  deleteUin(input: DeleteUinInput!): DeleteUin
+  acceptTos(input: AcceptTosInput!): AcceptTos
+}
+
+enum EPRStatus {
+  DELETED
+  ADMIN_APPROVED
+  COMPLETE
+  REJECTED
+  IN_REVIEW
 }
 
 input EUComplianceAddressInput {
@@ -3342,6 +3557,11 @@ input ExpireWhitelistProductsInput {
 type ExpireWhitelistProductsMutation {
   ok: Boolean!
   message: String
+}
+
+type ExtendedProducerResponsibilitySchema {
+  country(countryCode: CountryCode!): CountryEPRSchema!
+  countries: [CountryEPRSchema!]!
 }
 
 type ExternalBoostAttributedStats {
@@ -3641,6 +3861,15 @@ type FloorBidsSchema {
   bidPrice: CurrencyValue!
   date: Datetime!
   trueTag: TrueTagSchema!
+}
+
+type ForceApproveProduct {
+  ok: Boolean!
+  message: String
+}
+
+input ForceApproveProductInput {
+  productId: ObjectIdType!
 }
 
 type FranceComplianceMutations {
@@ -4100,6 +4329,11 @@ input InjunctionMerchantFreezeFilterInput {
   troNumbers: [Int!]
   states: [InjunctionMerchantFreezeState!]
   freezeTypes: [InjunctionMerchantFreezeType!]
+  fineIds: [ObjectIdType!]
+  legalStartDateUnix: Int
+  legalEndDateUnix: Int
+  updatedStartDateUnix: Int
+  updatedEndDateUnix: Int
 }
 
 input InjunctionMerchantFreezeFinePaymentInput {
@@ -4174,6 +4408,7 @@ type InjunctionMerchantFreezeSchema {
   sumOfFineAmounts: CurrencyValue!
   tentativeFreezeAmount: CurrencyValue
   state: InjunctionMerchantFreezeState!
+  lastUpdatedAt: Datetime!
 }
 
 enum InjunctionMerchantFreezeState {
@@ -4335,6 +4570,48 @@ enum LedgerAccountBalanceType {
   PENDING
 }
 
+type LedgerEvent {
+  id: String!
+  eventType: LedgerEventType!
+  documentId: String
+  eventTime: Datetime!
+  data: String!
+}
+
+enum LedgerEventType {
+  FINE_ELIGIBILITY_UPDATE
+  ARRIVE_AT_EPC_WAREHOUSE
+  USER_CONFIRMED_DELIVERED
+  FEE_CREATION
+  TRACKING_CANCELLED
+  CONFIRMED_DELIVERED
+  LEDGER_ITEM_FETCH
+  TAX_UPDATE
+  REBATE_CREATE
+  FEE_ELIGIBILITY_UPDATE
+  CONFIRMED_SHIPPED
+  ONEOFF_PAYMENT_CREATION
+  RECEIVE_WP_SHIPPING_ADJUSTMENT
+  RECEIVE_INITIAL_WP_SHIPPING
+  REMOVED_FROM_A_PLUS
+  LEDGER_ITEM_STATE_BATCH_UPDATE
+  FINE_REVERSAL
+  PAYMENT_AMOUNT_AMENDMENT
+  FINE_CREATION
+  MARKED_SHIPPED
+  ORDER_RELEASED
+  ONEOFF_PAYMENT_CANCEL
+  DISPUTE_SUCCESS
+  ORDER_WITHHOLD_CANCEL
+  REBATE_CANCEL
+  ORDER_REFUND
+  ACCOUNT_BALANCES_FETCH
+  FEE_REVERSAL
+  ORDER_WITHHOLD
+  TAX_ADJUSTMENT
+  TRACKING_AMENDMENT
+}
+
 type LedgerItem {
   id: String
   merchantPayableId: String!
@@ -4415,6 +4692,7 @@ type LedgerOrderInfo {
 
 type LedgerPayableInfo {
   ledgerItems: [LedgerItem!]
+  ledgerEvents: [LedgerEvent!]
 }
 
 enum LedgerPayableState {
@@ -4957,6 +5235,7 @@ type MFPServiceMutations {
   upsertDiscountCampaign(input: UpsertDiscountCampaignInput!): UpsertDiscountCampaignMutation!
   upsertFlashSaleCampaign(input: UpsertFlashSaleCampaignInput!): UpsertFlashSaleCampaignMutation!
   cancelMfpCampaign(input: CancelMFPCampaignInput!): CancelMFPCampaign!
+  createProductsDownloadJob(input: CreateProductsDownloadJobInput!): CreateProductsDownloadJobMutation!
   admin: MFPServiceAdminMutations
 }
 
@@ -5575,6 +5854,14 @@ input MerchantGamingReviewUpdateInput {
   infractionIds: String
 }
 
+type MerchantIdentityMutations {
+  bankAccountVerification: BankAccountVerificationReviewerMutations!
+}
+
+type MerchantIdentityServiceSchema {
+  bankAccountVerifications(offset: Int = 0, limit: Int = 50, merchantId: ObjectIdType, state: BankAccountVerificationStatus): [BankAccountVerificationSchema!]
+}
+
 type MerchantInviteInfo {
   valid: Boolean!
   email: String
@@ -5662,6 +5949,7 @@ type MerchantMutation {
   merchantTaxIdentification: MerchantTaxIdentificationMutations!
   sellerIdentityVerification: SellerIdentityVerificationMutations!
   sellerIdentityCnVerification: SellerIdentityCNVerificationMutations!
+  bankAccountVerification: BankAccountVerificationMerchantMutations!
   returnSettings: MerchantReturnSettingsMutations!
   returnWarehouseSettings: MerchantReturnWarehouseMutations
 }
@@ -5892,7 +6180,7 @@ type MerchantPaymentsService {
   paymentInfo(merchantId: ObjectIdType): MerchantPaymentDetail
   currentMerchant: MerchantPaymentDetail
   ledgerOrderInfo(orderId: String!): LedgerOrderInfo
-  ledgerPayableInfo(payableId: String!, payableType: String!): LedgerPayableInfo
+  ledgerPayableInfo(payableId: String!, payableType: String!, includeEvents: Boolean): LedgerPayableInfo
   disbursementScheduleInfo(year: Int!, paymentCycle: Int!): DisbursementScheduleInfo
 }
 
@@ -6067,6 +6355,7 @@ type MerchantSchema {
   isWishBlueSelfInventory: Boolean!
   isFactory: Boolean!
   taxIdentification: MerchantTaxIdentificationSchema
+  bankAccountVerification: BankAccountVerificationSchema
   email: String!
   isIdentifiedUsTax: Boolean
   eligibleForExpeditedPaymentPolicy: Boolean
@@ -6084,6 +6373,8 @@ type MerchantSchema {
   disableReasonCategory: String
   isFlatRateShippingOptedIn: Boolean
   canAccessFlatRateShippingOptInOptOut: Boolean
+  calculatedShippingAccountConfig: CalculatedShippingAccountConfigType
+  canAccessCalculatedShippingAccountConfig: Boolean
 }
 
 type MerchantSenderAddressMutations {
@@ -6373,6 +6664,7 @@ enum MerchantTodoItemType {
   BIND_WECHAT
   WE_REAPPLICATION_ELIGIBLE
   PRICE_DROP_VIEW_ONGOING_CAMPAIGNS
+  BANK_ACCOUNT_VERIFICATION
   TAX_VERIFICATION_FAILED
   UPLOAD_NEW_PRODUCTS
   ENROLL_PRODUCTS_IN_RETURNS
@@ -6515,10 +6807,14 @@ enum MerchantWarehouseWeekStatsSortFieldType {
 }
 
 enum MerchantWarningAction {
-  REPLY
+  CLAIM
+  LISTING_LEVEL_DISPUTE
+  UNCLAIM
+  CONFIRM
   MERCHANT_LEVEL_DISPUTE
   REQUEST_PAYMENT_RELEASE
-  LISTING_LEVEL_DISPUTE
+  CANCEL
+  REPLY
 }
 
 enum MerchantWarningAuditAction {
@@ -6538,6 +6834,15 @@ enum MerchantWarningAuditStatus {
   REQUIRE_AUDIT
   CONFIRMED
   REVERTED
+}
+
+type MerchantWarningBulkProcessSchema {
+  id: ObjectIdType!
+  type: BulkMerchantWarningAction!
+  requestedBy: String!
+  requestedWarningIds: [ObjectIdType!]
+  results: [MerchantWarningProcessResultSchema!]
+  submitted: Datetime!
 }
 
 enum MerchantWarningClaimStatus {
@@ -6589,6 +6894,12 @@ enum MerchantWarningImpactType {
 type MerchantWarningMutations {
   updateAuditQueueWarning(input: UpdateAuditQueueWarningInput): UpdateAuditQueueWarning
   upsertMerchantWarning(input: UpsertMerchantWarningInput): UpsertMerchantWarning
+}
+
+type MerchantWarningProcessResultSchema {
+  warningId: ObjectIdType!
+  success: Boolean!
+  error: String
 }
 
 enum MerchantWarningProofDisputeStatus {
@@ -6733,6 +7044,7 @@ enum MerchantWarningReplySenderType {
 
 enum MerchantWarningReplyType {
   ADMIN_COMMENT
+  REOPEN_REPLY
   APPROVE_PAYMENT_RELEASE
   UNBAN_EXPLANATION
   REGULAR_REPLY
@@ -6745,7 +7057,7 @@ enum MerchantWarningReplyType {
   REJECT_PAYMENT_RELEASE
   BD_APPROVE_PAYMENT_RELEASE
   REMOVE_WITHHOLD_FUNDS_EXPLANATION
-  REOPEN_REPLY
+  CLOSE_EXPLANATION
   RESET_PAYMENT_RELEASE
 }
 
@@ -6782,6 +7094,7 @@ type MerchantWarningSchema {
   takedownRequest: TakedownRequestSchema
   replies: [MerchantWarningReplySchema!]
   resolved: Boolean!
+  bulkProcessing: Boolean
 }
 
 input MerchantWarningSort {
@@ -7713,7 +8026,7 @@ enum PermissionType {
   CAN_CHECK_EXTERNAL_TRACKING
   SHOW_SHIPPING_PROVIDERS
   CAN_VIEW_ALL_INTERNAL_USERS
-  VIEW_TERM_OF_SERVICE_EPC_BILL_HOLD
+  CAN_REVIEW_MERCHANT_KYC
   REVIEW_ONEOFF_REQ_DISABLE_DYNAMIC_PRICING
   EDIT_TAGGING_PERMISSIONS
   CAN_ACT_ON_KR_MERCHANT
@@ -7747,6 +8060,7 @@ enum PermissionType {
   CAN_GROUP_MERCHANTS
   PROMO_TAG
   TRIGGER_SELLER_PROFILE_REVERIFICATION
+  CAN_UPLOAD_BANK_ACCOUNT_DOCUMENT
   MANAGE_LEGAL_INJUNCTION
   DEP_TRUE_BRAND_RESOLUTION_TAG
   REVIEW_ONEOFF_REQ_ISSUE_PB_CREDITS_TO_SELF_INVENTORY_MERCHANTS
@@ -7920,6 +8234,7 @@ enum PermissionType {
   UPLOAD_PRODUCTS_CSV
   CREATE_WISHPOST_ID_NOT_COMPLETE_FACE_RECOGNITION
   EXPORT_PRODUCT_DATA
+  VIEW_TERM_OF_SERVICE_EPC_BILL_HOLD
   CAN_EDIT_CANNED_RESPONSES
   CAN_VIEW_EARLY_PAYMENT_RISK_CONTROL
   CAN_REVIEW_TRACKING_DISPUTES
@@ -7976,6 +8291,7 @@ enum PermissionType {
   SHOW_MERCHANT_ASSETS
   REVIEW_ONEOFF_REQ_REMOVE_MAX_TTD_ENTENSION
   TRIGGER_KYC_REVERIFICATION
+  CAN_REVIEW_BANK_ACCOUNT_DOCUMENT
   EXPORT_ORDERS
   SHOW_MERCHANT_STATS
   VIEW_WARNING_BAN_HOLD
@@ -7999,6 +8315,7 @@ enum PermissionType {
   CAN_PERFORM_ACTION_ON_WISH_USERS
   PROFILE_PICTURE_TAG
   CREATE_OTHER_HOLD
+  CAN_ACCESS_BULK_ORDER_INFRACTION_TOOL
   INAPPROPRIATE_IN_HOUSE_TAG
   CAN_ACCESS_V2_HOMEPAGE
   MANAGE_SIZE_CHART
@@ -8361,6 +8678,7 @@ type PolicyMutations {
   merchantFinalSale: MerchantFinalSaleMutations
   merchantGamingReviewTicket: MerchantGamingReviewMutations
   merchantWarning: MerchantWarningMutations
+  bulkUpsertMerchantWarning(input: BulkUpsertMerchantWarningInput): BulkUpsertMerchantWarning
   productCategoryDispute: ProductCategoryDisputeMutations
   orderInfractionDispute: OrderInfractionDisputeMutations
   wfp: WFPMutations
@@ -8389,6 +8707,7 @@ type PolicySchema {
   productCategoryDispute: ProductCategoryDisputeHub
   dispute: DisputeSchema
   cannedResponse: CannedResponseHub
+  merchantWarningBulkProcesses(offset: Int = 0, limit: Int = 20, search: String, types: [BulkMerchantWarningAction!]): [MerchantWarningBulkProcessSchema!]
 }
 
 enum PolicyType {
@@ -8639,12 +8958,16 @@ type ProductCSVImportSchema {
 }
 
 enum ProductCSVJobType {
+  NEW_ADD_PRODUCTS
   ADD_PRODUCTS
   CREATE_PRESALE_PRODUCT
+  NEW_UPDATE_PRODUCTS
   EDIT_WISH_EXPRESS_COUNTRIES
-  SHOPIFY_CREATE_PRODUCTS
+  NEW_EDIT_SHIPPING
   UPSERT_PRODUCTS
+  NEW_ADD_VARIATION
   EDIT_FBW_SHIPPING
+  SHOPIFY_CREATE_PRODUCTS
   EDIT_SHIPPING
   ADD_SIZE_COLOR
   UPDATE_PRODUCTS
@@ -8660,6 +8983,7 @@ type ProductCatalogMutations {
   updateProductLogisticsMetadata(input: UpdateProductLogisticsMetadataInput!): UpdateProductLogisticsMetadata
   upsertVideo(input: VideoUpsertInput): UpsertVideo
   removeVideo(input: RemoveVideoInput!): RemoveVideo
+  forceApproveProduct(input: ForceApproveProductInput!): ForceApproveProduct
 }
 
 type ProductCatalogSchema {
@@ -8676,7 +9000,11 @@ type ProductCatalogSchema {
   csvProductImportJobsCount(feedType: ProductCSVJobType): Int!
   csvProductColumnNames: [String!]!
   csvProductColumnEnums: [ProductCSVColumnName!]!
+  csvShippingHeaderNames: [String!]!
+  csvPriceInventoryHeaderNames: [String!]!
+  csvTitleImagesDescriptionHeaderNames: [String!]!
   gtinProductService: GtinProductServiceSchema!
+  csvEnableDisableHeaderNames: [String!]!
   videoService: ProductVideoServiceSchema!
   csvProductTemplateWithTaxonomyColumnNames(categoryId: Int!, treeVersion: String!): [String!]
 }
@@ -8774,6 +9102,7 @@ type ProductComplianceMutations {
   euCompliance: EUComplianceMutations
   frCompliance: FranceComplianceMutations
   deCompliance: GermanyComplianceMutations
+  extendedProducerResponsibility: EPRMutations
 }
 
 type ProductComplianceSchema {
@@ -8790,6 +9119,7 @@ type ProductComplianceSchema {
   franceProductUniqueIdentificationNumbers(category: [FranceProductUniqueIdentificationNumberCategory!], states: [FranceProductUniqueIdentificationNumberStatus!]): [FranceProductUniqueIdentificationNumberSchema!]
   germanyProductUniqueIdentificationNumberCount(categories: [GermanyProductUniqueIdentificationNumberCategory!], states: [GermanyProductUniqueIdentificationNumberStatus!]): Int
   germanyProductUniqueIdentificationNumbers(categories: [GermanyProductUniqueIdentificationNumberCategory!], states: [GermanyProductUniqueIdentificationNumberStatus!]): [GermanyProductUniqueIdentificationNumberSchema!]
+  extendedProducerResponsibility: ExtendedProducerResponsibilitySchema!
 }
 
 enum ProductComplianceSearchType {
@@ -9381,6 +9711,15 @@ type ProductWeeklyStats {
   refund: RefundPerformanceStats!
   cs: CSPerformanceStats!
   sales: SalesPerformanceStats!
+}
+
+enum ProductsCSVTemplateType {
+  CATEGORY
+  DEFAULT
+  ENABLED
+  SHIPPING
+  CONTENT
+  PRICE_AND_INVENTORY
 }
 
 type PromotableProduct {
@@ -10304,6 +10643,19 @@ type Reversal {
   amount: CurrencyValue!
 }
 
+type ReviewBankAccountDocument {
+  ok: Boolean!
+  message: String
+}
+
+input ReviewBankAccountDocumentInput {
+  merchantId: ObjectIdType!
+  documentId: ObjectIdType!
+  documentType: BankAccountDocumentType!
+  state: BankAccountVerificationStatus!
+  comment: String
+}
+
 input ReviewMerchantTaxIdentificationInput {
   merchantTaxIdentificationId: ObjectIdType!
   reviewAction: MerchantTaxIdentificationReviewAction!
@@ -10447,6 +10799,7 @@ type RootMutation {
   customerSupportTickets: CustomerSupportTicketMutations
   locale: LocaleMutations
   sanctionScreening: SanctionScreeningMutations
+  merchantIdentity: MerchantIdentityMutations
 }
 
 type RootQuery {
@@ -10488,6 +10841,7 @@ type RootQuery {
   merchantEntity(merchantId: String, entityId: String): MerchantEntitySchema
   taxonomy: TaxonomySchema
   listingQualityInsights: ListingQualityInsightsSchema
+  merchantIdentity: MerchantIdentityServiceSchema
 }
 
 type SalesPerformanceStats {
@@ -11151,7 +11505,7 @@ type ShippingSchema {
 }
 
 type ShippingSettingMutations {
-  updateShippingSetting(useShopifyShippingRate: Boolean, flatRateShippingOptInStatus: Boolean, countryShipping: [CountryShippingSetting!], otherCountriesShipping: OtherCountriesShippingSetting, isUpsert: Boolean = false): UpdateShippingSetting
+  updateShippingSetting(useShopifyShippingRate: Boolean, countryShipping: [CountryShippingSetting!], calculatedShippingAccountConfig: Int, flatRateShippingOptInStatus: Boolean, otherCountriesShipping: OtherCountriesShippingSetting, isUpsert: Boolean = false): UpdateShippingSetting
 }
 
 type ShippingSettingsSchema {
@@ -11418,6 +11772,8 @@ type TaggingMutations {
   markProductTaxonomyCategoryDisputeUnchanged(input: MarkProductTaxonomyCategoryDisputeUnchangedInput!): MarkProductTaxonomyCategoryDisputeUnchanged
   getAndClaimProductTaxonomyCategoryDispute(input: GetAndClaimProductTaxonomyCategoryDisputeForReviewInput): GetAndClaimProductTaxonomyCategoryDisputeForReview
   submitAttributeExtraction(input: SubmitAttributeExtractionInput!): SubmitAttributeExtraction
+  updateDedupImage(input: UpdateDedupImageInput!): UpdateDedupImage
+  deleteDedupImage(input: DeleteDedupImageInput!): DeleteDedupImage
 }
 
 type TaggingServiceSchema {
@@ -11429,6 +11785,7 @@ type TaggingServiceSchema {
   productTaggingStatus(productId: ObjectIdType!): ProductTaggingStatusSchema
   productTaxonomyCategoryDisputeHub: ProductTaxonomyCategoryDisputeHub
   attributeExtractionTaggerJob(taskId: String): AttributeExtractionTaggerJobSchema
+  dedupImageLibHub: DedupImageLibraryHub
 }
 
 type TaggingViolationReason {
@@ -11970,6 +12327,8 @@ type TaxonomySchema {
   attributes(categoryId: Int!, treeVersion: String): [TaxonomyAttributeSchema!]
   l1Categories(leafCategoryIds: [Int!], treeVersion: String): [TaxonomyCategorySchema!]
   variationOptions(categoryId: Int!, treeVersion: String): [TaxonomyAttributeSchema!]
+  taxonomyTreeCsv(treeVersion: String): [[String!]!]
+  categoryAttributesCsv(categoryId: Int!): [[String!]!]
 }
 
 enum TermsOfServiceRegionType {
@@ -12485,6 +12844,16 @@ input UpdateAuditQueueWarningInput {
   auditRevertReason: MerchantWarningAuditRevertReason
 }
 
+type UpdateDedupImage {
+  ok: Boolean!
+  message: String
+}
+
+input UpdateDedupImageInput {
+  imageIds: [ObjectIdType!]!
+  brandId: ObjectIdType!
+}
+
 type UpdateMerchantFinalSale {
   ok: Boolean!
   message: String
@@ -12630,6 +12999,17 @@ input UpdateUIStateInput {
   intArrayValue: [Int!]
 }
 
+type UpdateUin {
+  ok: Boolean!
+  message: String
+}
+
+input UpdateUinInput {
+  id: ObjectIdType!
+  responsibleEntityName: String!
+  uin: String!
+}
+
 input UpdateUserInfoInput {
   id: ObjectIdType!
   firstName: String
@@ -12654,6 +13034,15 @@ input UpdateUserQueuesInput {
 type UpdateUserQueuesMutation {
   ok: Boolean!
   error: String
+}
+
+type UploadBankAccountDocument {
+  ok: Boolean!
+  message: String
+}
+
+input UploadBankAccountDocumentInput {
+  url: String!
 }
 
 type UploadEUVATTaxQuestionnaire {
@@ -12818,6 +13207,8 @@ input UpsertMerchantWarningInput {
   messageInput: ReplyInfractionInput
   disputeInput: DisputeInfractionInput
   requestPaymentInput: RequestPaymentInput
+  cancelWarningInput: CancelInfractionInput
+  claimWarningInput: ClaimInfractionInput
 }
 
 type UpsertOrderInfractionDispute {
@@ -13650,8 +14041,8 @@ type WSSPerformanceDeepDiveHub {
   orderFulfillmentSpeed(offset: Int = 0, limit: Int = 5, sortField: SortOrderFulfillmentSpeed = 1, sortOrder: SortByOrder = 2, orderIds: [ObjectIdType!] = [], destinations: [String!] = [], carriers: [String!] = []): WSSOrderFulfillmentPage!
   orderLogisticsRefund(offset: Int = 0, limit: Int = 5, sortField: SortOrderTransactionDateField = 1, sortOrder: SortByOrder = 2, orderIds: [ObjectIdType!] = [], refundReasons: [WSSLogisticsRefundReason!] = [], carriers: [String!] = []): WSSOrderRefundPage!
   orderQualityRefund(offset: Int = 0, limit: Int = 5, sortField: SortOrderTransactionDateField = 1, sortOrder: SortByOrder = 2, productId: ObjectIdType, refundReasons: [WSSQualityRefundReason!] = []): WSSOrderRefundPage!
-  productQualityRefund(offset: Int = 0, limit: Int = 5, sortField: SortProductQualityRefundField = 3, sortOrder: SortByOrder = 2, productIds: [ObjectIdType!] = []): WSSProductRefundPage!
-  productRating(offset: Int = 0, limit: Int = 5, sortField: SortProductRatingField = 4, sortOrder: SortByOrder = 1, productIds: [ObjectIdType!] = []): WSSProductRatingPage!
+  productQualityRefund(offset: Int = 0, limit: Int = 5, sortField: SortProductQualityRefundField = 3, sortOrder: SortByOrder = 2, productIds: [ObjectIdType!] = [], isBadByRefund: Boolean = false): WSSProductRefundPage!
+  productRating(offset: Int = 0, limit: Int = 5, sortField: SortProductRatingField = 4, sortOrder: SortByOrder = 1, productIds: [ObjectIdType!] = [], isBadByRating: Boolean = false): WSSProductRatingPage!
   qualityRefundBreakdown(productId: ObjectIdType): [WSSRefundBreakdown!]!
   fulfillmentRateDenominator: Int
   validTrackingRateDenominator: Int
@@ -13993,6 +14384,10 @@ type WishSellerStandardStats {
   repeatIpInfractionCount: Int!
   materialListingChangeCount: Int!
   date: Datetime!
+  productWithOrdersCount: Int
+  badProductCount: Int
+  badProductRate: Float
+  levelPreview: WSSMerchantLevelType
 }
 
 type WishUserSchema {

@@ -1,6 +1,8 @@
 #!/bin/bash
+
+# create certs required for HTTPS
 echo "setting up certs..."
-npm install
+yarn install
 node scripts/create-certs
 
 echo "Done"

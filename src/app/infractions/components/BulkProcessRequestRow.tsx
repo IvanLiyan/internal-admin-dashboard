@@ -15,11 +15,11 @@ import {
   ExpandRowColumns,
   ExpandRowLabels,
   TableColumns,
-  useTableData,
+  TableData,
 } from "@app/infractions/toolkit/bulk-status";
 
-const BulkStatusRow: React.FC<{
-  readonly row: ReturnType<typeof useTableData>[number];
+const BulkProcessRequestRow: React.FC<{
+  readonly row: TableData;
 }> = ({ row }) => {
   const [open, setOpen] = useState(false);
 
@@ -71,4 +71,4 @@ const BulkStatusRow: React.FC<{
   );
 };
 
-export default BulkStatusRow;
+export default BulkProcessRequestRow;

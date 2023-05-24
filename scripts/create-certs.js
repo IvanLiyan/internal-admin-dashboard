@@ -3,7 +3,7 @@ const devcert = require("devcert");
 const fs = require("fs");
 
 devcert
-  .certificateFor("leopard-internal.wish.com", { getCaPath: true })
+  .certificateFor("leopard-internal.corp.contextlogic.com", { getCaPath: true })
   .then(({ key, cert, caPath }) => {
     fs.writeFileSync("./certs/devcert.key", key);
     fs.writeFileSync("./certs/devcert.cert", cert);

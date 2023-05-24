@@ -59,6 +59,16 @@ export type AcceptTermsOfServiceInput = {
   tosVersion: Scalars['Int'];
 };
 
+export type AcceptTos = {
+  __typename?: 'AcceptTos';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type AcceptTosInput = {
+  country: CountryCode;
+};
+
 export type AccountBalanceType =
   | 'CONFIRMED'
   | 'PENDING';
@@ -906,6 +916,58 @@ export type BalanceUpdateReason =
   | 'PAYMENT_BY_CREDITS'
   | 'REFUND';
 
+export type BankAccountDocumentSchema = {
+  __typename?: 'BankAccountDocumentSchema';
+  comment?: Maybe<Scalars['String']>;
+  documentFile?: Maybe<MerchantFileSchema>;
+  documentType?: Maybe<BankAccountDocumentType>;
+  id: Scalars['ObjectIdType'];
+  reviewedAt?: Maybe<Datetime>;
+  reviewer?: Maybe<UserSchema>;
+  state: BankAccountVerificationStatus;
+  uploadedAt: Datetime;
+};
+
+export type BankAccountDocumentType =
+  | 'BANK_DOCUMENT'
+  | 'GOVERNMENT_DOCUMENT'
+  | 'UNIDENTIFIED';
+
+export type BankAccountVerificationMerchantMutations = {
+  __typename?: 'BankAccountVerificationMerchantMutations';
+  uploadDocument: UploadBankAccountDocument;
+};
+
+
+export type BankAccountVerificationMerchantMutationsUploadDocumentArgs = {
+  input: UploadBankAccountDocumentInput;
+};
+
+export type BankAccountVerificationReviewerMutations = {
+  __typename?: 'BankAccountVerificationReviewerMutations';
+  reviewDocument?: Maybe<ReviewBankAccountDocument>;
+};
+
+
+export type BankAccountVerificationReviewerMutationsReviewDocumentArgs = {
+  input: ReviewBankAccountDocumentInput;
+};
+
+export type BankAccountVerificationSchema = {
+  __typename?: 'BankAccountVerificationSchema';
+  bankAccountDocuments?: Maybe<Array<BankAccountDocumentSchema>>;
+  id: Scalars['ObjectIdType'];
+  lastReviewedAt?: Maybe<Datetime>;
+  lastUploadedAt?: Maybe<Datetime>;
+  state: BankAccountVerificationStatus;
+};
+
+export type BankAccountVerificationStatus =
+  | 'APPROVED'
+  | 'PENDING'
+  | 'REJECTED'
+  | 'SUBMITTED';
+
 export type BdSignupCodeInfo = {
   __typename?: 'BdSignupCodeInfo';
   bdName?: Maybe<Scalars['String']>;
@@ -1422,21 +1484,31 @@ export type BrandProtection = {
 
 export type BrandProtectionInjunctionMerchantFreezesArgs = {
   count?: InputMaybe<Scalars['Int']>;
+  fineIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   freezeTypes?: InputMaybe<Array<InjunctionMerchantFreezeType>>;
   imfIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
+  legalEndDateUnix?: InputMaybe<Scalars['Int']>;
+  legalStartDateUnix?: InputMaybe<Scalars['Int']>;
   merchantIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   offset?: InputMaybe<Scalars['Int']>;
   state?: InputMaybe<Array<InjunctionMerchantFreezeState>>;
   troNumbers?: InputMaybe<Array<Scalars['Int']>>;
+  updatedEndDateUnix?: InputMaybe<Scalars['Int']>;
+  updatedStartDateUnix?: InputMaybe<Scalars['Int']>;
 };
 
 
 export type BrandProtectionNumInjunctionMerchantFreezesArgs = {
+  fineIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   freezeTypes?: InputMaybe<Array<InjunctionMerchantFreezeType>>;
   imfIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
+  legalEndDateUnix?: InputMaybe<Scalars['Int']>;
+  legalStartDateUnix?: InputMaybe<Scalars['Int']>;
   merchantIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   state?: InputMaybe<Array<InjunctionMerchantFreezeState>>;
   troNumbers?: InputMaybe<Array<Scalars['Int']>>;
+  updatedEndDateUnix?: InputMaybe<Scalars['Int']>;
+  updatedStartDateUnix?: InputMaybe<Scalars['Int']>;
 };
 
 export type BrandProtectionConstants = {
@@ -1565,6 +1637,14 @@ export type BrandingSchemaBrandsArgs = {
   brandIds?: InputMaybe<Array<Scalars['String']>>;
 };
 
+export type BulkMerchantWarningAction =
+  | 'APPROVE'
+  | 'CONFIRM'
+  | 'DECLINE'
+  | 'DECLINE_AND_CLOSE'
+  | 'DELETE'
+  | 'REVERSE';
+
 export type BulkReviewInput = {
   merchantIds: Array<Scalars['ObjectIdType']>;
   pausedImpressionState?: InputMaybe<Scalars['Boolean']>;
@@ -1579,6 +1659,19 @@ export type BulkReviewMutation = {
   successfullyUpdated: Scalars['Int'];
   totalToUpdate: Scalars['Int'];
   updatedIds: Array<Scalars['ObjectIdType']>;
+};
+
+export type BulkUpsertMerchantWarning = {
+  __typename?: 'BulkUpsertMerchantWarning';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type BulkUpsertMerchantWarningInput = {
+  action: BulkMerchantWarningAction;
+  comment?: InputMaybe<Scalars['String']>;
+  message?: InputMaybe<Scalars['String']>;
+  warningIds: Array<Scalars['ObjectIdType']>;
 };
 
 export type BusinessDocTypes =
@@ -1689,6 +1782,11 @@ export type CsvValidationSchema = {
   previewData?: Maybe<Scalars['JSONString']>;
 };
 
+export type CalculatedShippingAccountConfigType =
+  | 'ACCOUNT_LEVEL_OFF'
+  | 'ACCOUNT_LEVEL_ON'
+  | 'USE_PRODUCT_LEVEL_CONFIG';
+
 export type CampaignEventInfo = {
   __typename?: 'CampaignEventInfo';
   countries: Array<Country>;
@@ -1747,6 +1845,10 @@ export type CancelChargeTransactionMutation = {
   ok: Scalars['Boolean'];
 };
 
+export type CancelInfractionInput = {
+  reason: CancelReason;
+};
+
 export type CancelMfpCampaign = {
   __typename?: 'CancelMFPCampaign';
   message?: Maybe<Scalars['String']>;
@@ -1758,6 +1860,16 @@ export type CancelMfpCampaignInput = {
   cancelReason: MfpCampaignCancelReason;
   comment?: InputMaybe<Scalars['String']>;
 };
+
+export type CancelReason =
+  | 'AGENT_ERROR'
+  | 'ALREADY_DELETED'
+  | 'EXPIRED'
+  | 'INCORRECT_DATA'
+  | 'OFFENDING_CONTENT_REMOVED'
+  | 'PASSED_AUTHORIZATION_TAGGING'
+  | 'POLICY_UPDATE'
+  | 'WHITE_GLOVE_WISH_X_STRAT_MERCH';
 
 export type CancelReturn = {
   __typename?: 'CancelReturn';
@@ -1899,6 +2011,17 @@ export type CategoryClassificationTaggerJobSchema = {
   modelGeneratedCategory?: Maybe<TaxonomyCategorySchema>;
   title: Scalars['String'];
   treeVersion?: Maybe<Scalars['String']>;
+};
+
+export type CategoryEprSchema = {
+  __typename?: 'CategoryEprSchema';
+  category: Scalars['Int'];
+  categoryName: Scalars['String'];
+  id?: Maybe<Scalars['ObjectIdType']>;
+  inScopePidCount: Scalars['Int'];
+  responsibleEntityName?: Maybe<Scalars['String']>;
+  status?: Maybe<EprStatus>;
+  uin?: Maybe<Scalars['String']>;
 };
 
 export type ChangeDisplayNameInput = {
@@ -2144,6 +2267,10 @@ export type ChromeSchemaObjectSearchArgs = {
   objectId: Scalars['ObjectIdType'];
 };
 
+export type ClaimInfractionInput = {
+  warningIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
+};
+
 export type ClearAllUiState = {
   __typename?: 'ClearAllUIState';
   message?: Maybe<Scalars['String']>;
@@ -2163,6 +2290,7 @@ export type ClearVacationSettingsMutation = {
 };
 
 export type ClientWritableBucket =
+  | 'BANK_ACCOUNT_DOCUMENTS'
   | 'BRAND_LOGO'
   | 'PUBLIC_APP_LOGO'
   | 'RACC_SOURCE_ASSETS'
@@ -2775,6 +2903,16 @@ export type CountryCode =
   | 'ZR'
   | 'ZW';
 
+export type CountryEprSchema = {
+  __typename?: 'CountryEPRSchema';
+  categories: Array<CategoryEprSchema>;
+  categoriesWithEpr: Scalars['Int'];
+  categoriesWithoutEpr: Scalars['Int'];
+  country: Country;
+  hasAcceptedTos: Scalars['Boolean'];
+  tos: Scalars['String'];
+};
+
 export type CountryShippingInput = {
   additionalPrice?: InputMaybe<CurrencyInput>;
   countryCode: CountryCode;
@@ -2896,6 +3034,18 @@ export type CreateProductTaxonomyCategoryDisputeInput = {
   supportFiles?: InputMaybe<Array<FileInput>>;
 };
 
+export type CreateProductsDownloadJobInput = {
+  eventId?: InputMaybe<Scalars['ObjectIdType']>;
+  promotionType: MfpCampaignPromotionType;
+};
+
+export type CreateProductsDownloadJobMutation = {
+  __typename?: 'CreateProductsDownloadJobMutation';
+  jobId?: Maybe<Scalars['ObjectIdType']>;
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
 export type CreateShippingPlan = {
   __typename?: 'CreateShippingPlan';
   message?: Maybe<Scalars['String']>;
@@ -2943,6 +3093,19 @@ export type CreateTakedownRequestInput = {
   notes?: InputMaybe<Scalars['String']>;
   productIds: Array<Scalars['ObjectIdType']>;
   typeOfInfringement: TypeOfInfringement;
+};
+
+export type CreateUin = {
+  __typename?: 'CreateUin';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type CreateUinInput = {
+  category: Scalars['Int'];
+  country: CountryCode;
+  responsibleEntityName: Scalars['String'];
+  uin: Scalars['String'];
 };
 
 export type CreateWhitelistProductsInput = {
@@ -3330,6 +3493,64 @@ export type DeciderKeySchemaDecideForNameArgs = {
   name: Scalars['String'];
 };
 
+export type DedupImageLibraryHub = {
+  __typename?: 'DedupImageLibraryHub';
+  imageCount: Scalars['Int'];
+  images: Array<DedupImageSchema>;
+};
+
+
+export type DedupImageLibraryHubImageCountArgs = {
+  imageType: DedupImageType;
+  lastUpdateTimeEnd?: InputMaybe<DatetimeInput>;
+  lastUpdateTimeStart?: InputMaybe<DatetimeInput>;
+  query?: InputMaybe<Scalars['String']>;
+};
+
+
+export type DedupImageLibraryHubImagesArgs = {
+  imageType: DedupImageType;
+  lastUpdateTimeEnd?: InputMaybe<DatetimeInput>;
+  lastUpdateTimeStart?: InputMaybe<DatetimeInput>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  query?: InputMaybe<Scalars['String']>;
+  sort?: InputMaybe<DedupImageSort>;
+};
+
+export type DedupImageSchema = {
+  __typename?: 'DedupImageSchema';
+  brand?: Maybe<BrandSchema>;
+  counterfeitReason?: Maybe<CounterfeitReasonCode>;
+  counterfeitSubcategory?: Maybe<TaggingViolationSubReasonCode>;
+  id: Scalars['ObjectIdType'];
+  imagePhash: Scalars['String'];
+  imageType: DedupImageType;
+  inappropriateReason?: Maybe<CounterfeitReasonCode>;
+  inappropriateSubcategory?: Maybe<TaggingViolationSubReasonCode>;
+  sampleImageUrl?: Maybe<Scalars['String']>;
+  source?: Maybe<DedupSource>;
+  updateTime: Datetime;
+};
+
+export type DedupImageSort = {
+  field: DedupImageSortFieldType;
+  order: SortOrderType;
+};
+
+export type DedupImageSortFieldType =
+  | 'BRAND_NAME'
+  | 'CREATED_TIME'
+  | 'LAST_UPDATE';
+
+export type DedupImageType =
+  | 'INAPPROPRIATE'
+  | 'IP_VIOLATION';
+
+export type DedupSource =
+  | 'AUDIT_FEEDBACK'
+  | 'MANUALLY_ADDED';
+
 export type DefaultShippingInput = {
   price: CurrencyInput;
   warehouseId: Scalars['ObjectIdType'];
@@ -3357,6 +3578,16 @@ export type DeleteBrandEnrollment = {
 
 export type DeleteBrandEnrollmentInput = {
   brandInfoId: Scalars['ObjectIdType'];
+};
+
+export type DeleteDedupImage = {
+  __typename?: 'DeleteDedupImage';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type DeleteDedupImageInput = {
+  imageIds: Array<Scalars['ObjectIdType']>;
 };
 
 export type DeleteDeviceInput = {
@@ -3397,6 +3628,16 @@ export type DeleteProductPostsMutation = {
   errorCode?: Maybe<ProductPostErrorCode>;
   message?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
+};
+
+export type DeleteUin = {
+  __typename?: 'DeleteUin';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type DeleteUinInput = {
+  id: Scalars['ObjectIdType'];
 };
 
 export type DeleteWebhookSubscription = {
@@ -3720,13 +3961,17 @@ export type DownloadAllProductsCsv = {
 };
 
 export type DownloadAllProductsCsvInput = {
+  categoryIds?: InputMaybe<Array<Scalars['Int']>>;
   includeRejected?: InputMaybe<Scalars['Boolean']>;
+  templateType?: InputMaybe<ProductsCsvTemplateType>;
   warehouseId?: InputMaybe<Scalars['ObjectIdType']>;
 };
 
 export type DownloadAllProductsInput = {
+  categoryIds?: InputMaybe<Array<Scalars['Int']>>;
   fileType?: InputMaybe<FileType>;
   includeRejected?: InputMaybe<Scalars['Boolean']>;
+  templateType?: InputMaybe<ProductsCsvTemplateType>;
   warehouseId?: InputMaybe<Scalars['ObjectIdType']>;
 };
 
@@ -3735,6 +3980,41 @@ export type DownloadEuComplianceProductLinks = {
   errorMessage?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
 };
+
+export type EprMutations = {
+  __typename?: 'EPRMutations';
+  acceptTos?: Maybe<AcceptTos>;
+  createUin?: Maybe<CreateUin>;
+  deleteUin?: Maybe<DeleteUin>;
+  updateUin?: Maybe<UpdateUin>;
+};
+
+
+export type EprMutationsAcceptTosArgs = {
+  input: AcceptTosInput;
+};
+
+
+export type EprMutationsCreateUinArgs = {
+  input: CreateUinInput;
+};
+
+
+export type EprMutationsDeleteUinArgs = {
+  input: DeleteUinInput;
+};
+
+
+export type EprMutationsUpdateUinArgs = {
+  input: UpdateUinInput;
+};
+
+export type EprStatus =
+  | 'ADMIN_APPROVED'
+  | 'COMPLETE'
+  | 'DELETED'
+  | 'IN_REVIEW'
+  | 'REJECTED';
 
 export type EuComplianceAddressInput = {
   city: Scalars['String'];
@@ -4027,6 +4307,17 @@ export type ExpireWhitelistProductsMutation = {
   __typename?: 'ExpireWhitelistProductsMutation';
   message?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
+};
+
+export type ExtendedProducerResponsibilitySchema = {
+  __typename?: 'ExtendedProducerResponsibilitySchema';
+  countries: Array<CountryEprSchema>;
+  country: CountryEprSchema;
+};
+
+
+export type ExtendedProducerResponsibilitySchemaCountryArgs = {
+  countryCode: CountryCode;
 };
 
 export type ExternalBoostAttributedStats = {
@@ -4349,6 +4640,16 @@ export type FloorBidsSchema = {
   date: Datetime;
   trueTag: TrueTagSchema;
   trueTagId: Scalars['ObjectIdType'];
+};
+
+export type ForceApproveProduct = {
+  __typename?: 'ForceApproveProduct';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type ForceApproveProductInput = {
+  productId: Scalars['ObjectIdType'];
 };
 
 export type FranceComplianceMutations = {
@@ -5063,11 +5364,16 @@ export type InjunctionMerchantFreezeExportCsv = {
 };
 
 export type InjunctionMerchantFreezeFilterInput = {
+  fineIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   freezeIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   freezeTypes?: InputMaybe<Array<InjunctionMerchantFreezeType>>;
+  legalEndDateUnix?: InputMaybe<Scalars['Int']>;
+  legalStartDateUnix?: InputMaybe<Scalars['Int']>;
   merchantIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   states?: InputMaybe<Array<InjunctionMerchantFreezeState>>;
   troNumbers?: InputMaybe<Array<Scalars['Int']>>;
+  updatedEndDateUnix?: InputMaybe<Scalars['Int']>;
+  updatedStartDateUnix?: InputMaybe<Scalars['Int']>;
 };
 
 export type InjunctionMerchantFreezeFinePaymentInput = {
@@ -5181,6 +5487,7 @@ export type InjunctionMerchantFreezeSchema = {
   fines: Array<MerchantFineSchema>;
   freezeType: InjunctionMerchantFreezeType;
   id: Scalars['ObjectIdType'];
+  lastUpdatedAt: Datetime;
   legalCounselCreationTs: Datetime;
   merchantId: Scalars['ObjectIdType'];
   state: InjunctionMerchantFreezeState;
@@ -5360,6 +5667,48 @@ export type LedgerAccountBalanceType =
   | 'CONFIRMED'
   | 'PENDING';
 
+export type LedgerEvent = {
+  __typename?: 'LedgerEvent';
+  data: Scalars['String'];
+  documentId?: Maybe<Scalars['String']>;
+  eventTime: Datetime;
+  eventType: LedgerEventType;
+  id: Scalars['String'];
+};
+
+export type LedgerEventType =
+  | 'ACCOUNT_BALANCES_FETCH'
+  | 'ARRIVE_AT_EPC_WAREHOUSE'
+  | 'CONFIRMED_DELIVERED'
+  | 'CONFIRMED_SHIPPED'
+  | 'DISPUTE_SUCCESS'
+  | 'FEE_CREATION'
+  | 'FEE_ELIGIBILITY_UPDATE'
+  | 'FEE_REVERSAL'
+  | 'FINE_CREATION'
+  | 'FINE_ELIGIBILITY_UPDATE'
+  | 'FINE_REVERSAL'
+  | 'LEDGER_ITEM_FETCH'
+  | 'LEDGER_ITEM_STATE_BATCH_UPDATE'
+  | 'MARKED_SHIPPED'
+  | 'ONEOFF_PAYMENT_CANCEL'
+  | 'ONEOFF_PAYMENT_CREATION'
+  | 'ORDER_REFUND'
+  | 'ORDER_RELEASED'
+  | 'ORDER_WITHHOLD'
+  | 'ORDER_WITHHOLD_CANCEL'
+  | 'PAYMENT_AMOUNT_AMENDMENT'
+  | 'REBATE_CANCEL'
+  | 'REBATE_CREATE'
+  | 'RECEIVE_INITIAL_WP_SHIPPING'
+  | 'RECEIVE_WP_SHIPPING_ADJUSTMENT'
+  | 'REMOVED_FROM_A_PLUS'
+  | 'TAX_ADJUSTMENT'
+  | 'TAX_UPDATE'
+  | 'TRACKING_AMENDMENT'
+  | 'TRACKING_CANCELLED'
+  | 'USER_CONFIRMED_DELIVERED';
+
 export type LedgerItem = {
   __typename?: 'LedgerItem';
   createdTime: Datetime;
@@ -5443,6 +5792,7 @@ export type LedgerOrderInfo = {
 
 export type LedgerPayableInfo = {
   __typename?: 'LedgerPayableInfo';
+  ledgerEvents?: Maybe<Array<LedgerEvent>>;
   ledgerItems?: Maybe<Array<LedgerItem>>;
 };
 
@@ -6067,6 +6417,7 @@ export type MfpServiceMutations = {
   __typename?: 'MFPServiceMutations';
   admin?: Maybe<MfpServiceAdminMutations>;
   cancelMfpCampaign: CancelMfpCampaign;
+  createProductsDownloadJob: CreateProductsDownloadJobMutation;
   upsertDiscountCampaign: UpsertDiscountCampaignMutation;
   upsertFlashSaleCampaign: UpsertFlashSaleCampaignMutation;
 };
@@ -6074,6 +6425,11 @@ export type MfpServiceMutations = {
 
 export type MfpServiceMutationsCancelMfpCampaignArgs = {
   input: CancelMfpCampaignInput;
+};
+
+
+export type MfpServiceMutationsCreateProductsDownloadJobArgs = {
+  input: CreateProductsDownloadJobInput;
 };
 
 
@@ -6973,6 +7329,24 @@ export type MerchantGamingReviewUpdateInput = {
   policyTier?: InputMaybe<MerchantGamingReviewPolicyTierType>;
 };
 
+export type MerchantIdentityMutations = {
+  __typename?: 'MerchantIdentityMutations';
+  bankAccountVerification: BankAccountVerificationReviewerMutations;
+};
+
+export type MerchantIdentityServiceSchema = {
+  __typename?: 'MerchantIdentityServiceSchema';
+  bankAccountVerifications?: Maybe<Array<BankAccountVerificationSchema>>;
+};
+
+
+export type MerchantIdentityServiceSchemaBankAccountVerificationsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  state?: InputMaybe<BankAccountVerificationStatus>;
+};
+
 export type MerchantInviteInfo = {
   __typename?: 'MerchantInviteInfo';
   email?: Maybe<Scalars['String']>;
@@ -7057,6 +7431,7 @@ export type MerchantMobileMinimumAppVersionArgs = {
 
 export type MerchantMutation = {
   __typename?: 'MerchantMutation';
+  bankAccountVerification: BankAccountVerificationMerchantMutations;
   changeDisplayName: ChangeDisplayNameMutation;
   changePreferredUnits: ChangePreferredUnitsMutation;
   euVatTax?: Maybe<EuvatTaxMutations>;
@@ -7442,6 +7817,7 @@ export type MerchantPaymentsServiceLedgerOrderInfoArgs = {
 
 
 export type MerchantPaymentsServiceLedgerPayableInfoArgs = {
+  includeEvents?: InputMaybe<Scalars['Boolean']>;
   payableId: Scalars['String'];
   payableType: Scalars['String'];
 };
@@ -7582,11 +7958,14 @@ export type MerchantSchema = {
   accountManager?: Maybe<UserSchema>;
   allowMfp: Scalars['Boolean'];
   allowMfpEligibleProducts: Scalars['Boolean'];
+  bankAccountVerification?: Maybe<BankAccountVerificationSchema>;
   branding: BrandingSchema;
   businessAddress?: Maybe<AddressSchema>;
   businessName?: Maybe<Scalars['String']>;
   bypassProductRestrictions?: Maybe<Array<TaggingViolationSubcategory>>;
+  calculatedShippingAccountConfig?: Maybe<CalculatedShippingAccountConfigType>;
   canAccessAdditionalItemShipping: Scalars['Boolean'];
+  canAccessCalculatedShippingAccountConfig?: Maybe<Scalars['Boolean']>;
   canAccessEarlyPayment: Scalars['Boolean'];
   canAccessFinalSale: Scalars['Boolean'];
   canAccessFlatRateShippingOptInOptOut?: Maybe<Scalars['Boolean']>;
@@ -8066,6 +8445,7 @@ export type MerchantTodoItemType =
   | 'ADD_PAYMENT'
   | 'ADD_WAREHOUSE'
   | 'APPLY_RESTRICTED_PRODUCT_REQUEST'
+  | 'BANK_ACCOUNT_VERIFICATION'
   | 'BIND_WECHAT'
   | 'BRL_CURRENCY_CODE_MIGRATION'
   | 'COMPLETE_EU_VAT_TAX_QUESTIONNAIRE'
@@ -8286,10 +8666,14 @@ export type MerchantWarehouseWeekStatsSortFieldType =
   | 'START_DATE';
 
 export type MerchantWarningAction =
+  | 'CANCEL'
+  | 'CLAIM'
+  | 'CONFIRM'
   | 'LISTING_LEVEL_DISPUTE'
   | 'MERCHANT_LEVEL_DISPUTE'
   | 'REPLY'
-  | 'REQUEST_PAYMENT_RELEASE';
+  | 'REQUEST_PAYMENT_RELEASE'
+  | 'UNCLAIM';
 
 export type MerchantWarningAuditAction =
   | 'BATCH_CLAIM'
@@ -8306,6 +8690,16 @@ export type MerchantWarningAuditStatus =
   | 'CONFIRMED'
   | 'REQUIRE_AUDIT'
   | 'REVERTED';
+
+export type MerchantWarningBulkProcessSchema = {
+  __typename?: 'MerchantWarningBulkProcessSchema';
+  id: Scalars['ObjectIdType'];
+  requestedBy: Scalars['String'];
+  requestedWarningIds?: Maybe<Array<Scalars['ObjectIdType']>>;
+  results?: Maybe<Array<MerchantWarningProcessResultSchema>>;
+  submitted: Datetime;
+  type: BulkMerchantWarningAction;
+};
 
 export type MerchantWarningClaimStatus =
   | 'ALL'
@@ -8364,6 +8758,13 @@ export type MerchantWarningMutationsUpdateAuditQueueWarningArgs = {
 
 export type MerchantWarningMutationsUpsertMerchantWarningArgs = {
   input?: InputMaybe<UpsertMerchantWarningInput>;
+};
+
+export type MerchantWarningProcessResultSchema = {
+  __typename?: 'MerchantWarningProcessResultSchema';
+  error?: Maybe<Scalars['String']>;
+  success: Scalars['Boolean'];
+  warningId: Scalars['ObjectIdType'];
 };
 
 export type MerchantWarningProofDisputeStatus =
@@ -8511,6 +8912,7 @@ export type MerchantWarningReplyType =
   | 'AUTOBOT_REPLY'
   | 'BAN_EXPLANATION'
   | 'BD_APPROVE_PAYMENT_RELEASE'
+  | 'CLOSE_EXPLANATION'
   | 'CLOSE_REPLY'
   | 'REGULAR_REPLY'
   | 'REJECT_PAYMENT_RELEASE'
@@ -8527,6 +8929,7 @@ export type MerchantWarningSchema = {
   adminReasonText?: Maybe<Scalars['String']>;
   auditStatus?: Maybe<MerchantWarningAuditStatus>;
   banned?: Maybe<Scalars['Boolean']>;
+  bulkProcessing?: Maybe<Scalars['Boolean']>;
   claimedBy?: Maybe<UserSchema>;
   correspondenceStatus?: Maybe<MerchantWarningCorrespondenceStatus>;
   counterfeitBrand?: Maybe<BrandSchema>;
@@ -9669,6 +10072,7 @@ export type PermissionType =
   | 'BRAND_REVIEW_TAG'
   | 'CAN_ACCESS_AUTH_BRAND_AUDIT'
   | 'CAN_ACCESS_BLANKET_AUTHORIZATION'
+  | 'CAN_ACCESS_BULK_ORDER_INFRACTION_TOOL'
   | 'CAN_ACCESS_CONFIRM_DELIVERED_CARRIER'
   | 'CAN_ACCESS_GATEKEEPER_PAYMENT_HOLD_ONEOFF'
   | 'CAN_ACCESS_IPV_DETECTION_EXTERNAL_V3_API'
@@ -9763,12 +10167,14 @@ export type PermissionType =
   | 'CAN_PROVIDE_MERCHANT_CHAT_SUPPORT'
   | 'CAN_RECEIVE_SMS_ON_QA_ENV'
   | 'CAN_REVERSE_FINE'
+  | 'CAN_REVIEW_BANK_ACCOUNT_DOCUMENT'
   | 'CAN_REVIEW_CN_PAYMENT_REQUEST'
   | 'CAN_REVIEW_DISPUTES'
   | 'CAN_REVIEW_EPC_APPLICATION'
   | 'CAN_REVIEW_EU_MERCHANTS'
   | 'CAN_REVIEW_MERCHANTS'
   | 'CAN_REVIEW_MERCHANT_INFO_ONLY'
+  | 'CAN_REVIEW_MERCHANT_KYC'
   | 'CAN_REVIEW_PRODUCT_CATEGORY_DISPUTE'
   | 'CAN_REVIEW_RESPONSIBLE_PERSON'
   | 'CAN_REVIEW_TRACKING_DISPUTES'
@@ -9787,6 +10193,7 @@ export type PermissionType =
   | 'CAN_UNCOMBINE_APLUS_ORDERS'
   | 'CAN_UNENROLL_WHITE_GLOVE'
   | 'CAN_UPDATE_COLLECTIONBOOST'
+  | 'CAN_UPLOAD_BANK_ACCOUNT_DOCUMENT'
   | 'CAN_USE_BP_DATA_TOOL'
   | 'CAN_USE_TFA_ADMIN_TOOL'
   | 'CAN_USE_TFA_BD_TOOL'
@@ -10367,6 +10774,7 @@ export type PolicyFactor =
 export type PolicyMutations = {
   __typename?: 'PolicyMutations';
   adaptivePolicyAdmin?: Maybe<AdaptivePolicyAdminMutations>;
+  bulkUpsertMerchantWarning?: Maybe<BulkUpsertMerchantWarning>;
   merchantFinalSale?: Maybe<MerchantFinalSaleMutations>;
   merchantGamingReviewTicket?: Maybe<MerchantGamingReviewMutations>;
   merchantWarning?: Maybe<MerchantWarningMutations>;
@@ -10376,6 +10784,11 @@ export type PolicyMutations = {
   refundDispute?: Maybe<RefundDisputeMutations>;
   restrictedProduct?: Maybe<RestrictedProductMutations>;
   wfp?: Maybe<WfpMutations>;
+};
+
+
+export type PolicyMutationsBulkUpsertMerchantWarningArgs = {
+  input?: InputMaybe<BulkUpsertMerchantWarningInput>;
 };
 
 export type PolicyPublicMutations = {
@@ -10397,6 +10810,7 @@ export type PolicySchema = {
   dispute?: Maybe<DisputeSchema>;
   finalSaleCategories?: Maybe<Array<FinalSaleCategorySchema>>;
   merchantWarning?: Maybe<MerchantWarningSchema>;
+  merchantWarningBulkProcesses?: Maybe<Array<MerchantWarningBulkProcessSchema>>;
   merchantWarningCount?: Maybe<Scalars['Int']>;
   merchantWarningReasons?: Maybe<Array<MerchantWarningReasonSchema>>;
   merchantWarnings?: Maybe<Array<MerchantWarningSchema>>;
@@ -10423,6 +10837,14 @@ export type PolicySchemaFinalSaleCategoriesArgs = {
 
 export type PolicySchemaMerchantWarningArgs = {
   id?: InputMaybe<Scalars['ObjectIdType']>;
+};
+
+
+export type PolicySchemaMerchantWarningBulkProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  search?: InputMaybe<Scalars['String']>;
+  types?: InputMaybe<Array<BulkMerchantWarningAction>>;
 };
 
 
@@ -10763,6 +11185,10 @@ export type ProductCsvJobType =
   | 'EDIT_FBW_SHIPPING'
   | 'EDIT_SHIPPING'
   | 'EDIT_WISH_EXPRESS_COUNTRIES'
+  | 'NEW_ADD_PRODUCTS'
+  | 'NEW_ADD_VARIATION'
+  | 'NEW_EDIT_SHIPPING'
+  | 'NEW_UPDATE_PRODUCTS'
   | 'SHOPIFY_CREATE_PRODUCTS'
   | 'UPDATE_PRODUCTS'
   | 'UPSERT_PRODUCTS';
@@ -10771,6 +11197,7 @@ export type ProductCatalogMutations = {
   __typename?: 'ProductCatalogMutations';
   downloadAllProducts?: Maybe<DownloadAllProducts>;
   downloadAllProductsCsv?: Maybe<DownloadAllProductsCsv>;
+  forceApproveProduct?: Maybe<ForceApproveProduct>;
   removeProduct?: Maybe<RemoveProduct>;
   removeVideo?: Maybe<RemoveVideo>;
   updateProductLogisticsMetadata?: Maybe<UpdateProductLogisticsMetadata>;
@@ -10788,6 +11215,11 @@ export type ProductCatalogMutationsDownloadAllProductsArgs = {
 
 export type ProductCatalogMutationsDownloadAllProductsCsvArgs = {
   input: DownloadAllProductsCsvInput;
+};
+
+
+export type ProductCatalogMutationsForceApproveProductArgs = {
+  input: ForceApproveProductInput;
 };
 
 
@@ -10828,10 +11260,14 @@ export type ProductCatalogMutationsUpsertVideoArgs = {
 export type ProductCatalogSchema = {
   __typename?: 'ProductCatalogSchema';
   bulkCsvProductImportJobs: Array<CsvProductImportJobSchema>;
+  csvEnableDisableHeaderNames: Array<Scalars['String']>;
+  csvPriceInventoryHeaderNames: Array<Scalars['String']>;
   csvProductColumnEnums: Array<ProductCsvColumnName>;
   csvProductColumnNames: Array<Scalars['String']>;
   csvProductImportJobsCount: Scalars['Int'];
   csvProductTemplateWithTaxonomyColumnNames?: Maybe<Array<Scalars['String']>>;
+  csvShippingHeaderNames: Array<Scalars['String']>;
+  csvTitleImagesDescriptionHeaderNames: Array<Scalars['String']>;
   gtinProductService: GtinProductServiceSchema;
   product?: Maybe<ProductSchema>;
   productCount: Scalars['Int'];
@@ -11079,6 +11515,7 @@ export type ProductComplianceMutations = {
   __typename?: 'ProductComplianceMutations';
   deCompliance?: Maybe<GermanyComplianceMutations>;
   euCompliance?: Maybe<EuComplianceMutations>;
+  extendedProducerResponsibility?: Maybe<EprMutations>;
   frCompliance?: Maybe<FranceComplianceMutations>;
 };
 
@@ -11086,6 +11523,7 @@ export type ProductComplianceSchema = {
   __typename?: 'ProductComplianceSchema';
   allEuComplianceCategories?: Maybe<Array<EuProductComplianceCategory>>;
   allMsrCategories?: Maybe<Array<MsrCategory>>;
+  extendedProducerResponsibility: ExtendedProducerResponsibilitySchema;
   franceProductUniqueIdentificationNumberCount?: Maybe<Scalars['Int']>;
   franceProductUniqueIdentificationNumbers?: Maybe<Array<FranceProductUniqueIdentificationNumberSchema>>;
   germanyProductUniqueIdentificationNumberCount?: Maybe<Scalars['Int']>;
@@ -11956,6 +12394,14 @@ export type ProductWeeklyStats = {
   sales: SalesPerformanceStats;
   startDate: Datetime;
 };
+
+export type ProductsCsvTemplateType =
+  | 'CATEGORY'
+  | 'CONTENT'
+  | 'DEFAULT'
+  | 'ENABLED'
+  | 'PRICE_AND_INVENTORY'
+  | 'SHIPPING';
 
 export type PromotableProduct = {
   __typename?: 'PromotableProduct';
@@ -12970,6 +13416,20 @@ export type Reversal = {
   id: Scalars['ObjectIdType'];
 };
 
+export type ReviewBankAccountDocument = {
+  __typename?: 'ReviewBankAccountDocument';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type ReviewBankAccountDocumentInput = {
+  comment?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ObjectIdType'];
+  documentType: BankAccountDocumentType;
+  merchantId: Scalars['ObjectIdType'];
+  state: BankAccountVerificationStatus;
+};
+
 export type ReviewMerchantTaxIdentificationInput = {
   merchantTaxIdentificationId: Scalars['ObjectIdType'];
   rejectedReason?: InputMaybe<MerchantTaxIdentificationRejectReson>;
@@ -13100,6 +13560,7 @@ export type RootMutation = {
   locale?: Maybe<LocaleMutations>;
   logistics?: Maybe<LogisticsMutations>;
   marketing?: Maybe<MarketingServiceMutations>;
+  merchantIdentity?: Maybe<MerchantIdentityMutations>;
   merchantSafety?: Maybe<MerchantSafetyMutations>;
   mfp?: Maybe<MfpServiceMutations>;
   oneoffPayments?: Maybe<MerchantOneoffPaymentMutations>;
@@ -13136,6 +13597,7 @@ export type RootQuery = {
   logistics?: Maybe<LogisticsSchema>;
   marketing?: Maybe<MarketingServiceSchema>;
   merchantEntity?: Maybe<MerchantEntitySchema>;
+  merchantIdentity?: Maybe<MerchantIdentityServiceSchema>;
   merchantSafetyInfo?: Maybe<MerchantSafetySchema>;
   merchantTermsOfService: MerchantTermsOfServiceSchema;
   merchants?: Maybe<MerchantServiceSchema>;
@@ -13937,6 +14399,7 @@ export type ShippingSettingMutations = {
 
 
 export type ShippingSettingMutationsUpdateShippingSettingArgs = {
+  calculatedShippingAccountConfig?: InputMaybe<Scalars['Int']>;
   countryShipping?: InputMaybe<Array<CountryShippingSetting>>;
   flatRateShippingOptInStatus?: InputMaybe<Scalars['Boolean']>;
   isUpsert?: InputMaybe<Scalars['Boolean']>;
@@ -14219,6 +14682,7 @@ export type TaggingMlResult =
 export type TaggingMutations = {
   __typename?: 'TaggingMutations';
   createProductTaxonomyCategoryDispute?: Maybe<CreateProductTaxonomyCategoryDispute>;
+  deleteDedupImage?: Maybe<DeleteDedupImage>;
   getAndClaimProductTaxonomyCategoryDispute?: Maybe<GetAndClaimProductTaxonomyCategoryDisputeForReview>;
   markProductTaxonomyCategoryDisputeUnchanged?: Maybe<MarkProductTaxonomyCategoryDisputeUnchanged>;
   markProductTaxonomyCategoryDisputeUpdated?: Maybe<MarkProductTaxonomyCategoryDisputeUpdated>;
@@ -14228,11 +14692,17 @@ export type TaggingMutations = {
   submitAttributeExtraction?: Maybe<SubmitAttributeExtraction>;
   submitCategoryClassification?: Maybe<SubmitCategoryClassification>;
   submitCategoryManualOverride?: Maybe<SubmitCategoryManualOverride>;
+  updateDedupImage?: Maybe<UpdateDedupImage>;
 };
 
 
 export type TaggingMutationsCreateProductTaxonomyCategoryDisputeArgs = {
   input: CreateProductTaxonomyCategoryDisputeInput;
+};
+
+
+export type TaggingMutationsDeleteDedupImageArgs = {
+  input: DeleteDedupImageInput;
 };
 
 
@@ -14265,10 +14735,16 @@ export type TaggingMutationsSubmitCategoryManualOverrideArgs = {
   input: SubmitCategoryManualOverrideInput;
 };
 
+
+export type TaggingMutationsUpdateDedupImageArgs = {
+  input: UpdateDedupImageInput;
+};
+
 export type TaggingServiceSchema = {
   __typename?: 'TaggingServiceSchema';
   attributeExtractionTaggerJob?: Maybe<AttributeExtractionTaggerJobSchema>;
   categoryClassificationTaggerJob?: Maybe<CategoryClassificationTaggerJobSchema>;
+  dedupImageLibHub?: Maybe<DedupImageLibraryHub>;
   generalTaggingManagement?: Maybe<GeneralTaggingManagement>;
   ipViolationTaggingManagement?: Maybe<IpViolationTaggingManagement>;
   productTaggingStatus?: Maybe<ProductTaggingStatusSchema>;
@@ -14890,8 +15366,10 @@ export type TaxonomySchema = {
   __typename?: 'TaxonomySchema';
   attributes?: Maybe<Array<TaxonomyAttributeSchema>>;
   category?: Maybe<TaxonomyCategorySchema>;
+  categoryAttributesCsv?: Maybe<Array<Array<Scalars['String']>>>;
   l1Categories?: Maybe<Array<TaxonomyCategorySchema>>;
   leafCategories?: Maybe<Array<TaxonomyCategorySchema>>;
+  taxonomyTreeCsv?: Maybe<Array<Array<Scalars['String']>>>;
   variationOptions?: Maybe<Array<TaxonomyAttributeSchema>>;
 };
 
@@ -14908,6 +15386,11 @@ export type TaxonomySchemaCategoryArgs = {
 };
 
 
+export type TaxonomySchemaCategoryAttributesCsvArgs = {
+  categoryId: Scalars['Int'];
+};
+
+
 export type TaxonomySchemaL1CategoriesArgs = {
   leafCategoryIds?: InputMaybe<Array<Scalars['Int']>>;
   treeVersion?: InputMaybe<Scalars['String']>;
@@ -14916,6 +15399,11 @@ export type TaxonomySchemaL1CategoriesArgs = {
 
 export type TaxonomySchemaLeafCategoriesArgs = {
   l1CategoryId: Scalars['Int'];
+  treeVersion?: InputMaybe<Scalars['String']>;
+};
+
+
+export type TaxonomySchemaTaxonomyTreeCsvArgs = {
   treeVersion?: InputMaybe<Scalars['String']>;
 };
 
@@ -15542,6 +16030,17 @@ export type UpdateAuditQueueWarningInput = {
   ids?: InputMaybe<Array<Scalars['ObjectIdType']>>;
 };
 
+export type UpdateDedupImage = {
+  __typename?: 'UpdateDedupImage';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type UpdateDedupImageInput = {
+  brandId: Scalars['ObjectIdType'];
+  imageIds: Array<Scalars['ObjectIdType']>;
+};
+
 export type UpdateMerchantFinalSale = {
   __typename?: 'UpdateMerchantFinalSale';
   message?: Maybe<Scalars['String']>;
@@ -15701,6 +16200,18 @@ export type UpdateUiStateInput = {
   stringValue?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateUin = {
+  __typename?: 'UpdateUin';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type UpdateUinInput = {
+  id: Scalars['ObjectIdType'];
+  responsibleEntityName: Scalars['String'];
+  uin: Scalars['String'];
+};
+
 export type UpdateUserInfoInput = {
   bdMerchantCountry?: InputMaybe<BdMerchantCountryCodeType>;
   email?: InputMaybe<Scalars['String']>;
@@ -15727,6 +16238,16 @@ export type UpdateUserQueuesMutation = {
   __typename?: 'UpdateUserQueuesMutation';
   error?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
+};
+
+export type UploadBankAccountDocument = {
+  __typename?: 'UploadBankAccountDocument';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type UploadBankAccountDocumentInput = {
+  url: Scalars['String'];
 };
 
 export type UploadEuvatTaxQuestionnaire = {
@@ -15908,6 +16429,8 @@ export type UpsertMerchantWarning = {
 
 export type UpsertMerchantWarningInput = {
   action: MerchantWarningAction;
+  cancelWarningInput?: InputMaybe<CancelInfractionInput>;
+  claimWarningInput?: InputMaybe<ClaimInfractionInput>;
   disputeInput?: InputMaybe<DisputeInfractionInput>;
   messageInput?: InputMaybe<ReplyInfractionInput>;
   requestPaymentInput?: InputMaybe<RequestPaymentInput>;
@@ -16943,6 +17466,7 @@ export type WssPerformanceDeepDiveHubOrderUnfulfilledArgs = {
 
 
 export type WssPerformanceDeepDiveHubProductQualityRefundArgs = {
+  isBadByRefund?: InputMaybe<Scalars['Boolean']>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   productIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
@@ -16952,6 +17476,7 @@ export type WssPerformanceDeepDiveHubProductQualityRefundArgs = {
 
 
 export type WssPerformanceDeepDiveHubProductRatingArgs = {
+  isBadByRating?: InputMaybe<Scalars['Boolean']>;
   limit?: InputMaybe<Scalars['Int']>;
   offset?: InputMaybe<Scalars['Int']>;
   productIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
@@ -17316,10 +17841,13 @@ export type WishPostShippingUpdatesSchema = {
 
 export type WishSellerStandardStats = {
   __typename?: 'WishSellerStandardStats';
+  badProductCount?: Maybe<Scalars['Int']>;
+  badProductRate?: Maybe<Scalars['Float']>;
   date: Datetime;
   fulfillmentSpeed?: Maybe<Timedelta>;
   ipViolationProductCount: Scalars['Int'];
   lateConfirmedFulfillmentCount: Scalars['Int'];
+  levelPreview?: Maybe<WssMerchantLevelType>;
   materialListingChangeCount: Scalars['Int'];
   maturedOrderCount: Scalars['Int'];
   misleadingListingCount: Scalars['Int'];
@@ -17329,6 +17857,7 @@ export type WishSellerStandardStats = {
   orderFultillmentRate?: Maybe<Scalars['Float']>;
   productLogisticsRefundRate?: Maybe<Scalars['Float']>;
   productQualityRefundRate?: Maybe<Scalars['Float']>;
+  productWithOrdersCount?: Maybe<Scalars['Int']>;
   prohibitedProductCount: Scalars['Int'];
   repeatIpInfractionCount: Scalars['Int'];
   unfulfilledOrderCount: Scalars['Int'];
@@ -17366,6 +17895,16 @@ export type AuthQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuthQueryQuery = { __typename?: 'RootQuery', currentUser?: { __typename?: 'UserSchema', id: string, roles?: Array<{ __typename?: 'RoleSchema', id: RoleType }> | null } | null };
 
+export type BulkDisputes_ProcessingStatusQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  search?: InputMaybe<Scalars['String']>;
+  types?: InputMaybe<Array<BulkMerchantWarningAction> | BulkMerchantWarningAction>;
+}>;
+
+
+export type BulkDisputes_ProcessingStatusQuery = { __typename?: 'RootQuery', policy?: { __typename?: 'PolicySchema', merchantWarningBulkProcesses?: Array<{ __typename?: 'MerchantWarningBulkProcessSchema', id: string, type: BulkMerchantWarningAction, requestedBy: string, requestedWarningIds?: Array<string> | null, submitted: { __typename?: 'Datetime', unix: number }, results?: Array<{ __typename?: 'MerchantWarningProcessResultSchema', warningId: string, success: boolean, error?: string | null }> | null }> | null } | null };
+
 export type BulkDisputes_InfractionsQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ObjectIdType']>;
   offset?: InputMaybe<Scalars['Int']>;
@@ -17391,5 +17930,6 @@ export type Authentication_LoginMutationMutation = { __typename?: 'RootMutation'
 
 
 export const AuthQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<AuthQueryQuery, AuthQueryQueryVariables>;
+export const BulkDisputes_ProcessingStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"BulkDisputes_ProcessingStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"types"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BulkMerchantWarningAction"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcesses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"submitted"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"requestedBy"}},{"kind":"Field","name":{"kind":"Name","value":"requestedWarningIds"}},{"kind":"Field","name":{"kind":"Name","value":"results"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"warningId"}},{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}}]}}]}}]}}]}}]} as unknown as DocumentNode<BulkDisputes_ProcessingStatusQuery, BulkDisputes_ProcessingStatusQueryVariables>;
 export const BulkDisputes_InfractionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"BulkDisputes_Infractions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"states"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningState"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningClaimStatus"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningReason"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningSort"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningProofType"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarnings"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"creatorName"}},{"kind":"Field","name":{"kind":"Name","value":"adminReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"counterfeitReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"correspondenceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"wssImpact"}},{"kind":"Field","name":{"kind":"Name","value":"createdTime"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUpdate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"merchant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"accountManager"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"bdMerchantCountry"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wishSellerStandard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}}]}},{"kind":"Field","name":{"kind":"Name","value":"storeStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"thirtyDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"30"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"orders"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"sevenDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"7"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalGmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<BulkDisputes_InfractionsQuery, BulkDisputes_InfractionsQueryVariables>;
 export const Authentication_LoginMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Authentication_LoginMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authentication"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"loginOk"}},{"kind":"Field","name":{"kind":"Name","value":"error"}},{"kind":"Field","name":{"kind":"Name","value":"errorState"}}]}}]}}]}}]} as unknown as DocumentNode<Authentication_LoginMutationMutation, Authentication_LoginMutationMutationVariables>;
