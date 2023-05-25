@@ -25,7 +25,7 @@ import { useState } from "react";
 import { useQuery } from "urql";
 
 const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
-  const [, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [orderBy] = useState<(typeof TableColumns)[number]>("submitted");
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -37,6 +37,7 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
     variables: {
       limit,
       offset,
+      search,
     },
   });
 
@@ -64,7 +65,7 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
               showLastButton
               rowsPerPageOptions={[10, 50, 100]}
               component={"div"}
-              count={0} // TODO GQL not ready
+              count={data?.policy?.merchantWarningBulkProcessCount || 0}
               rowsPerPage={limit}
               page={page}
               onPageChange={(_, page) => {
@@ -74,9 +75,6 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
                 setLimit(parseInt(event.target.value));
               }}
             />
-          </Stack>
-          <Stack direction={"row"} spacing={1} m={1}>
-            {/* Place filters here */}
           </Stack>
         </Stack>
         {fetching ? (

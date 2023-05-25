@@ -8361,6 +8361,7 @@ enum PermissionType {
   CNY_PROMOTED_DISABLE
   CREATE_PRODUCT
   REVIEW_ONEOFF_REQ_MERCHANT_EU_ENTITY
+  SUPPLY_CHAIN_WAREHOUSE
   CHANGE_LANGUAGE
   REVIEW_ONEOFF_REQ_CREATE_PB_SHADOW_CAMPAIGNS
   HANDLE_CS_TICKETS
@@ -8430,6 +8431,7 @@ enum PermissionType {
   VIEW_PRODUCT_PROFILE_PAGE
   TRUE_BRAND_ESCALATION_TAG
   VIEW_ALL_MERCHANTS
+  CAN_ACCESS_IPV_DEDUP_LIB_TOOL
   CAN_APPROVE_PRODUCT_BOOST_MERCHANTS
   HOVERBOARD
   UPDATE_TRACKING
@@ -8517,7 +8519,7 @@ enum PermissionType {
   CAN_HANDLE_VIOLATION_REPORT
   CAN_TRANSFER_MERCHANTS
   CAN_VIEW_WISH_USER_INFO
-  SUPPLY_CHAIN_WAREHOUSE
+  CAN_ACCESS_INAPPROPRIATE_DEDUP_LIB_TOOL
   CAN_BLOCK_USER_ON_USER_REVIEW
   UPDATE_ACTION_RULE
   USE_CUSTOM_COLORS
@@ -8708,6 +8710,7 @@ type PolicySchema {
   dispute: DisputeSchema
   cannedResponse: CannedResponseHub
   merchantWarningBulkProcesses(offset: Int = 0, limit: Int = 20, search: String, types: [BulkMerchantWarningAction!]): [MerchantWarningBulkProcessSchema!]
+  merchantWarningBulkProcessCount(search: String, types: [BulkMerchantWarningAction!]): Int
 }
 
 enum PolicyType {
@@ -9003,6 +9006,7 @@ type ProductCatalogSchema {
   csvShippingHeaderNames: [String!]!
   csvPriceInventoryHeaderNames: [String!]!
   csvTitleImagesDescriptionHeaderNames: [String!]!
+  productCategoryTaxonomyTreeJson: JSONString!
   gtinProductService: GtinProductServiceSchema!
   csvEnableDisableHeaderNames: [String!]!
   videoService: ProductVideoServiceSchema!
@@ -13042,7 +13046,7 @@ type UploadBankAccountDocument {
 }
 
 input UploadBankAccountDocumentInput {
-  url: String!
+  bankDocFile: FileInput!
 }
 
 type UploadEUVATTaxQuestionnaire {

@@ -7,12 +7,11 @@ import {
   Snackbar,
   Typography,
 } from "@mui/material";
-import { UserSchema } from "@schema";
 import Cookies from "js-cookie";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { graphql } from "src/schema";
-import { gql, useMutation, useQuery } from "urql";
+import { useMutation, useQuery } from "urql";
 
 const loginMutation = graphql(`
   mutation Authentication_LoginMutation($input: LoginMutationInput!) {
@@ -26,17 +25,13 @@ const loginMutation = graphql(`
   }
 `);
 
-type GetUserResponse = {
-  readonly currentUser?: Pick<UserSchema, "id">;
-};
-
-const GetUserQuery = gql<GetUserResponse, void>`
-  query {
+const GetUserQuery = graphql(`
+  query DevOnly_GetUser {
     currentUser {
       id
     }
   }
-`;
+`);
 
 const DevLoginPage: NextPage<Record<string, never>> = () => {
   const [toastOpen, setToastOpen] = useState(false);

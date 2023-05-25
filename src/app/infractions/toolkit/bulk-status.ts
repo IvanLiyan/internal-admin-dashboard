@@ -97,6 +97,7 @@ export const BulkProcessingStatusQuery = graphql(`
     $types: [BulkMerchantWarningAction!]
   ) {
     policy {
+      merchantWarningBulkProcessCount(search: $search, types: $types)
       merchantWarningBulkProcesses(
         offset: $offset
         limit: $limit
