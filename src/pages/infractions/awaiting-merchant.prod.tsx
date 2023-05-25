@@ -151,13 +151,14 @@ const AwaitingMerchantPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button size="small" variant="text">
+            <Button size="small" variant="text" disabled={!selected.length}>
               Dump selected claim
             </Button>
-            <Button size="small" variant="text">
+            <Button size="small" variant="text" disabled={!selected.length}>
               Claim selected
             </Button>
             <Button
+              disabled={!selected.length}
               size="small"
               variant="contained"
               onClick={() => setBulkActionOpen(true)}

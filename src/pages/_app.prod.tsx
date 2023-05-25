@@ -1,10 +1,13 @@
 import AuthProvider from "@app/core/auth/AuthProvider";
+import ToastProvider from "@app/core/toast/ToastProvider";
 import { NavigationBar } from "@app/navigation/NavigationBar";
 import { Container, ThemeProvider, createTheme } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Cookies from "js-cookie";
 import type { AppProps } from "next/app";
 import "src/styles/global.css";
-import { cacheExchange, createClient, fetchExchange, Provider } from "urql";
+import { Provider, cacheExchange, createClient, fetchExchange } from "urql";
 
 const client = createClient({
   url: `/api/graphql`,
@@ -43,10 +46,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
     <Provider value={client}>
       <AuthProvider>
         <ThemeProvider theme={theme}>
-          <NavigationBar />
-          <Container maxWidth={false} sx={{ mt: 2 }}>
-            <Component {...pageProps} />
-          </Container>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <ToastProvider>
+              <NavigationBar />
+              <Container maxWidth={false} sx={{ mt: 2 }}>
+                <Component {...pageProps} />
+              </Container>
+            </ToastProvider>
+          </LocalizationProvider>
         </ThemeProvider>
       </AuthProvider>
     </Provider>

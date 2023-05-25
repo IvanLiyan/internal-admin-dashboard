@@ -198,7 +198,7 @@ export const RequiresReviewTableColumns = [
 ] as const;
 
 export const BulkDisputeQuery = graphql(`
-  query BulkDisputes_Infractions(
+  query Disputes_GetInfractions(
     $id: ObjectIdType
     $offset: Int
     $limit: Int

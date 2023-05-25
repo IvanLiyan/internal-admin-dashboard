@@ -1,7 +1,9 @@
+import { useToast } from "@app/core/toast/ToastProvider";
 import ApproveDialog from "@app/infractions/components/modals/ApproveDialog";
 import DeclineDialog from "@app/infractions/components/modals/DeclineDialog";
 import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
 import ReverseDialog from "@app/infractions/components/modals/ReverseDialog";
+import { BulkActionMutation } from "@app/infractions/toolkit/bulk-action";
 import { BulkActionModalSchema } from "@app/infractions/toolkit/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Delete, Visibility } from "@mui/icons-material";
@@ -23,10 +25,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { MerchantWarningSchema } from "@schema";
+import { BulkMerchantWarningAction, MerchantWarningSchema } from "@schema";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useMutation } from "urql";
 
 type InfractionData = Pick<MerchantWarningSchema, "id" | "adminReasonText"> & {
   readonly lastUpdate: {
@@ -50,6 +53,8 @@ const BulkActionDialog: React.FC<Props> = ({
   reverseAction,
   ...props
 }) => {
+  const toast = useToast();
+
   const [approveOpen, setApproveOpen] = useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
   const [reverseOpen, setReverseOpen] = useState(false);
@@ -57,8 +62,9 @@ const BulkActionDialog: React.FC<Props> = ({
   const [previewInfractionId, setPreviewInfractionId] = useState<string | null>(
     null
   );
-
   const [rows, setRows] = useState<ReadonlyArray<InfractionData>>([]);
+
+  const [, bulkAction] = useMutation(BulkActionMutation);
 
   const {
     reset,
@@ -80,23 +86,26 @@ const BulkActionDialog: React.FC<Props> = ({
     reset();
   };
 
-  const handleApprove = () => {
+  const handleAction = (action: BulkMerchantWarningAction) => {
     handleSubmit((data) => {
-      return data;
-    })();
-    onClose();
-  };
-
-  const handleDecline = () => {
-    handleSubmit((data) => {
-      return data;
-    })();
-    onClose();
-  };
-
-  const handleReverse = () => {
-    handleSubmit((data) => {
-      return data;
+      bulkAction({
+        input: {
+          action: action,
+          warningIds: rows.map((row) => row.id),
+          comment: data.internalMessage,
+          message: data.message,
+        },
+      }).then((result) => {
+        if (!result.data?.policy?.bulkUpsertMerchantWarning?.ok) {
+          toast.alert(
+            "error",
+            result.data?.policy?.bulkUpsertMerchantWarning?.message ||
+              result.error?.message
+          );
+          return;
+        }
+        toast.alert("success", "Bulk action submitted successfully");
+      });
     })();
     onClose();
   };
@@ -107,19 +116,19 @@ const BulkActionDialog: React.FC<Props> = ({
         open={approveOpen}
         infractionsCount={rows.length}
         handleClose={() => setApproveOpen(false)}
-        handleConfirm={handleApprove}
+        handleConfirm={() => handleAction("APPROVE")}
       />
       <DeclineDialog
         open={declineOpen}
         infractionsCount={rows.length}
         handleClose={() => setDeclineOpen(false)}
-        handleConfirm={handleDecline}
+        handleConfirm={() => handleAction("DECLINE")}
       />
       <ReverseDialog
         open={reverseOpen}
         infractionsCount={rows.length}
         handleClose={() => setReverseOpen(false)}
-        handleConfirm={handleReverse}
+        handleConfirm={() => handleAction("REVERSE")}
       />
       <MessagePreviewDialog
         infractionId={previewInfractionId}

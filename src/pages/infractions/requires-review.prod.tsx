@@ -1,11 +1,13 @@
 import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
+import { useToast } from "@app/core/toast/ToastProvider";
 import TableHeading from "@app/infractions/components/TableHeading";
 import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
+import { BulkActionMutation } from "@app/infractions/toolkit/bulk-action";
 import {
   SearchTypes,
   useInfractionSearch,
@@ -32,6 +34,7 @@ import {
   createTheme,
 } from "@mui/material";
 import {
+  BulkMerchantWarningAction,
   MerchantWarningClaimStatus,
   MerchantWarningReason,
   MerchantWarningState,
@@ -40,7 +43,7 @@ import {
 import dayjs from "dayjs";
 import { NextPage } from "next";
 import { useState } from "react";
-import { useQuery } from "urql";
+import { useMutation, useQuery } from "urql";
 
 const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [search, setSearch] = useState("");
@@ -48,7 +51,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const [order] = useState<SortOrderType>("ASC");
   const [orderBy] =
     useState<(typeof RequiresReviewTableColumns)[number]>("created");
-  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [states] = useState<MerchantWarningState[]>(["REQUIRES_ADMIN_REVIEW"]);
@@ -64,6 +67,7 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   const gqlOrderBy = OrderBy[orderBy];
 
   const searchVars = useInfractionSearch(searchBy, search);
+  const toast = useToast();
 
   const [{ data, fetching }] = useQuery({
     query: BulkDisputeQuery,
@@ -87,6 +91,27 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
   });
 
   const tableData = useInfractionTableData(RequiresReviewTableColumns, data);
+
+  const [, bulkAction] = useMutation(BulkActionMutation);
+
+  const handleBulkAction = (action: BulkMerchantWarningAction) => {
+    bulkAction({
+      input: {
+        action: action,
+        warningIds: selected,
+      },
+    }).then((result) => {
+      if (!result.data?.policy?.bulkUpsertMerchantWarning?.ok) {
+        toast.alert(
+          "error",
+          result.data?.policy?.bulkUpsertMerchantWarning?.message ||
+            result.error?.message
+        );
+        return;
+      }
+      toast.alert("success", `${action} bulk action submitted successfully`);
+    });
+  };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -148,16 +173,26 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
             />
           </Stack>
           <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button size="small" variant="text">
+            <Button size="small" variant="text" disabled={!selected.length}>
               Dump selected claim
             </Button>
-            <Button size="small" variant="text">
+            <Button size="small" variant="text" disabled={!selected.length}>
               Claim selected
             </Button>
-            <Button size="small" variant="text">
+            <Button
+              disabled={!selected.length}
+              size="small"
+              variant="text"
+              onClick={() => handleBulkAction("CONFIRM")}
+            >
               Confirm
             </Button>
-            <Button size="small" variant="text">
+            <Button
+              disabled={!selected.length}
+              size="small"
+              variant="text"
+              onClick={() => handleBulkAction("DELETE")}
+            >
               Delete
             </Button>
           </Stack>

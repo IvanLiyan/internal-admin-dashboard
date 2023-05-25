@@ -90,7 +90,7 @@ export const useTableData = (
 };
 
 export const BulkProcessingStatusQuery = graphql(`
-  query BulkDisputes_ProcessingStatus(
+  query Disputes_BulkStatus(
     $offset: Int
     $limit: Int
     $search: String
