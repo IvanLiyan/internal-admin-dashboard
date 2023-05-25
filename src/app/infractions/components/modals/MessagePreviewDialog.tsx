@@ -1,4 +1,6 @@
+import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import MessageBubble from "@app/infractions/components/MessageBubble";
+import { DisputeMessagesQuery } from "@app/infractions/toolkit/message";
 import {
   Button,
   Dialog,
@@ -8,34 +10,54 @@ import {
   DialogTitle,
   Stack,
 } from "@mui/material";
+import { useQuery } from "urql";
 
 type Props = Pick<DialogProps, "open"> & {
   readonly infractionId?: string | null;
   readonly handleClose: () => void;
 };
 
-const MOCK_DATE = 1683052681;
-const MOCK_SENDER_NAME = "Wish Merchant Service";
-const MOCK_MSG_CONTENT =
-  "temp copy explaining infractions temp copy explaining infractions temp copy explaining infractions";
+const MessagePreviewDialog: React.FC<Props> = ({
+  handleClose,
+  infractionId,
+  ...props
+}) => {
+  const [{ fetching, data }] = useQuery({
+    query: DisputeMessagesQuery,
+    variables: { warningId: infractionId },
+  });
 
-const MessagePreviewDialog: React.FC<Props> = ({ handleClose, ...props }) => {
-  // TODO fetch messages for `infractionId`
+  const msgData = (
+    (data?.policy?.merchantWarning?.replies ??
+      data?.policy?.merchantWarning?.trackingDispute?.messages) ||
+    []
+  ).sort((msgA, msgB) => {
+    if (!msgA.date?.unix || !msgB.date?.unix) {
+      return 0;
+    }
+    return msgA.date.unix - msgB.date.unix;
+  });
+
   return (
     <Dialog maxWidth={"md"} onClose={handleClose} {...props}>
       <DialogTitle>Message Preview</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={1}>
-          {/* TODO fetch messages for `infractionId`, sorted by date newest on top */}
-          {[...Array(10)].map((_, i) => (
-            <MessageBubble
-              key={i}
-              alignSelf={i % 2 == 0 ? "flex-end" : "flex-start"}
-              content={MOCK_MSG_CONTENT}
-              senderName={MOCK_SENDER_NAME}
-              unix={MOCK_DATE}
-            />
-          ))}
+          {fetching ? (
+            <LoadingIndicator />
+          ) : (
+            msgData.map((msg, i) => (
+              <MessageBubble
+                key={i}
+                alignSelf={
+                  msg.senderType === "MERCHANT" ? "flex-start" : "flex-end"
+                }
+                content={msg.message || "n/a"}
+                senderName={msg.senderName || msg.senderType || "n/a"}
+                unix={msg.date?.unix || 0}
+              />
+            ))
+          )}
         </Stack>
       </DialogContent>
       <DialogActions>

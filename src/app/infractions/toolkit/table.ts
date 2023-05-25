@@ -239,6 +239,10 @@ export const BulkDisputeQuery = graphql(`
         banned
         correspondenceStatus
         wssImpact
+        bulkProcessing
+        claimedBy {
+          id
+        }
         createdTime {
           unix
         }
