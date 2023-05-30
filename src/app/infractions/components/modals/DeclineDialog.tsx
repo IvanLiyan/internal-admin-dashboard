@@ -1,9 +1,9 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogProps,
   DialogTitle,
   Typography,
@@ -25,9 +25,10 @@ const DeclineDialog: React.FC<Props> = ({
     <Dialog {...props} maxWidth={"sm"} fullWidth onClose={handleClose}>
       <DialogTitle>Decline Disputes</DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <Typography>
           Are you sure you want to{" "}
-          <Typography
+          <Box
+            component={"span"}
             sx={{
               fontWeight: "bold",
               display: "inline",
@@ -35,9 +36,9 @@ const DeclineDialog: React.FC<Props> = ({
             }}
           >
             decline {infractionsCount}
-          </Typography>{" "}
+          </Box>{" "}
           infraction disputes?
-        </DialogContentText>
+        </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>

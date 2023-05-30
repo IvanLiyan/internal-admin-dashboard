@@ -74,15 +74,17 @@ export const useTableData = (
               reason: result.error || "N/A",
             };
           }) || []),
-          ...(row.requestedWarningIds?.map<TableData["infractions"][number]>(
-            (request) => {
+          ...(row.requestedWarningIds
+            ?.filter((id) =>
+              row.results?.every((result) => result.warningId != id)
+            )
+            ?.map<TableData["infractions"][number]>((request) => {
               return {
                 infractionId: request,
                 status: "In Progress",
                 reason: "N/A",
               };
-            }
-          ) || []),
+            }) || []),
         ],
       };
     }) || []

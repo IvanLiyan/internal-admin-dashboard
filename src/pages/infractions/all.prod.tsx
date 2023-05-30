@@ -1,7 +1,12 @@
 import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
+import CompactTableCell from "@app/infractions/components/CompactTableCell";
+import TableContextProvider from "@app/infractions/components/TableContext";
 import TableHeading from "@app/infractions/components/TableHeading";
+import ClaimButton from "@app/infractions/components/buttons/ClaimButton";
+import ClaimSelectedButton from "@app/infractions/components/buttons/ClaimSelectedButton";
+import DumpSelectedButton from "@app/infractions/components/buttons/DumpSelectedButton";
 import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
 import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
@@ -9,16 +14,15 @@ import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
 import {
-  SearchTypes,
-  useInfractionSearch,
-} from "@app/infractions/toolkit/search";
+  initTableState,
+  tableStateReducer,
+} from "@app/infractions/toolkit/reducer";
 import {
   AllInfractionTableColumns,
-  BulkDisputeQuery,
-  OrderBy,
-  useInfractionTableData,
+  useSelectHandlers,
+  useTableData,
+  useTableQuery,
 } from "@app/infractions/toolkit/table";
-import { InfractionTableThemeOptions } from "@app/infractions/toolkit/theme";
 import {
   Button,
   Checkbox,
@@ -26,210 +30,147 @@ import {
   Stack,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TablePagination,
   TableRow,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material";
-import {
-  MerchantWarningClaimStatus,
-  MerchantWarningReason,
-  MerchantWarningState,
-  SortOrderType,
-} from "@schema";
 import dayjs from "dayjs";
 import { NextPage } from "next";
-import { useState } from "react";
-import { useQuery } from "urql";
+import { useReducer, useState } from "react";
 
 const AllInfractionsPage: NextPage<Record<string, never>> = () => {
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [searchBy, setSearchBy] = useState<SearchTypes>("ID");
-  const [order] = useState<SortOrderType>("ASC");
-  const [orderBy] =
-    useState<(typeof AllInfractionTableColumns)[number]>("lastUpdated");
-  const [selected, setSelected] = useState<readonly string[]>([]);
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
-  const [states] = useState<MerchantWarningState[]>([
-    "AWAITING_MERCHANT",
-    "NEW",
-    "CLOSED",
-    "AWAITING_ADMIN",
-    "REQUEST_PAYMENT",
-    "CN_BD_REVIEW_PAYMENT",
-    "US_BD_REVIEW_PAYMENT",
-  ]);
-  const [issueDateStart, setIssueDateStart] = useState<number | null>(null);
-  const [issueDateEnd, setIssueDateEnd] = useState<number | null>(null);
-  const [reasons, setReasons] = useState<
-    MerchantWarningReason[] | null | undefined
-  >(null);
-  const [claimStatus, setClaimStatus] =
-    useState<MerchantWarningClaimStatus | null>(null);
-
-  const offset = page * limit;
-  const gqlOrderBy = OrderBy[orderBy];
-
-  const searchVars = useInfractionSearch(searchBy, search);
-
-  const [{ data, fetching }] = useQuery({
-    query: BulkDisputeQuery,
-    variables: {
-      limit,
-      offset,
-      states,
-      sort:
-        gqlOrderBy == null ? undefined : { field: gqlOrderBy, order: order },
-      issueDateStart:
-        issueDateStart != null
-          ? {
-              unix: issueDateStart,
-            }
-          : undefined,
-      issueDateEnd: issueDateEnd != null ? { unix: issueDateEnd } : undefined,
-      reasons,
-      claimStatus,
-      ...searchVars,
+  const [state, dispatch] = useReducer(
+    tableStateReducer,
+    {
+      order: "ASC",
+      orderBy: "lastUpdated",
+      states: [
+        "AWAITING_MERCHANT",
+        "NEW",
+        "CLOSED",
+        "AWAITING_ADMIN",
+        "REQUEST_PAYMENT",
+        "CN_BD_REVIEW_PAYMENT",
+        "US_BD_REVIEW_PAYMENT",
+      ],
     },
-  });
-
-  const tableData = useInfractionTableData(AllInfractionTableColumns, data);
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      setSelected(tableData.map((n) => n.infractionId));
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (
-    event: React.MouseEvent<unknown>,
-    infractionId: string
-  ) => {
-    if (selected.includes(infractionId)) {
-      setSelected((prev) => prev.filter((i) => i !== infractionId));
-      return;
-    }
-    setSelected((prev) => [...prev, infractionId]);
-  };
-
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+    initTableState
+  );
+  const [{ data, fetching }, reexecuteQuery] = useTableQuery(state);
+  const tableData = useTableData(data);
+  const { onSelect, onSelectAll } = useSelectHandlers(
+    state,
+    dispatch,
+    tableData
+  );
+  const isSelected = (name: string) => state.selected.indexOf(name) !== -1;
 
   return (
     <PageRoot title="All Merchant Infractions">
       <Paper>
-        <Stack>
-          <Stack
-            direction={"row"}
-            justifyContent={"space-between"}
-            alignItems="center"
-          >
-            <Searchbox
-              onConfirm={(token) => {
-                setSearch(token);
-              }}
-              size="small"
-              placeholder="Search"
-              sx={{ minWidth: 400, mx: 1 }}
-              searchBy={{
-                keys: ["ID", "Merchant Name"],
-                onSearchByChange: (searchBy) => setSearchBy(searchBy),
-                defaultKey: "ID",
-              }}
-            />
-            <TablePagination
-              showFirstButton
-              showLastButton
-              rowsPerPageOptions={[10, 50, 100]}
-              component={"div"}
-              count={data?.policy?.merchantWarningCount || 0}
-              rowsPerPage={limit}
-              page={page}
-              onPageChange={(_, page) => {
-                setPage(page);
-              }}
-              onRowsPerPageChange={(event) => {
-                setLimit(parseInt(event.target.value));
-              }}
-            />
-          </Stack>
-          <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
-            <Button size="small" variant="text" disabled={!selected.length}>
-              Dump selected claim
-            </Button>
-            <Button size="small" variant="text" disabled={!selected.length}>
-              Claim selected
-            </Button>
-            <Button
-              disabled={!selected.length}
-              size="small"
-              variant="contained"
-              onClick={() => setBulkActionOpen(true)}
+        <TableContextProvider
+          state={state}
+          dispatch={{ dispatch, reexecuteQuery }}
+        >
+          <Stack>
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              alignItems="center"
             >
-              Take further action
-            </Button>
-          </Stack>
-          <Stack direction={"row"} spacing={1} m={1}>
-            {/* Place filters here */}
-            <DateFilter
-              onChangeStartDate={(startDate) => {
-                if (startDate == null) {
-                  setIssueDateStart(null);
+              <Searchbox
+                onConfirm={(token) => {
+                  dispatch({ search: token });
+                }}
+                size="small"
+                placeholder="Search"
+                sx={{ minWidth: 400, mx: 1 }}
+                searchBy={{
+                  keys: ["ID", "Merchant Name"],
+                  onSearchByChange: (searchBy) => dispatch({ searchBy }),
+                  defaultKey: "ID",
+                }}
+              />
+              <TablePagination
+                showFirstButton
+                showLastButton
+                rowsPerPageOptions={[10, 50, 100]}
+                component={"div"}
+                count={data?.policy?.merchantWarningCount || 0}
+                rowsPerPage={state.limit}
+                page={state.page}
+                onPageChange={(_, page) => {
+                  dispatch({ page });
+                }}
+                onRowsPerPageChange={(event) => {
+                  dispatch({
+                    limit: parseInt(event.target.value),
+                  });
+                }}
+              />
+            </Stack>
+            <Stack direction={"row"} justifyContent={"flex-end"} m={1}>
+              <DumpSelectedButton />
+              <ClaimSelectedButton />
+              <Button
+                disabled={!state.selected.length}
+                size="small"
+                variant="contained"
+                onClick={() => setBulkActionOpen(true)}
+              >
+                Take further action
+              </Button>
+            </Stack>
+            <Stack direction={"row"} spacing={1} m={1}>
+              {/* Place filters here */}
+              <DateFilter
+                onChangeStartDate={(startDate) => {
+                  dispatch({
+                    issueDateStart:
+                      startDate != null ? dayjs(startDate).unix() : null,
+                  });
+                }}
+                onChangeEndDate={(endDate) => {
+                  dispatch({
+                    issueDateEnd:
+                      endDate != null ? dayjs(endDate).unix() : null,
+                  });
+                }}
+              />
+              <ClaimFilter
+                onConfirm={(status) => {
+                  dispatch({ claimStatus: status });
+                }}
+              />
+              <ReasonFilter
+                onConfirm={(reason) => {
+                  dispatch({ reasons: reason });
+                }}
+              />
+              <CounterfeitReasonFilter
+                onConfirm={() => {
                   return;
-                }
-                setIssueDateStart(dayjs(startDate).unix());
-              }}
-              onChangeEndDate={(endDate) => {
-                if (endDate == null) {
-                  setIssueDateEnd(null);
+                }}
+              />
+              <CounterfeitSubreasonFilter
+                onConfirm={() => {
                   return;
-                }
-                setIssueDateEnd(dayjs(endDate).unix());
-              }}
-            />
-            <ClaimFilter
-              onConfirm={(status) => {
-                setClaimStatus(status);
-              }}
-            />
-            <ReasonFilter
-              onConfirm={(reason) => {
-                setReasons(reason);
-              }}
-            />
-            <CounterfeitReasonFilter
-              onConfirm={() => {
-                return;
-              }}
-            />
-            <CounterfeitSubreasonFilter
-              onConfirm={() => {
-                return;
-              }}
-            />
+                }}
+              />
+            </Stack>
           </Stack>
-        </Stack>
-        {fetching ? (
-          <LoadingIndicator />
-        ) : (
-          <ThemeProvider
-            theme={(theme) =>
-              createTheme({ ...theme, ...InfractionTableThemeOptions })
-            }
-          >
+          {fetching ? (
+            <LoadingIndicator />
+          ) : (
             <TableContainer>
               <Table size={"medium"}>
                 <TableHeading
                   columns={AllInfractionTableColumns}
-                  numSelected={selected.length}
-                  order={order == "ASC" ? "asc" : "desc"}
-                  orderBy={orderBy}
-                  onSelectAllClick={handleSelectAllClick}
+                  numSelected={state.selected.length}
+                  order={state.order == "ASC" ? "asc" : "desc"}
+                  orderBy={state.orderBy}
+                  onSelectAllClick={onSelectAll}
                   rowCount={tableData.length}
                 />
                 <TableBody>
@@ -242,42 +183,47 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
                         key={row.infractionId}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
+                        <CompactTableCell padding="checkbox">
                           <Checkbox
                             checked={isItemSelected}
                             onClick={(event) =>
-                              handleClick(event, row.infractionId)
+                              onSelect(event, row.infractionId)
                             }
                           />
-                        </TableCell>
+                        </CompactTableCell>
                         {AllInfractionTableColumns.map((col) => (
-                          <TableCell key={col} align="right">
+                          <CompactTableCell key={col} align="right">
                             {row[col]}
-                          </TableCell>
+                          </CompactTableCell>
                         ))}
-                        <TableCell align="center">
-                          <Button size="small">View</Button>
-                          <Button size="small">Claim</Button>
-                        </TableCell>
+                        <CompactTableCell align="center">
+                          <Button
+                            size="small"
+                            href={`/warning/view/${row.infractionId}`}
+                          >
+                            View
+                          </Button>
+                          <ClaimButton infraction={row} />
+                        </CompactTableCell>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
             </TableContainer>
-          </ThemeProvider>
-        )}
+          )}
 
-        <BulkActionDialog
-          reverseAction
-          open={bulkActionOpen}
-          handleClose={() => setBulkActionOpen(false)}
-          infractions={
-            data?.policy?.merchantWarnings?.filter((r) =>
-              selected.includes(r.id)
-            ) || []
-          }
-        />
+          <BulkActionDialog
+            reverseAction
+            open={bulkActionOpen}
+            handleClose={() => setBulkActionOpen(false)}
+            infractions={
+              data?.policy?.merchantWarnings?.filter((r) =>
+                state.selected.includes(r.id)
+              ) || []
+            }
+          />
+        </TableContextProvider>
       </Paper>
     </PageRoot>
   );

@@ -52,10 +52,8 @@ const BulkProcessRequestRow: React.FC<{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.infractions.map((item, i) => (
-                    <TableRow
-                      key={`${row.requestId}-${item.infractionId}-${i}`}
-                    >
+                  {row.infractions.map((item) => (
+                    <TableRow key={`${row.requestId}-${item.infractionId}`}>
                       {ExpandRowColumns.map((ec) => (
                         <TableCell key={ec} align="right">
                           {item[ec]}

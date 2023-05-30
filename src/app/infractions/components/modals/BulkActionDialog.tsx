@@ -3,7 +3,7 @@ import ApproveDialog from "@app/infractions/components/modals/ApproveDialog";
 import DeclineDialog from "@app/infractions/components/modals/DeclineDialog";
 import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
 import ReverseDialog from "@app/infractions/components/modals/ReverseDialog";
-import { BulkActionMutation } from "@app/infractions/toolkit/bulk-action";
+import { BulkActionMutation } from "@app/infractions/toolkit/action";
 import { BulkActionModalSchema } from "@app/infractions/toolkit/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Delete, Visibility } from "@mui/icons-material";
@@ -104,7 +104,7 @@ const BulkActionDialog: React.FC<Props> = ({
           );
           return;
         }
-        toast.alert("success", "Bulk action submitted successfully");
+        toast.alert("success", `${action} bulk action submitted successfully`);
       });
     })();
     onClose();

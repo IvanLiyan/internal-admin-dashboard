@@ -1,9 +1,17 @@
-import { graphql } from "src/schema";
-import { ResultOf } from "@graphql-typed-document-node/core";
-import dayjs from "dayjs";
+import { Action, State } from "@app/infractions/toolkit/reducer";
+import { ResultOf, VariablesOf } from "@graphql-typed-document-node/core";
 import { MerchantWarningSortFieldType } from "@schema";
+import dayjs from "dayjs";
+import { Dispatch } from "react";
+import { graphql } from "src/schema";
+import { useQuery } from "urql";
 
-export const InfractionsTableColumns = {
+export type TableData = Record<keyof typeof ColumnLabel, string> & {
+  readonly claimed: boolean;
+  readonly bulkStatus: boolean;
+};
+
+export const ColumnLabel = {
   created: "Created",
   creator: "Creator",
   lastUpdated: "Last Update",
@@ -25,80 +33,11 @@ export const InfractionsTableColumns = {
   correspondenceStatus: "Correspondence Status",
 } as const;
 
-export const OrderBy: {
-  [T in keyof typeof InfractionsTableColumns]: MerchantWarningSortFieldType | null;
+const OrderBy: {
+  [T in keyof typeof ColumnLabel]?: MerchantWarningSortFieldType | null;
 } = {
-  bdRep: null,
-  correspondenceStatus: null,
   created: "CREATED_TIME",
-  creator: null,
-  geo: null,
-  ban: null,
-  gmv7Day: null,
-  gmv7DayPercentage: null,
-  gmvLifetime: null,
-  infractionId: null,
   lastUpdated: "LAST_UPDATE",
-  merchantId: null,
-  merchantName: null,
-  orderCount30Day: null,
-  parentCategory: null,
-  reason: null,
-  subCategory: null,
-  wssImpact: null,
-  wssTier: null,
-};
-
-export const useInfractionTableData = <
-  T extends ReadonlyArray<keyof typeof InfractionsTableColumns>
->(
-  columns: T,
-  data: ResultOf<typeof BulkDisputeQuery> | null | undefined
-) => {
-  const allData =
-    data?.policy?.merchantWarnings?.map<{
-      [P in keyof typeof InfractionsTableColumns]: string;
-    }>((i) => {
-      return {
-        created: dayjs.unix(i.createdTime.unix).format("YYYY-MM-DD HH:MM"),
-        creator: i.creatorName ?? "N/A",
-        lastUpdated: dayjs.unix(i.lastUpdate.unix).format("YYYY-MM-DD HH:MM"),
-        merchantName: i.merchant?.displayName ?? "N/A",
-        merchantId: i.merchant?.id ?? "N/A",
-        infractionId: i.id,
-        bdRep: i.merchant?.accountManager?.name ?? "N/A",
-        geo: i.merchant?.accountManager?.bdMerchantCountry ?? "N/A",
-        reason: i.adminReasonText ?? "N/A",
-        parentCategory: i.counterfeitReasonText ?? "N/A",
-        subCategory: "N/A",
-        ban: i.banned == null ? "N/A" : i.banned ? "Yes" : "No",
-        gmv7Day: i.merchant?.storeStats.sevenDayTotals.gmv.display ?? "N/A",
-        gmv7DayPercentage:
-          i.merchant?.storeStats.sevenDayTotals.gmv.display ?? "N/A",
-        gmvLifetime: i.merchant?.storeStats.totalGmv.display ?? "N/A",
-        orderCount30Day:
-          i.merchant?.storeStats.thirtyDayTotals.orders == null
-            ? "N/A"
-            : `${i.merchant?.storeStats.thirtyDayTotals.orders}`,
-        wssTier: i.merchant?.wishSellerStandard.level ?? "N/A",
-        wssImpact: i.wssImpact,
-        correspondenceStatus: i.correspondenceStatus ?? "N/A",
-      };
-    }) || [];
-
-  return allData.map((data) => {
-    return (Object.keys(data) as (keyof typeof data)[]).reduce((acc, cur) => {
-      if (columns.includes(cur)) {
-        return {
-          ...acc,
-          [cur]: data[cur],
-        };
-      }
-      return {
-        ...acc,
-      };
-    }, {} as { [K in T[number]]: string });
-  });
 };
 
 export const ActionRequiredTableColumns = [
@@ -210,6 +149,9 @@ export const BulkDisputeQuery = graphql(`
     $issueDateEnd: DatetimeInput
     $searchProofIdTypes: [MerchantWarningProofType!]
   ) {
+    currentUser {
+      id
+    }
     policy {
       merchantWarningCount(
         id: $id
@@ -277,3 +219,121 @@ export const BulkDisputeQuery = graphql(`
     }
   }
 `);
+
+export const useTableData = (
+  data: ResultOf<typeof BulkDisputeQuery> | null | undefined
+): ReadonlyArray<TableData> => {
+  return (
+    data?.policy?.merchantWarnings?.map<TableData>((i) => {
+      return {
+        created: dayjs.unix(i.createdTime.unix).format("YYYY-MM-DD HH:MM"),
+        creator: i.creatorName ?? "N/A",
+        lastUpdated: dayjs.unix(i.lastUpdate.unix).format("YYYY-MM-DD HH:MM"),
+        merchantName: i.merchant?.displayName ?? "N/A",
+        merchantId: i.merchant?.id ?? "N/A",
+        infractionId: i.id,
+        bdRep: i.merchant?.accountManager?.name ?? "N/A",
+        geo: i.merchant?.accountManager?.bdMerchantCountry ?? "N/A",
+        reason: i.adminReasonText ?? "N/A",
+        parentCategory: i.counterfeitReasonText ?? "N/A",
+        subCategory: "N/A",
+        ban: i.banned == null ? "N/A" : i.banned ? "Yes" : "No",
+        gmv7Day: i.merchant?.storeStats.sevenDayTotals.gmv.display ?? "N/A",
+        gmv7DayPercentage:
+          i.merchant?.storeStats.sevenDayTotals.gmv.display ?? "N/A",
+        gmvLifetime: i.merchant?.storeStats.totalGmv.display ?? "N/A",
+        orderCount30Day:
+          i.merchant?.storeStats.thirtyDayTotals.orders == null
+            ? "N/A"
+            : `${i.merchant?.storeStats.thirtyDayTotals.orders}`,
+        wssTier: i.merchant?.wishSellerStandard.level ?? "N/A",
+        wssImpact: i.wssImpact,
+        correspondenceStatus: i.correspondenceStatus ?? "N/A",
+        claimed: i.claimedBy?.id == data.currentUser?.id,
+        bulkStatus: !!i.bulkProcessing,
+      };
+    }) || []
+  );
+};
+
+export type SearchTypes = "ID" | "Merchant Name";
+
+const useSearchVars = <T extends SearchTypes>(
+  searchBy: T,
+  query: string
+): VariablesOf<typeof BulkDisputeQuery> => {
+  if (!query) {
+    return {};
+  }
+  switch (searchBy) {
+    case "Merchant Name":
+      // TODO GQL not ready
+      return {};
+    case "ID":
+      return {
+        id: query,
+        searchProofIdTypes: ["MERCHANT", "PRODUCT", "ORDER"],
+      };
+  }
+  return {};
+};
+
+export const useTableQuery = (state: State) => {
+  const gqlOrderBy = OrderBy[state.orderBy];
+  return useQuery({
+    query: BulkDisputeQuery,
+    variables: {
+      limit: state.limit,
+      offset: state.offset,
+      states: state.states,
+      sort:
+        gqlOrderBy == null
+          ? undefined
+          : { field: gqlOrderBy, order: state.order },
+      issueDateStart:
+        state.issueDateStart != null
+          ? {
+              unix: state.issueDateStart,
+            }
+          : undefined,
+      issueDateEnd:
+        state.issueDateEnd != null ? { unix: state.issueDateEnd } : undefined,
+      reasons: state.reasons,
+      claimStatus: state.claimStatus,
+      ...useSearchVars(state.searchBy, state.search),
+    },
+  });
+};
+
+export const useSelectHandlers = (
+  state: State,
+  dispatch: Dispatch<Action>,
+  tableData: ReturnType<typeof useTableData>
+) => {
+  const onSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      dispatch({
+        selected: tableData
+          .filter((n) => !n.bulkStatus)
+          .map((n) => n.infractionId),
+      });
+      return;
+    }
+    dispatch({
+      selected: [],
+    });
+  };
+
+  const onSelect = (event: React.MouseEvent<unknown>, infractionId: string) => {
+    if (state.selected.includes(infractionId)) {
+      dispatch({
+        selected: state.selected.filter((i) => i !== infractionId),
+      });
+      return;
+    }
+    dispatch({
+      selected: [...state.selected, infractionId],
+    });
+  };
+  return { onSelectAll, onSelect };
+};
