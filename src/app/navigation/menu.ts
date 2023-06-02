@@ -42,4 +42,13 @@ export const MenuData: MenuItemProps[] = [
       },
     ],
   },
+  {
+    text: "Seller Identity",
+    subMenuItems: [
+      {
+        text: "Bank Account Verification",
+        href: "/seller-identity/bank-verifications",
+      },
+    ],
+  },
 ];

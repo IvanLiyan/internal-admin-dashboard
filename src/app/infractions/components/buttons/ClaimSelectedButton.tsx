@@ -17,7 +17,7 @@ const ClaimSelectedButton: React.FC<ButtonProps> = ({ ...buttonProps }) => {
       size="small"
       disabled={!state?.selected.length}
       onClick={() => {
-        onClaim({ claimWarningInput: { warningIds: state?.selected } }).then(
+        onClaim({ claimInput: { warningIds: state?.selected } }).then(
           (result) => {
             if (
               result.data?.policy?.merchantWarning?.upsertMerchantWarning?.ok

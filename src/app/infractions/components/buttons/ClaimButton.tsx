@@ -22,7 +22,7 @@ const ClaimButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
       disabled={infraction.claimed || infraction.bulkStatus}
       onClick={() => {
         onClaim({
-          claimWarningInput: { warningIds: [infraction.infractionId] },
+          claimInput: { warningIds: [infraction.infractionId] },
         }).then((result) => {
           if (result.data?.policy?.merchantWarning?.upsertMerchantWarning?.ok) {
             dispatchContext?.reexecuteQuery({

@@ -936,7 +936,6 @@ enum BrandPartnerCountryAndRegionCode {
   HU
   MK
   BR
-  JE
   FI
   DK
   PR
@@ -1778,6 +1777,10 @@ enum ClientWritableBucket {
   TEMP_UPLOADS_V2
   PUBLIC_APP_LOGO
   TAX_SETTING_FILE_UPLOADS
+}
+
+input CloseInfractionInput {
+  warningIds: [ObjectIdType!]
 }
 
 enum ColumnCategoryId {
@@ -2868,6 +2871,7 @@ type DedupImageSchema {
   counterfeitSubcategory: TaggingViolationSubReasonCode
   brand: BrandSchema
   sampleImageUrl: String
+  createdTime: Datetime!
   updateTime: Datetime!
   source: DedupSource
 }
@@ -2889,6 +2893,8 @@ enum DedupImageType {
 }
 
 enum DedupSource {
+  TAKEDOWN_REQUEST
+  MANUAL_TAG
   MANUALLY_ADDED
   AUDIT_FEEDBACK
 }
@@ -3314,6 +3320,25 @@ type EPRMutations {
   acceptTos(input: AcceptTosInput!): AcceptTos
 }
 
+type EPRNonCompliantSummaryRecordSchema {
+  country: Country!
+  eprCategoryName: String!
+  nonCompliantProductCount: Int!
+}
+
+type EPRNonCompliantSummarySchema {
+  summaryRecords: [EPRNonCompliantSummaryRecordSchema!]!
+  productRecordTotal(countryCode: CountryCode!, eprCategories: [Int!], productId: String): Int!
+  productRecords(countryCode: CountryCode!, eprCategories: [Int!], productId: String, offset: Int = 0, limit: Int = 10, sortDesc: Boolean = false): [EPRProductRecordSchema!]!
+}
+
+type EPRProductRecordSchema {
+  productId: ObjectIdType!
+  country: Country!
+  taxonomyCategoryNames: [String!]!
+  eprCategoryNames: [String!]!
+}
+
 enum EPRStatus {
   DELETED
   ADMIN_APPROVED
@@ -3479,6 +3504,8 @@ input EditTrademarksAndBrandInfoInput {
 type EligibleProductInfo {
   product: ProductSchema!
   variations: [VariationSchema!]!
+  maxCalculatedShippingPrice(countries: [CountryCode!]): CurrencyValue
+  maxMerchantSetShippingPrice(countries: [CountryCode!]): CurrencyValue
 }
 
 enum EntityTypes {
@@ -3562,6 +3589,7 @@ type ExpireWhitelistProductsMutation {
 type ExtendedProducerResponsibilitySchema {
   country(countryCode: CountryCode!): CountryEPRSchema!
   countries: [CountryEPRSchema!]!
+  eprNonCompliantSummary: EPRNonCompliantSummarySchema!
 }
 
 type ExternalBoostAttributedStats {
@@ -5268,6 +5296,7 @@ type MFPVariationDiscountData {
   variation: VariationSchema!
   maxQuantity: Int
   discountPercentage: Float!
+  discountAmount: CurrencyValue
   scheduledStartTime: Datetime
   scheduledEndTime: Datetime
 }
@@ -5292,6 +5321,10 @@ enum MFPVariationUnqualifiedReason {
   FRS_HIGH_DISCOUNT
   FRS_DISCOUNT_PRICE
   FRS_NEGATIVE_PRICE
+  DISCOUNT_PRICE_HISTORY
+  FLASH_SALE_MINIMUM_VARIATION_INVENTORY
+  COMPETING_PROMOTION
+  PROMOTION_HISTORY
 }
 
 enum MFPWhitelistProductSortBy {
@@ -5859,6 +5892,7 @@ type MerchantIdentityMutations {
 }
 
 type MerchantIdentityServiceSchema {
+  bankAccountVerificationsCount(merchantId: ObjectIdType, state: BankAccountVerificationStatus): Int
   bankAccountVerifications(offset: Int = 0, limit: Int = 50, merchantId: ObjectIdType, state: BankAccountVerificationStatus): [BankAccountVerificationSchema!]
 }
 
@@ -6808,13 +6842,14 @@ enum MerchantWarehouseWeekStatsSortFieldType {
 
 enum MerchantWarningAction {
   CLAIM
-  LISTING_LEVEL_DISPUTE
-  UNCLAIM
   CONFIRM
+  UNCLAIM
+  LISTING_LEVEL_DISPUTE
   MERCHANT_LEVEL_DISPUTE
   REQUEST_PAYMENT_RELEASE
-  CANCEL
   REPLY
+  CANCEL
+  CLOSE
 }
 
 enum MerchantWarningAuditAction {
@@ -8853,7 +8888,6 @@ enum ProductCSVColumnName {
   IL
   IS
   IT
-  JE
   JP
   KR
   LI
@@ -8914,7 +8948,6 @@ enum ProductCSVColumnName {
   IL_TTD
   IS_TTD
   IT_TTD
-  JE_TTD
   JP_TTD
   KR_TTD
   LI_TTD
@@ -8966,11 +8999,10 @@ enum ProductCSVJobType {
   CREATE_PRESALE_PRODUCT
   NEW_UPDATE_PRODUCTS
   EDIT_WISH_EXPRESS_COUNTRIES
-  NEW_EDIT_SHIPPING
+  SHOPIFY_CREATE_PRODUCTS
   UPSERT_PRODUCTS
   NEW_ADD_VARIATION
   EDIT_FBW_SHIPPING
-  SHOPIFY_CREATE_PRODUCTS
   EDIT_SHIPPING
   ADD_SIZE_COLOR
   UPDATE_PRODUCTS
@@ -9003,6 +9035,7 @@ type ProductCatalogSchema {
   csvProductImportJobsCount(feedType: ProductCSVJobType): Int!
   csvProductColumnNames: [String!]!
   csvProductColumnEnums: [ProductCSVColumnName!]!
+  csvAllHeaderNames: [String!]!
   csvShippingHeaderNames: [String!]!
   csvPriceInventoryHeaderNames: [String!]!
   csvTitleImagesDescriptionHeaderNames: [String!]!
@@ -10715,6 +10748,7 @@ enum RoleType {
   CONTRACTOR
   STORE_USER
   CS_REP_EXTERNAL
+  SYSTEM_ACCOUNT
   TASKUS_DETAIL_LEAD
   WAREHOUSE_OPERATOR
   BD_LEAD
@@ -11274,7 +11308,6 @@ enum ShippableCountryCode {
   DE
   HU
   US
-  JE
   AD
   PR
   PT
@@ -13211,8 +13244,9 @@ input UpsertMerchantWarningInput {
   messageInput: ReplyInfractionInput
   disputeInput: DisputeInfractionInput
   requestPaymentInput: RequestPaymentInput
-  cancelWarningInput: CancelInfractionInput
-  claimWarningInput: ClaimInfractionInput
+  cancelInput: CancelInfractionInput
+  claimInput: ClaimInfractionInput
+  closeInput: CloseInfractionInput
 }
 
 type UpsertOrderInfractionDispute {

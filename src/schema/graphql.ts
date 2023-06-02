@@ -1274,7 +1274,6 @@ export type BrandPartnerCountryAndRegionCode =
   | 'IL'
   | 'IS'
   | 'IT'
-  | 'JE'
   | 'JP'
   | 'KR'
   | 'LI'
@@ -2298,6 +2297,10 @@ export type ClientWritableBucket =
   | 'TAX_SETTING_FILE_UPLOADS'
   | 'TEMP_UPLOADS'
   | 'TEMP_UPLOADS_V2';
+
+export type CloseInfractionInput = {
+  warningIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
+};
 
 export type ColumnCategoryId =
   | 'ADDITIONAL_ITEM_SHIPPING'
@@ -3523,6 +3526,7 @@ export type DedupImageSchema = {
   brand?: Maybe<BrandSchema>;
   counterfeitReason?: Maybe<CounterfeitReasonCode>;
   counterfeitSubcategory?: Maybe<TaggingViolationSubReasonCode>;
+  createdTime: Datetime;
   id: Scalars['ObjectIdType'];
   imagePhash: Scalars['String'];
   imageType: DedupImageType;
@@ -3549,7 +3553,9 @@ export type DedupImageType =
 
 export type DedupSource =
   | 'AUDIT_FEEDBACK'
-  | 'MANUALLY_ADDED';
+  | 'MANUALLY_ADDED'
+  | 'MANUAL_TAG'
+  | 'TAKEDOWN_REQUEST';
 
 export type DefaultShippingInput = {
   price: CurrencyInput;
@@ -4009,6 +4015,45 @@ export type EprMutationsUpdateUinArgs = {
   input: UpdateUinInput;
 };
 
+export type EprNonCompliantSummaryRecordSchema = {
+  __typename?: 'EPRNonCompliantSummaryRecordSchema';
+  country: Country;
+  eprCategoryName: Scalars['String'];
+  nonCompliantProductCount: Scalars['Int'];
+};
+
+export type EprNonCompliantSummarySchema = {
+  __typename?: 'EPRNonCompliantSummarySchema';
+  productRecordTotal: Scalars['Int'];
+  productRecords: Array<EprProductRecordSchema>;
+  summaryRecords: Array<EprNonCompliantSummaryRecordSchema>;
+};
+
+
+export type EprNonCompliantSummarySchemaProductRecordTotalArgs = {
+  countryCode: CountryCode;
+  eprCategories?: InputMaybe<Array<Scalars['Int']>>;
+  productId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type EprNonCompliantSummarySchemaProductRecordsArgs = {
+  countryCode: CountryCode;
+  eprCategories?: InputMaybe<Array<Scalars['Int']>>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  productId?: InputMaybe<Scalars['String']>;
+  sortDesc?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type EprProductRecordSchema = {
+  __typename?: 'EPRProductRecordSchema';
+  country: Country;
+  eprCategoryNames: Array<Scalars['String']>;
+  productId: Scalars['ObjectIdType'];
+  taxonomyCategoryNames: Array<Scalars['String']>;
+};
+
 export type EprStatus =
   | 'ADMIN_APPROVED'
   | 'COMPLETE'
@@ -4203,8 +4248,20 @@ export type EditTrademarksAndBrandInfoInput = {
 
 export type EligibleProductInfo = {
   __typename?: 'EligibleProductInfo';
+  maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
+  maxMerchantSetShippingPrice?: Maybe<CurrencyValue>;
   product: ProductSchema;
   variations: Array<VariationSchema>;
+};
+
+
+export type EligibleProductInfoMaxCalculatedShippingPriceArgs = {
+  countries?: InputMaybe<Array<CountryCode>>;
+};
+
+
+export type EligibleProductInfoMaxMerchantSetShippingPriceArgs = {
+  countries?: InputMaybe<Array<CountryCode>>;
 };
 
 export type EntityTypes =
@@ -4313,6 +4370,7 @@ export type ExtendedProducerResponsibilitySchema = {
   __typename?: 'ExtendedProducerResponsibilitySchema';
   countries: Array<CountryEprSchema>;
   country: CountryEprSchema;
+  eprNonCompliantSummary: EprNonCompliantSummarySchema;
 };
 
 
@@ -6588,6 +6646,7 @@ export type MfpUnqualifiedVariationData = {
 
 export type MfpVariationDiscountData = {
   __typename?: 'MFPVariationDiscountData';
+  discountAmount?: Maybe<CurrencyValue>;
   discountPercentage: Scalars['Float'];
   maxQuantity?: Maybe<Scalars['Int']>;
   product: ProductSchema;
@@ -6600,7 +6659,10 @@ export type MfpVariationDiscountData = {
 
 export type MfpVariationUnqualifiedReason =
   | 'CAMPAIGN_LIMIT'
+  | 'COMPETING_PROMOTION'
+  | 'DISCOUNT_PRICE_HISTORY'
   | 'FLASH_SALE_MINIMUM_DEAL_QUANTITY'
+  | 'FLASH_SALE_MINIMUM_VARIATION_INVENTORY'
   | 'FRS_DISCOUNT_PRICE'
   | 'FRS_HIGH_DISCOUNT'
   | 'FRS_LOW_DISCOUNT'
@@ -6615,6 +6677,7 @@ export type MfpVariationUnqualifiedReason =
   | 'PRODUCT_LISTED_DAYS'
   | 'PRODUCT_PRICE'
   | 'PRODUCT_SHIPPING_PRICE'
+  | 'PROMOTION_HISTORY'
   | 'SALE_HISTORY'
   | 'UNITY_PRODUCT'
   | 'VARIATIONS_PRICING_GAMING';
@@ -7337,6 +7400,7 @@ export type MerchantIdentityMutations = {
 export type MerchantIdentityServiceSchema = {
   __typename?: 'MerchantIdentityServiceSchema';
   bankAccountVerifications?: Maybe<Array<BankAccountVerificationSchema>>;
+  bankAccountVerificationsCount?: Maybe<Scalars['Int']>;
 };
 
 
@@ -7344,6 +7408,12 @@ export type MerchantIdentityServiceSchemaBankAccountVerificationsArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   merchantId?: InputMaybe<Scalars['ObjectIdType']>;
   offset?: InputMaybe<Scalars['Int']>;
+  state?: InputMaybe<BankAccountVerificationStatus>;
+};
+
+
+export type MerchantIdentityServiceSchemaBankAccountVerificationsCountArgs = {
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
   state?: InputMaybe<BankAccountVerificationStatus>;
 };
 
@@ -8668,6 +8738,7 @@ export type MerchantWarehouseWeekStatsSortFieldType =
 export type MerchantWarningAction =
   | 'CANCEL'
   | 'CLAIM'
+  | 'CLOSE'
   | 'CONFIRM'
   | 'LISTING_LEVEL_DISPUTE'
   | 'MERCHANT_LEVEL_DISPUTE'
@@ -11053,8 +11124,6 @@ export type ProductCsvColumnName =
   | 'IS_TTD'
   | 'IT'
   | 'IT_TTD'
-  | 'JE'
-  | 'JE_TTD'
   | 'JP'
   | 'JP_TTD'
   | 'KR'
@@ -11196,7 +11265,6 @@ export type ProductCsvJobType =
   | 'EDIT_WISH_EXPRESS_COUNTRIES'
   | 'NEW_ADD_PRODUCTS'
   | 'NEW_ADD_VARIATION'
-  | 'NEW_EDIT_SHIPPING'
   | 'NEW_UPDATE_PRODUCTS'
   | 'SHOPIFY_CREATE_PRODUCTS'
   | 'UPDATE_PRODUCTS'
@@ -11269,6 +11337,7 @@ export type ProductCatalogMutationsUpsertVideoArgs = {
 export type ProductCatalogSchema = {
   __typename?: 'ProductCatalogSchema';
   bulkCsvProductImportJobs: Array<CsvProductImportJobSchema>;
+  csvAllHeaderNames: Array<Scalars['String']>;
   csvEnableDisableHeaderNames: Array<Scalars['String']>;
   csvPriceInventoryHeaderNames: Array<Scalars['String']>;
   csvProductColumnEnums: Array<ProductCsvColumnName>;
@@ -13519,6 +13588,7 @@ export type RoleType =
   | 'STORE_USER'
   | 'SUB_USER'
   | 'SUPPLY_CHAIN'
+  | 'SYSTEM_ACCOUNT'
   | 'TAGGER'
   | 'TAGGER_LEAD'
   | 'TASKUS_CS_LEAD'
@@ -14119,7 +14189,6 @@ export type ShippableCountryCode =
   | 'IL'
   | 'IS'
   | 'IT'
-  | 'JE'
   | 'JP'
   | 'KR'
   | 'LI'
@@ -16439,8 +16508,9 @@ export type UpsertMerchantWarning = {
 
 export type UpsertMerchantWarningInput = {
   action: MerchantWarningAction;
-  cancelWarningInput?: InputMaybe<CancelInfractionInput>;
-  claimWarningInput?: InputMaybe<ClaimInfractionInput>;
+  cancelInput?: InputMaybe<CancelInfractionInput>;
+  claimInput?: InputMaybe<ClaimInfractionInput>;
+  closeInput?: InputMaybe<CloseInfractionInput>;
   disputeInput?: InputMaybe<DisputeInfractionInput>;
   messageInput?: InputMaybe<ReplyInfractionInput>;
   requestPaymentInput?: InputMaybe<RequestPaymentInput>;
@@ -17952,6 +18022,30 @@ export type Disputes_GetInfractionsQueryVariables = Exact<{
 
 export type Disputes_GetInfractionsQuery = { __typename?: 'RootQuery', currentUser?: { __typename?: 'UserSchema', id: string } | null, policy?: { __typename?: 'PolicySchema', merchantWarningCount?: number | null, merchantWarnings?: Array<{ __typename?: 'MerchantWarningSchema', id: string, creatorName?: string | null, adminReasonText?: string | null, counterfeitReasonText?: string | null, banned?: boolean | null, correspondenceStatus?: MerchantWarningCorrespondenceStatus | null, wssImpact: WssImpactState, bulkProcessing?: boolean | null, claimedBy?: { __typename?: 'UserSchema', id: string } | null, createdTime: { __typename?: 'Datetime', unix: number }, lastUpdate: { __typename?: 'Datetime', unix: number }, merchant?: { __typename?: 'MerchantSchema', id: string, displayName: string, accountManager?: { __typename?: 'UserSchema', name?: string | null, bdMerchantCountry?: BdMerchantCountryCodeType | null } | null, wishSellerStandard: { __typename?: 'MerchantWishSellerStandardDetails', level?: WssMerchantLevelType | null }, storeStats: { __typename?: 'MerchantStats', thirtyDayTotals: { __typename?: 'MerchantTotalStats', orders: number }, sevenDayTotals: { __typename?: 'MerchantTotalStats', gmv: { __typename?: 'CurrencyValue', display: string } }, totalGmv: { __typename?: 'CurrencyValue', display: string } } } | null }> | null } | null };
 
+export type SellerIdentity_ReviewBankDocumentMutationVariables = Exact<{
+  input: ReviewBankAccountDocumentInput;
+}>;
+
+
+export type SellerIdentity_ReviewBankDocumentMutation = { __typename?: 'RootMutation', merchantIdentity?: { __typename?: 'MerchantIdentityMutations', bankAccountVerification: { __typename?: 'BankAccountVerificationReviewerMutations', reviewDocument?: { __typename?: 'ReviewBankAccountDocument', ok: boolean, message?: string | null } | null } } | null };
+
+export type SellerIdentity_BankAccountDocumentsQueryVariables = Exact<{
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+}>;
+
+
+export type SellerIdentity_BankAccountDocumentsQuery = { __typename?: 'RootQuery', merchants?: { __typename?: 'MerchantServiceSchema', merchant?: { __typename?: 'MerchantSchema', state: CommerceMerchantState, bankAccountVerification?: { __typename?: 'BankAccountVerificationSchema', id: string, state: BankAccountVerificationStatus, bankAccountDocuments?: Array<{ __typename?: 'BankAccountDocumentSchema', id: string, state: BankAccountVerificationStatus, comment?: string | null, documentType?: BankAccountDocumentType | null, documentFile?: { __typename?: 'MerchantFileSchema', id: string, fileUrl: string } | null, uploadedAt: { __typename?: 'Datetime', unix: number }, reviewedAt?: { __typename?: 'Datetime', unix: number } | null, reviewer?: { __typename?: 'UserSchema', name?: string | null } | null }> | null } | null } | null } | null };
+
+export type SellerIdentity_BankAccountVerificationsQueryVariables = Exact<{
+  offset?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+  state?: InputMaybe<BankAccountVerificationStatus>;
+}>;
+
+
+export type SellerIdentity_BankAccountVerificationsQuery = { __typename?: 'RootQuery', merchantIdentity?: { __typename?: 'MerchantIdentityServiceSchema', bankAccountVerificationsCount?: number | null, bankAccountVerifications?: Array<{ __typename?: 'BankAccountVerificationSchema', id: string, state: BankAccountVerificationStatus, lastReviewedAt?: { __typename?: 'Datetime', unix: number } | null, lastUploadedAt?: { __typename?: 'Datetime', unix: number } | null, bankAccountDocuments?: Array<{ __typename?: 'BankAccountDocumentSchema', id: string }> | null }> | null } | null };
+
 export type Authentication_LoginMutationMutationVariables = Exact<{
   input: LoginMutationInput;
 }>;
@@ -17971,5 +18065,8 @@ export const Dispute_ActionDocument = {"kind":"Document","definitions":[{"kind":
 export const Disputes_BulkStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_BulkStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"types"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BulkMerchantWarningAction"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcessCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcesses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"submitted"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"requestedBy"}},{"kind":"Field","name":{"kind":"Name","value":"requestedWarningIds"}},{"kind":"Field","name":{"kind":"Name","value":"results"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"warningId"}},{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_BulkStatusQuery, Disputes_BulkStatusQueryVariables>;
 export const Disputes_MessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_Messages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"warningId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarning"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"warningId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"senderType"}},{"kind":"Field","name":{"kind":"Name","value":"senderName"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"date"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"trackingDispute"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"senderType"}},{"kind":"Field","name":{"kind":"Name","value":"senderName"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"date"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_MessagesQuery, Disputes_MessagesQueryVariables>;
 export const Disputes_GetInfractionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_GetInfractions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"states"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningState"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningClaimStatus"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningReason"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningSort"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningProofType"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarnings"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"creatorName"}},{"kind":"Field","name":{"kind":"Name","value":"adminReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"counterfeitReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"correspondenceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"wssImpact"}},{"kind":"Field","name":{"kind":"Name","value":"bulkProcessing"}},{"kind":"Field","name":{"kind":"Name","value":"claimedBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdTime"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUpdate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"merchant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"accountManager"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"bdMerchantCountry"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wishSellerStandard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}}]}},{"kind":"Field","name":{"kind":"Name","value":"storeStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"thirtyDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"30"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"orders"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"sevenDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"7"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalGmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_GetInfractionsQuery, Disputes_GetInfractionsQueryVariables>;
+export const SellerIdentity_ReviewBankDocumentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SellerIdentity_ReviewBankDocument"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ReviewBankAccountDocumentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantIdentity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reviewDocument"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_ReviewBankDocumentMutation, SellerIdentity_ReviewBankDocumentMutationVariables>;
+export const SellerIdentity_BankAccountDocumentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountDocuments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"documentFile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"uploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"documentType"}},{"kind":"Field","name":{"kind":"Name","value":"reviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountDocumentsQuery, SellerIdentity_BankAccountDocumentsQueryVariables>;
+export const SellerIdentity_BankAccountVerificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountVerifications"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"state"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"BankAccountVerificationStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantIdentity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerificationsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"merchantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"state"},"value":{"kind":"Variable","name":{"kind":"Name","value":"state"}}}]},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"merchantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"state"},"value":{"kind":"Variable","name":{"kind":"Name","value":"state"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"lastReviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountVerificationsQuery, SellerIdentity_BankAccountVerificationsQueryVariables>;
 export const Authentication_LoginMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Authentication_LoginMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authentication"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"loginOk"}},{"kind":"Field","name":{"kind":"Name","value":"error"}},{"kind":"Field","name":{"kind":"Name","value":"errorState"}}]}}]}}]}}]} as unknown as DocumentNode<Authentication_LoginMutationMutation, Authentication_LoginMutationMutationVariables>;
 export const DevOnly_GetUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DevOnly_GetUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DevOnly_GetUserQuery, DevOnly_GetUserQueryVariables>;

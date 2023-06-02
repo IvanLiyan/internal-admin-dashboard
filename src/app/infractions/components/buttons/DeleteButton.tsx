@@ -72,7 +72,7 @@ const DeleteButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
                 if (infraction != null) {
                   onDelete({
                     warningId: infraction.infractionId,
-                    cancelWarningInput: { reason: cancelReason },
+                    cancelInput: { reason: cancelReason },
                   }).then((result) => {
                     if (
                       result.data?.policy?.merchantWarning

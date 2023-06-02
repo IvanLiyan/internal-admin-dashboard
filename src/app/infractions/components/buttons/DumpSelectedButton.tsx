@@ -18,7 +18,7 @@ const DumpSelectedButton: React.FC<ButtonProps> = ({ ...buttonProps }) => {
       variant="text"
       disabled={!state?.selected.length}
       onClick={() => {
-        onDump({ claimWarningInput: { warningIds: state?.selected } }).then(
+        onDump({ claimInput: { warningIds: state?.selected } }).then(
           (result) => {
             if (
               result.data?.policy?.merchantWarning?.upsertMerchantWarning?.ok
