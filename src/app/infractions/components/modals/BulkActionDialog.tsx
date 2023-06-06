@@ -1,12 +1,11 @@
 import { useToast } from "@app/core/toast/ToastProvider";
 import ApproveDialog from "@app/infractions/components/modals/ApproveDialog";
 import DeclineDialog from "@app/infractions/components/modals/DeclineDialog";
-import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
 import ReverseDialog from "@app/infractions/components/modals/ReverseDialog";
 import { BulkActionMutation } from "@app/infractions/toolkit/action";
 import { BulkActionModalSchema } from "@app/infractions/toolkit/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Delete, Visibility } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -58,10 +57,6 @@ const BulkActionDialog: React.FC<Props> = ({
   const [approveOpen, setApproveOpen] = useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
   const [reverseOpen, setReverseOpen] = useState(false);
-  const [messageOpen, setMessageOpen] = useState(false);
-  const [previewInfractionId, setPreviewInfractionId] = useState<string | null>(
-    null
-  );
   const [rows, setRows] = useState<ReadonlyArray<InfractionData>>([]);
 
   const [, bulkAction] = useMutation(BulkActionMutation);
@@ -130,14 +125,6 @@ const BulkActionDialog: React.FC<Props> = ({
         handleClose={() => setReverseOpen(false)}
         handleConfirm={() => handleAction("REVERSE")}
       />
-      <MessagePreviewDialog
-        infractionId={previewInfractionId}
-        open={messageOpen}
-        handleClose={() => {
-          setMessageOpen(false);
-          setPreviewInfractionId(null);
-        }}
-      />
       <form>
         <DialogTitle>Bulk Action</DialogTitle>
         <DialogContent>
@@ -198,14 +185,6 @@ const BulkActionDialog: React.FC<Props> = ({
                         {dayjs.unix(row.lastUpdate.unix).format("lll")}
                       </TableCell>
                       <TableCell align="center">
-                        <IconButton
-                          onClick={() => {
-                            setPreviewInfractionId(row.id);
-                            setMessageOpen(true);
-                          }}
-                        >
-                          <Visibility />
-                        </IconButton>
                         <IconButton
                           onClick={() => {
                             setRows((prev) =>

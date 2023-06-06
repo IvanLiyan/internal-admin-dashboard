@@ -1,6 +1,7 @@
 import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
+import AlternatingTableRow from "@app/infractions/components/AlternatingTableRow";
 import CompactTableCell from "@app/infractions/components/CompactTableCell";
 import TableContextProvider from "@app/infractions/components/TableContext";
 import TableHeading from "@app/infractions/components/TableHeading";
@@ -13,6 +14,7 @@ import CounterfeitSubreasonFilter from "@app/infractions/components/filters/Coun
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import BulkActionDialog from "@app/infractions/components/modals/BulkActionDialog";
+import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
 import {
   initTableState,
   tableStateReducer,
@@ -23,16 +25,17 @@ import {
   useTableData,
   useTableQuery,
 } from "@app/infractions/toolkit/table";
+import { Visibility } from "@mui/icons-material";
 import {
   Button,
   Checkbox,
+  IconButton,
   Paper,
   Stack,
   Table,
   TableBody,
   TableContainer,
   TablePagination,
-  TableRow,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { NextPage } from "next";
@@ -40,6 +43,11 @@ import { useReducer, useState } from "react";
 
 const AllInfractionsPage: NextPage<Record<string, never>> = () => {
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
+  const [msgPreview, setMsgPreview] = useState<{
+    open: boolean;
+    id: string | null;
+  }>({ open: false, id: null });
+
   const [state, dispatch] = useReducer(
     tableStateReducer,
     {
@@ -84,13 +92,8 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
                   dispatch({ search: token });
                 }}
                 size="small"
-                placeholder="Search"
+                placeholder="Search by MID/PID/OID/IID"
                 sx={{ minWidth: 400, mx: 1 }}
-                searchBy={{
-                  keys: ["ID", "Merchant Name"],
-                  onSearchByChange: (searchBy) => dispatch({ searchBy }),
-                  defaultKey: "ID",
-                }}
               />
               <TablePagination
                 showFirstButton
@@ -149,13 +152,13 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
                 }}
               />
               <CounterfeitReasonFilter
-                onConfirm={() => {
-                  return;
+                onConfirm={(category) => {
+                  dispatch({ category });
                 }}
               />
               <CounterfeitSubreasonFilter
-                onConfirm={() => {
-                  return;
+                onConfirm={(subcategory) => {
+                  dispatch({ subcategory });
                 }}
               />
             </Stack>
@@ -177,7 +180,7 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
                   {tableData?.map((row) => {
                     const isItemSelected = isSelected(row.infractionId);
                     return (
-                      <TableRow
+                      <AlternatingTableRow
                         hover
                         tabIndex={-1}
                         key={row.infractionId}
@@ -192,20 +195,33 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
                           />
                         </CompactTableCell>
                         {AllInfractionTableColumns.map((col) => (
-                          <CompactTableCell key={col} align="right">
+                          <CompactTableCell key={col} align="left">
                             {row[col]}
                           </CompactTableCell>
                         ))}
                         <CompactTableCell align="center">
+                          <IconButton
+                            onClick={() => {
+                              setMsgPreview({
+                                open: true,
+                                id: row.infractionId,
+                              });
+                            }}
+                          >
+                            <Visibility />
+                          </IconButton>
+                        </CompactTableCell>
+                        <CompactTableCell align="center">
                           <Button
                             size="small"
                             href={`/warning/view/${row.infractionId}`}
+                            target="_blank"
                           >
                             View
                           </Button>
                           <ClaimButton infraction={row} />
                         </CompactTableCell>
-                      </TableRow>
+                      </AlternatingTableRow>
                     );
                   })}
                 </TableBody>
@@ -213,16 +229,27 @@ const AllInfractionsPage: NextPage<Record<string, never>> = () => {
             </TableContainer>
           )}
 
-          <BulkActionDialog
-            reverseAction
-            open={bulkActionOpen}
-            handleClose={() => setBulkActionOpen(false)}
-            infractions={
-              data?.policy?.merchantWarnings?.filter((r) =>
-                state.selected.includes(r.id)
-              ) || []
-            }
-          />
+          {bulkActionOpen && (
+            <BulkActionDialog
+              reverseAction
+              open={bulkActionOpen}
+              handleClose={() => setBulkActionOpen(false)}
+              infractions={
+                data?.policy?.merchantWarnings?.filter((r) =>
+                  state.selected.includes(r.id)
+                ) || []
+              }
+            />
+          )}
+          {msgPreview.open && (
+            <MessagePreviewDialog
+              infractionId={msgPreview.id}
+              open={msgPreview.open}
+              handleClose={() => {
+                setMsgPreview({ open: false, id: null });
+              }}
+            />
+          )}
         </TableContextProvider>
       </Paper>
     </PageRoot>

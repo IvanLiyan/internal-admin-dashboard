@@ -1,12 +1,19 @@
+import { CounterfeitSubreasonsDictionary } from "@app/infractions/toolkit/counterfeit-sub-reason";
 import { Action, State } from "@app/infractions/toolkit/reducer";
 import { ResultOf, VariablesOf } from "@graphql-typed-document-node/core";
+import { Link } from "@mui/material";
 import { MerchantWarningSortFieldType } from "@schema";
 import dayjs from "dayjs";
-import { Dispatch } from "react";
+import React, { Dispatch, ReactNode } from "react";
 import { graphql } from "src/schema";
 import { useQuery } from "urql";
 
-export type TableData = Record<keyof typeof ColumnLabel, string> & {
+export type TableData = Record<
+  ExcludeStrict<keyof typeof ColumnLabel, "merchantId" | "merchantName">,
+  string
+> & {
+  readonly merchantId: ReactNode;
+  readonly merchantName: ReactNode;
   readonly claimed: boolean;
   readonly bulkStatus: boolean;
 };
@@ -148,6 +155,8 @@ export const BulkDisputeQuery = graphql(`
     $issueDateStart: DatetimeInput
     $issueDateEnd: DatetimeInput
     $searchProofIdTypes: [MerchantWarningProofType!]
+    $category: CounterfeitReasonCode
+    $subcategory: TaggingViolationSubReasonCode
   ) {
     currentUser {
       id
@@ -161,6 +170,8 @@ export const BulkDisputeQuery = graphql(`
         issueDateStart: $issueDateStart
         issueDateEnd: $issueDateEnd
         searchProofIdTypes: $searchProofIdTypes
+        category: $category
+        subcategory: $subcategory
       )
       merchantWarnings(
         id: $id
@@ -173,6 +184,8 @@ export const BulkDisputeQuery = graphql(`
         issueDateStart: $issueDateStart
         issueDateEnd: $issueDateEnd
         searchProofIdTypes: $searchProofIdTypes
+        category: $category
+        subcategory: $subcategory
       ) {
         id
         creatorName
@@ -182,6 +195,11 @@ export const BulkDisputeQuery = graphql(`
         correspondenceStatus
         wssImpact
         bulkProcessing
+        productTrueTagInfo {
+          subreason {
+            subcategory
+          }
+        }
         claimedBy {
           id
         }
@@ -225,18 +243,32 @@ export const useTableData = (
 ): ReadonlyArray<TableData> => {
   return (
     data?.policy?.merchantWarnings?.map<TableData>((i) => {
+      const subcategory = i.productTrueTagInfo?.subreason?.subcategory;
       return {
         created: dayjs.unix(i.createdTime.unix).format("YYYY-MM-DD HH:MM"),
         creator: i.creatorName ?? "N/A",
         lastUpdated: dayjs.unix(i.lastUpdate.unix).format("YYYY-MM-DD HH:MM"),
-        merchantName: i.merchant?.displayName ?? "N/A",
+        merchantName:
+          i.merchant?.displayName != null ? (
+            <Link
+              target="_blank"
+              href={`/merchants#merchant=${i.merchant.displayName}`}
+            >
+              {i.merchant?.displayName}
+            </Link>
+          ) : (
+            "N/A"
+          ),
         merchantId: i.merchant?.id ?? "N/A",
         infractionId: i.id,
         bdRep: i.merchant?.accountManager?.name ?? "N/A",
         geo: i.merchant?.accountManager?.bdMerchantCountry ?? "N/A",
         reason: i.adminReasonText ?? "N/A",
         parentCategory: i.counterfeitReasonText ?? "N/A",
-        subCategory: "N/A",
+        subCategory:
+          subcategory != null
+            ? CounterfeitSubreasonsDictionary[subcategory].text
+            : "N/A",
         ban: i.banned == null ? "N/A" : i.banned ? "Yes" : "No",
         gmv7Day: i.merchant?.storeStats.sevenDayTotals.gmv.display ?? "N/A",
         gmv7DayPercentage:
@@ -256,7 +288,7 @@ export const useTableData = (
   );
 };
 
-export type SearchTypes = "ID" | "Merchant Name";
+export type SearchTypes = "ID";
 
 const useSearchVars = <T extends SearchTypes>(
   searchBy: T,
@@ -266,9 +298,6 @@ const useSearchVars = <T extends SearchTypes>(
     return {};
   }
   switch (searchBy) {
-    case "Merchant Name":
-      // TODO GQL not ready
-      return {};
     case "ID":
       return {
         id: query,
@@ -300,6 +329,8 @@ export const useTableQuery = (state: State) => {
         state.issueDateEnd != null ? { unix: state.issueDateEnd } : undefined,
       reasons: state.reasons,
       claimStatus: state.claimStatus,
+      category: state.category,
+      subcategory: state.subcategory,
       ...useSearchVars(state.searchBy, state.search),
     },
   });

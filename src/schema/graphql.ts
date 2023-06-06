@@ -1683,6 +1683,7 @@ export type BusinessDocTypes =
   | 'PRODUCT_LICENSING'
   | 'RECENT_BUSINESS_RETURNS'
   | 'SHARE_ALLOCATION_CERTIFICATE'
+  | 'TAX_FORM'
   | 'UTILITY_BILL_STATEMENT';
 
 export type BuyerFraudReasonCategory =
@@ -2502,57 +2503,6 @@ export type CountUnit =
   | 'ROLL'
   | 'WASH';
 
-export type CounterfeitReason =
-  | 'ADULT_CONTENT'
-  | 'AMBIGUOUS_LISTING'
-  | 'ANIMAL_PRODUCTS'
-  | 'BIKE_HELMETS'
-  | 'BLURRED_INFORMATION'
-  | 'BLURRED_LABEL'
-  | 'BLURRED_WATERMARK'
-  | 'CARSEAT'
-  | 'CELEBRITY_PHOTO'
-  | 'CENSORED_FACE'
-  | 'CN_PROHIBITED_PRODUCTS'
-  | 'CONSUMPTION_MATERIALS'
-  | 'CONTACT_LENSES'
-  | 'DANGEROUS_ITEMS'
-  | 'DISTASTEFUL_CONTENT'
-  | 'FALSE_ADVERTISING'
-  | 'GRAPHIC_VIOLENCE'
-  | 'HARMFUL_CHEMICALS'
-  | 'HARNESS'
-  | 'HATE_CRIME'
-  | 'HAZARDOUS_MATERIALS'
-  | 'HOVERBOARD'
-  | 'ILLEGAL_ELECTRONICS'
-  | 'IS_MAJOR_BRAND'
-  | 'JEWELRY_AND_METALS'
-  | 'LIGHTERS'
-  | 'MEDICAL_MATERIALS'
-  | 'MISLEADING_LISTING'
-  | 'MISLEADING_LISTING_AUTHENTIC_BRAND'
-  | 'NUDITY'
-  | 'PICTURED_WITH_MAJOR_BRAND'
-  | 'PIERCING_GUN'
-  | 'PLANTS_AND_SEEDS'
-  | 'PLANT_SEEDS'
-  | 'PRICE_GOUGING'
-  | 'PRODUCT_MODIFIED'
-  | 'PROP_MONEY'
-  | 'RECALLED_TOYS'
-  | 'REGIONAL_RESTRICTIONS'
-  | 'SAFETY_EQUIPMENT'
-  | 'SMOKING'
-  | 'TATTOO_GUN'
-  | 'TEAM_LOGO'
-  | 'TRICK_CANDLES'
-  | 'UNLICENSED_MEDIA'
-  | 'UNVERIFIED_MONEY'
-  | 'VIRTUAL_GOODS'
-  | 'WEAPON'
-  | 'WISH_ADMIN';
-
 export type CounterfeitReasonCode =
   | 'ADULT_CONTENT'
   | 'AMBIGUOUS_LISTING'
@@ -2612,7 +2562,7 @@ export type CounterfeitRiskLevel =
 export type CounterfeitViolationSchema = {
   __typename?: 'CounterfeitViolationSchema';
   isConfirmed: Scalars['Boolean'];
-  reason?: Maybe<CounterfeitReason>;
+  reason?: Maybe<CounterfeitReasonCode>;
   reasonDisplayName?: Maybe<Scalars['String']>;
   reasonExplanation?: Maybe<Scalars['String']>;
   subcategoryMessage?: Maybe<Scalars['String']>;
@@ -4248,20 +4198,8 @@ export type EditTrademarksAndBrandInfoInput = {
 
 export type EligibleProductInfo = {
   __typename?: 'EligibleProductInfo';
-  maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
-  maxMerchantSetShippingPrice?: Maybe<CurrencyValue>;
   product: ProductSchema;
   variations: Array<VariationSchema>;
-};
-
-
-export type EligibleProductInfoMaxCalculatedShippingPriceArgs = {
-  countries?: InputMaybe<Array<CountryCode>>;
-};
-
-
-export type EligibleProductInfoMaxMerchantSetShippingPriceArgs = {
-  countries?: InputMaybe<Array<CountryCode>>;
 };
 
 export type EntityTypes =
@@ -5347,10 +5285,15 @@ export type ImageSize =
 export type InappropriateViolationSchema = {
   __typename?: 'InappropriateViolationSchema';
   isConfirmed: Scalars['Boolean'];
-  reason?: Maybe<CounterfeitReason>;
+  reason?: Maybe<CounterfeitReasonCode>;
   reasonDisplayName?: Maybe<Scalars['String']>;
   reasonExplanation?: Maybe<Scalars['String']>;
   subcategoryMessage?: Maybe<Scalars['String']>;
+};
+
+export type InappropriateViolationTaggingManagement = {
+  __typename?: 'InappropriateViolationTaggingManagement';
+  violationReasons: Array<TaggingViolationReason>;
 };
 
 export type InfoCollectedForPaymentProvider = {
@@ -6625,6 +6568,7 @@ export type MfpServiceSchemaGenericCampaignsArgs = {
 
 
 export type MfpServiceSchemaGenericEligibleProductsArgs = {
+  countries?: InputMaybe<Array<CountryCode>>;
   currency: PaymentCurrencyCode;
   eventId?: InputMaybe<Scalars['ObjectIdType']>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -9106,6 +9050,11 @@ export type MfpCampaignPriceDiscounted =
   | 'PRICE'
   | 'SHIPPING';
 
+export type MisleadingViolationTaggingManagement = {
+  __typename?: 'MisleadingViolationTaggingManagement';
+  violationReasons: Array<TaggingViolationReason>;
+};
+
 export type MobilePlatformType =
   | 'ANDROID'
   | 'IOS';
@@ -10931,6 +10880,7 @@ export type PolicySchemaMerchantWarningBulkProcessesArgs = {
 export type PolicySchemaMerchantWarningCountArgs = {
   auditStatuses?: InputMaybe<Array<MerchantWarningAuditStatus>>;
   banned?: InputMaybe<Scalars['Boolean']>;
+  category?: InputMaybe<CounterfeitReasonCode>;
   claimStatus?: InputMaybe<MerchantWarningClaimStatus>;
   detailedReasons?: InputMaybe<Array<DetailedMerchantWarningReason>>;
   disputePendingBrandAuth?: InputMaybe<Scalars['Boolean']>;
@@ -10944,6 +10894,7 @@ export type PolicySchemaMerchantWarningCountArgs = {
   reasons?: InputMaybe<Array<MerchantWarningReason>>;
   searchProofIdTypes?: InputMaybe<Array<MerchantWarningProofType>>;
   states?: InputMaybe<Array<MerchantWarningState>>;
+  subcategory?: InputMaybe<TaggingViolationSubReasonCode>;
   wssImpact?: InputMaybe<Array<WssImpactState>>;
 };
 
@@ -10951,6 +10902,7 @@ export type PolicySchemaMerchantWarningCountArgs = {
 export type PolicySchemaMerchantWarningsArgs = {
   auditStatuses?: InputMaybe<Array<MerchantWarningAuditStatus>>;
   banned?: InputMaybe<Scalars['Boolean']>;
+  category?: InputMaybe<CounterfeitReasonCode>;
   claimStatus?: InputMaybe<MerchantWarningClaimStatus>;
   detailedReasons?: InputMaybe<Array<DetailedMerchantWarningReason>>;
   disputePendingBrandAuth?: InputMaybe<Scalars['Boolean']>;
@@ -10966,6 +10918,7 @@ export type PolicySchemaMerchantWarningsArgs = {
   searchProofIdTypes?: InputMaybe<Array<MerchantWarningProofType>>;
   sort?: InputMaybe<MerchantWarningSort>;
   states?: InputMaybe<Array<MerchantWarningState>>;
+  subcategory?: InputMaybe<TaggingViolationSubReasonCode>;
   wssImpact?: InputMaybe<Array<WssImpactState>>;
 };
 
@@ -11278,6 +11231,7 @@ export type ProductCatalogMutations = {
   removeProduct?: Maybe<RemoveProduct>;
   removeVideo?: Maybe<RemoveVideo>;
   updateProductLogisticsMetadata?: Maybe<UpdateProductLogisticsMetadata>;
+  uploadProductComplianceDocument?: Maybe<UploadProductComplianceDocuments>;
   upsertProduct?: Maybe<UpsertProduct>;
   upsertProductCsvFile?: Maybe<UpsertProductsFromCsvFile>;
   upsertProducts?: Maybe<UpsertProducts>;
@@ -11312,6 +11266,11 @@ export type ProductCatalogMutationsRemoveVideoArgs = {
 
 export type ProductCatalogMutationsUpdateProductLogisticsMetadataArgs = {
   input: UpdateProductLogisticsMetadataInput;
+};
+
+
+export type ProductCatalogMutationsUploadProductComplianceDocumentArgs = {
+  input: Array<ProductComplianceDocumentInput>;
 };
 
 
@@ -11589,6 +11548,22 @@ export type ProductCategoryDisputeTrueTagState =
   | 'APPROVED'
   | 'DISPUTED'
   | 'PROPOSED';
+
+export type ProductComplianceDocumentInput = {
+  delete: Scalars['Boolean'];
+  documentLabel: Scalars['String'];
+  fileExtension: Scalars['String'];
+  fileName: Scalars['String'];
+  productId: Scalars['ObjectIdType'];
+  sourceUrl: Scalars['String'];
+};
+
+export type ProductComplianceDocumentSchema = {
+  __typename?: 'ProductComplianceDocumentSchema';
+  documentLabel: Scalars['String'];
+  fileName?: Maybe<Scalars['String']>;
+  s3Url: Scalars['String'];
+};
 
 export type ProductComplianceMutations = {
   __typename?: 'ProductComplianceMutations';
@@ -12025,6 +12000,7 @@ export type ProductSchema = {
   msrp?: Maybe<CurrencyValue>;
   name: Scalars['String'];
   performance?: Maybe<ProductPerformanceSchema>;
+  productComplianceDocuments?: Maybe<Array<ProductComplianceDocumentSchema>>;
   productTrueTagInfo?: Maybe<ProductTrueTagInfoSchema>;
   referenceArea?: Maybe<Area>;
   referenceLength?: Maybe<Length>;
@@ -12475,6 +12451,7 @@ export type ProductWeeklyStats = {
 };
 
 export type ProductsCsvTemplateType =
+  | 'ALL_COLUMNS'
   | 'CATEGORY'
   | 'CONTENT'
   | 'DEFAULT'
@@ -14462,8 +14439,20 @@ export type ShippingSchema = {
   calculatedShippingEnabled?: Maybe<Scalars['Boolean']>;
   defaultShipping?: Maybe<Array<DefaultShippingSchema>>;
   domesticShipping?: Maybe<Array<DomesticShippingSchema>>;
+  maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
+  maxMerchantSetShippingPrice?: Maybe<CurrencyValue>;
   warehouseCountryShipping?: Maybe<Array<WarehouseCountryShippingSchema>>;
   wishpostEstimatedShipping?: Maybe<Array<WishPostShippingSchema>>;
+};
+
+
+export type ShippingSchemaMaxCalculatedShippingPriceArgs = {
+  countries?: InputMaybe<Array<CountryCode>>;
+};
+
+
+export type ShippingSchemaMaxMerchantSetShippingPriceArgs = {
+  countries?: InputMaybe<Array<CountryCode>>;
 };
 
 
@@ -14825,7 +14814,9 @@ export type TaggingServiceSchema = {
   categoryClassificationTaggerJob?: Maybe<CategoryClassificationTaggerJobSchema>;
   dedupImageLibHub?: Maybe<DedupImageLibraryHub>;
   generalTaggingManagement?: Maybe<GeneralTaggingManagement>;
+  inappropriateViolationTaggingManagement?: Maybe<InappropriateViolationTaggingManagement>;
   ipViolationTaggingManagement?: Maybe<IpViolationTaggingManagement>;
+  misleadingViolationTaggingManagement?: Maybe<MisleadingViolationTaggingManagement>;
   productTaggingStatus?: Maybe<ProductTaggingStatusSchema>;
   productTaxonomyCategoryDisputeHub?: Maybe<ProductTaxonomyCategoryDisputeHub>;
   productVideoContentTaggerJob?: Maybe<ProductVideoTaggerJobSchema>;
@@ -16343,6 +16334,14 @@ export type UploadMutations = {
 
 export type UploadMutationsInitiateUploadArgs = {
   input: InitiateUploadInput;
+};
+
+export type UploadProductComplianceDocuments = {
+  __typename?: 'UploadProductComplianceDocuments';
+  failures?: Maybe<Array<Scalars['String']>>;
+  fileUrls?: Maybe<Array<Scalars['String']>>;
+  ok: Scalars['Boolean'];
+  productId?: Maybe<Scalars['ObjectIdType']>;
 };
 
 export type UpsertConfirmedDeliveryCarrier = {
@@ -18017,10 +18016,12 @@ export type Disputes_GetInfractionsQueryVariables = Exact<{
   issueDateStart?: InputMaybe<DatetimeInput>;
   issueDateEnd?: InputMaybe<DatetimeInput>;
   searchProofIdTypes?: InputMaybe<Array<MerchantWarningProofType> | MerchantWarningProofType>;
+  category?: InputMaybe<CounterfeitReasonCode>;
+  subcategory?: InputMaybe<TaggingViolationSubReasonCode>;
 }>;
 
 
-export type Disputes_GetInfractionsQuery = { __typename?: 'RootQuery', currentUser?: { __typename?: 'UserSchema', id: string } | null, policy?: { __typename?: 'PolicySchema', merchantWarningCount?: number | null, merchantWarnings?: Array<{ __typename?: 'MerchantWarningSchema', id: string, creatorName?: string | null, adminReasonText?: string | null, counterfeitReasonText?: string | null, banned?: boolean | null, correspondenceStatus?: MerchantWarningCorrespondenceStatus | null, wssImpact: WssImpactState, bulkProcessing?: boolean | null, claimedBy?: { __typename?: 'UserSchema', id: string } | null, createdTime: { __typename?: 'Datetime', unix: number }, lastUpdate: { __typename?: 'Datetime', unix: number }, merchant?: { __typename?: 'MerchantSchema', id: string, displayName: string, accountManager?: { __typename?: 'UserSchema', name?: string | null, bdMerchantCountry?: BdMerchantCountryCodeType | null } | null, wishSellerStandard: { __typename?: 'MerchantWishSellerStandardDetails', level?: WssMerchantLevelType | null }, storeStats: { __typename?: 'MerchantStats', thirtyDayTotals: { __typename?: 'MerchantTotalStats', orders: number }, sevenDayTotals: { __typename?: 'MerchantTotalStats', gmv: { __typename?: 'CurrencyValue', display: string } }, totalGmv: { __typename?: 'CurrencyValue', display: string } } } | null }> | null } | null };
+export type Disputes_GetInfractionsQuery = { __typename?: 'RootQuery', currentUser?: { __typename?: 'UserSchema', id: string } | null, policy?: { __typename?: 'PolicySchema', merchantWarningCount?: number | null, merchantWarnings?: Array<{ __typename?: 'MerchantWarningSchema', id: string, creatorName?: string | null, adminReasonText?: string | null, counterfeitReasonText?: string | null, banned?: boolean | null, correspondenceStatus?: MerchantWarningCorrespondenceStatus | null, wssImpact: WssImpactState, bulkProcessing?: boolean | null, productTrueTagInfo?: { __typename?: 'ProductTrueTagInfoSchema', subreason?: { __typename?: 'TaggingViolationSubcategory', subcategory?: TaggingViolationSubReasonCode | null } | null } | null, claimedBy?: { __typename?: 'UserSchema', id: string } | null, createdTime: { __typename?: 'Datetime', unix: number }, lastUpdate: { __typename?: 'Datetime', unix: number }, merchant?: { __typename?: 'MerchantSchema', id: string, displayName: string, accountManager?: { __typename?: 'UserSchema', name?: string | null, bdMerchantCountry?: BdMerchantCountryCodeType | null } | null, wishSellerStandard: { __typename?: 'MerchantWishSellerStandardDetails', level?: WssMerchantLevelType | null }, storeStats: { __typename?: 'MerchantStats', thirtyDayTotals: { __typename?: 'MerchantTotalStats', orders: number }, sevenDayTotals: { __typename?: 'MerchantTotalStats', gmv: { __typename?: 'CurrencyValue', display: string } }, totalGmv: { __typename?: 'CurrencyValue', display: string } } } | null }> | null } | null };
 
 export type SellerIdentity_ReviewBankDocumentMutationVariables = Exact<{
   input: ReviewBankAccountDocumentInput;
@@ -18064,7 +18065,7 @@ export const Disputes_BulkActionDocument = {"kind":"Document","definitions":[{"k
 export const Dispute_ActionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Dispute_Action"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UpsertMerchantWarningInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarning"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertMerchantWarning"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Dispute_ActionMutation, Dispute_ActionMutationVariables>;
 export const Disputes_BulkStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_BulkStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"types"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BulkMerchantWarningAction"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcessCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcesses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"submitted"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"requestedBy"}},{"kind":"Field","name":{"kind":"Name","value":"requestedWarningIds"}},{"kind":"Field","name":{"kind":"Name","value":"results"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"warningId"}},{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_BulkStatusQuery, Disputes_BulkStatusQueryVariables>;
 export const Disputes_MessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_Messages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"warningId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarning"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"warningId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"replies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"senderType"}},{"kind":"Field","name":{"kind":"Name","value":"senderName"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"date"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"trackingDispute"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"senderType"}},{"kind":"Field","name":{"kind":"Name","value":"senderName"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"date"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_MessagesQuery, Disputes_MessagesQueryVariables>;
-export const Disputes_GetInfractionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_GetInfractions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"states"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningState"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningClaimStatus"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningReason"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningSort"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningProofType"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarnings"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"creatorName"}},{"kind":"Field","name":{"kind":"Name","value":"adminReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"counterfeitReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"correspondenceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"wssImpact"}},{"kind":"Field","name":{"kind":"Name","value":"bulkProcessing"}},{"kind":"Field","name":{"kind":"Name","value":"claimedBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdTime"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUpdate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"merchant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"accountManager"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"bdMerchantCountry"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wishSellerStandard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}}]}},{"kind":"Field","name":{"kind":"Name","value":"storeStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"thirtyDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"30"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"orders"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"sevenDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"7"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalGmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_GetInfractionsQuery, Disputes_GetInfractionsQueryVariables>;
+export const Disputes_GetInfractionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_GetInfractions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"states"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningState"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningClaimStatus"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningReason"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningSort"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningProofType"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"category"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CounterfeitReasonCode"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"subcategory"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"TaggingViolationSubReasonCode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}},{"kind":"Argument","name":{"kind":"Name","value":"category"},"value":{"kind":"Variable","name":{"kind":"Name","value":"category"}}},{"kind":"Argument","name":{"kind":"Name","value":"subcategory"},"value":{"kind":"Variable","name":{"kind":"Name","value":"subcategory"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarnings"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}},{"kind":"Argument","name":{"kind":"Name","value":"category"},"value":{"kind":"Variable","name":{"kind":"Name","value":"category"}}},{"kind":"Argument","name":{"kind":"Name","value":"subcategory"},"value":{"kind":"Variable","name":{"kind":"Name","value":"subcategory"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"creatorName"}},{"kind":"Field","name":{"kind":"Name","value":"adminReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"counterfeitReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"correspondenceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"wssImpact"}},{"kind":"Field","name":{"kind":"Name","value":"bulkProcessing"}},{"kind":"Field","name":{"kind":"Name","value":"productTrueTagInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subreason"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subcategory"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"claimedBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdTime"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUpdate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"merchant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"accountManager"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"bdMerchantCountry"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wishSellerStandard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}}]}},{"kind":"Field","name":{"kind":"Name","value":"storeStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"thirtyDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"30"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"orders"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"sevenDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"7"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalGmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_GetInfractionsQuery, Disputes_GetInfractionsQueryVariables>;
 export const SellerIdentity_ReviewBankDocumentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SellerIdentity_ReviewBankDocument"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ReviewBankAccountDocumentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantIdentity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reviewDocument"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_ReviewBankDocumentMutation, SellerIdentity_ReviewBankDocumentMutationVariables>;
 export const SellerIdentity_BankAccountDocumentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountDocuments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"documentFile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"uploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"documentType"}},{"kind":"Field","name":{"kind":"Name","value":"reviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountDocumentsQuery, SellerIdentity_BankAccountDocumentsQueryVariables>;
 export const SellerIdentity_BankAccountVerificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountVerifications"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"state"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"BankAccountVerificationStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantIdentity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerificationsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"merchantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"state"},"value":{"kind":"Variable","name":{"kind":"Name","value":"state"}}}]},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"merchantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"state"},"value":{"kind":"Variable","name":{"kind":"Name","value":"state"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"lastReviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountVerificationsQuery, SellerIdentity_BankAccountVerificationsQueryVariables>;

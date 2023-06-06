@@ -1,7 +1,7 @@
-import { CounterfeitReason } from "@schema";
+import { CounterfeitReasonCode } from "@schema";
 
 type MisleadingTaggingReasons = ExtractStrict<
-  CounterfeitReason,
+  CounterfeitReasonCode,
   | "MISLEADING_LISTING"
   | "AMBIGUOUS_LISTING"
   | "PRICE_GOUGING"
@@ -10,7 +10,7 @@ type MisleadingTaggingReasons = ExtractStrict<
 
 type InappropriateTaggingReasons = Exclude<
   ExtractStrict<
-    CounterfeitReason,
+    CounterfeitReasonCode,
     | "WEAPON"
     | "SMOKING"
     | "RECALLED_TOYS"
@@ -37,7 +37,7 @@ type InappropriateTaggingReasons = Exclude<
 >;
 
 type IPViolationTaggingReasons = ExtractStrict<
-  CounterfeitReason,
+  CounterfeitReasonCode,
   | "IS_MAJOR_BRAND"
   | "PICTURED_WITH_MAJOR_BRAND"
   | "TEAM_LOGO"
@@ -171,7 +171,7 @@ const CategorizedCounterfeitReasonsDictionary: {
 
 const UncategorizedCounterfeitReasonsDictionary: {
   [T in ExcludeStrict<
-    CounterfeitReason,
+    CounterfeitReasonCode,
     | MisleadingTaggingReasons
     | InappropriateTaggingReasons
     | IPViolationTaggingReasons

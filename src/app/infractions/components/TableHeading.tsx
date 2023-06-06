@@ -40,7 +40,7 @@ const TableHeading = (props: Props) => {
           return (
             <CompactTableCell
               key={key}
-              align={"right"}
+              align={"left"}
               sortDirection={orderBy === key ? order : false}
             >
               <TableSortLabel
@@ -52,6 +52,7 @@ const TableHeading = (props: Props) => {
             </CompactTableCell>
           );
         })}
+        <CompactTableCell align="center">Messages</CompactTableCell>
         <CompactTableCell align="center">Actions</CompactTableCell>
       </TableRow>
     </TableHead>

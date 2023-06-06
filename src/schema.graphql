@@ -1257,8 +1257,9 @@ enum BusinessDocTypes {
   RECENT_BUSINESS_RETURNS
   SHARE_ALLOCATION_CERTIFICATE
   CERTIFICATE_OF_INCORPORATION
-  UTILITY_BILL_STATEMENT
+  TAX_FORM
   CREDIT_CARD_STATEMENT
+  UTILITY_BILL_STATEMENT
   GOVERNMENT_ISSUED_BUSINESS_LICENSE
   ENTITY_TRADING_NAME
   ARTICLES_OF_INCORPORATION
@@ -1992,58 +1993,6 @@ enum CountUnit {
   WASH
 }
 
-enum CounterfeitReason {
-  UNLICENSED_MEDIA
-  SAFETY_EQUIPMENT
-  LIGHTERS
-  PROP_MONEY
-  GRAPHIC_VIOLENCE
-  ILLEGAL_ELECTRONICS
-  ANIMAL_PRODUCTS
-  BLURRED_WATERMARK
-  WISH_ADMIN
-  HARMFUL_CHEMICALS
-  CN_PROHIBITED_PRODUCTS
-  FALSE_ADVERTISING
-  RECALLED_TOYS
-  CARSEAT
-  PLANTS_AND_SEEDS
-  UNVERIFIED_MONEY
-  WEAPON
-  TEAM_LOGO
-  PICTURED_WITH_MAJOR_BRAND
-  PIERCING_GUN
-  ADULT_CONTENT
-  PRICE_GOUGING
-  SMOKING
-  MISLEADING_LISTING
-  REGIONAL_RESTRICTIONS
-  PRODUCT_MODIFIED
-  CENSORED_FACE
-  NUDITY
-  HATE_CRIME
-  BLURRED_LABEL
-  MEDICAL_MATERIALS
-  AMBIGUOUS_LISTING
-  JEWELRY_AND_METALS
-  HOVERBOARD
-  CELEBRITY_PHOTO
-  TRICK_CANDLES
-  BLURRED_INFORMATION
-  CONSUMPTION_MATERIALS
-  HAZARDOUS_MATERIALS
-  IS_MAJOR_BRAND
-  DISTASTEFUL_CONTENT
-  DANGEROUS_ITEMS
-  HARNESS
-  TATTOO_GUN
-  MISLEADING_LISTING_AUTHENTIC_BRAND
-  CONTACT_LENSES
-  VIRTUAL_GOODS
-  BIKE_HELMETS
-  PLANT_SEEDS
-}
-
 enum CounterfeitReasonCode {
   UNLICENSED_MEDIA
   SAFETY_EQUIPMENT
@@ -2104,7 +2053,7 @@ enum CounterfeitRiskLevel {
 
 type CounterfeitViolationSchema {
   isConfirmed: Boolean!
-  reason: CounterfeitReason
+  reason: CounterfeitReasonCode
   reasonDisplayName: String
   reasonExplanation: String
   subcategoryMessage: String
@@ -3504,8 +3453,6 @@ input EditTrademarksAndBrandInfoInput {
 type EligibleProductInfo {
   product: ProductSchema!
   variations: [VariationSchema!]!
-  maxCalculatedShippingPrice(countries: [CountryCode!]): CurrencyValue
-  maxMerchantSetShippingPrice(countries: [CountryCode!]): CurrencyValue
 }
 
 enum EntityTypes {
@@ -4284,10 +4231,14 @@ enum ImageSize {
 
 type InappropriateViolationSchema {
   isConfirmed: Boolean!
-  reason: CounterfeitReason
+  reason: CounterfeitReasonCode
   reasonDisplayName: String
   reasonExplanation: String
   subcategoryMessage: String
+}
+
+type InappropriateViolationTaggingManagement {
+  violationReasons: [TaggingViolationReason!]!
 }
 
 type InfoCollectedForPaymentProvider {
@@ -5271,7 +5222,7 @@ type MFPServiceSchema {
   genericCampaigns(startAtMin: DatetimeInput, startAtMax: DatetimeInput, endAtMin: DatetimeInput, endAtMax: DatetimeInput, searchType: MFPCampaignSearchType, searchQuery: String, states: [MFPCampaignState!], promotionTypes: [MFPCampaignPromotionType!], offset: Int = 0, limit: Int = 25, performanceStartDate: DatetimeInput, performanceEndDate: DatetimeInput): [GenericScalar!]
   campaigns(startAtMin: DatetimeInput, startAtMax: DatetimeInput, endAtMin: DatetimeInput, endAtMax: DatetimeInput, searchType: MFPCampaignSearchType, searchQuery: String, states: [MFPCampaignState!], promotionTypes: [MFPCampaignPromotionType!], offset: Int = 0, limit: Int = 25, eventIds: [ObjectIdType!], eventConfig: MFPCampaignEventConfig): [MFPCampaignSchema!]
   campaignsCount(startAtMin: DatetimeInput, startAtMax: DatetimeInput, endAtMin: DatetimeInput, endAtMax: DatetimeInput, searchType: MFPCampaignSearchType, searchQuery: String, states: [MFPCampaignState!], promotionTypes: [MFPCampaignPromotionType!], eventIds: [ObjectIdType!], eventConfig: MFPCampaignEventConfig): Int
-  genericEligibleProducts(currency: PaymentCurrencyCode!, promotionType: MFPCampaignPromotionType, searchQuery: String, searchType: MFPProductSearchType, eventId: ObjectIdType, offset: Int = 0, limit: Int = 20, sort: ProductSort): GenericScalar
+  genericEligibleProducts(currency: PaymentCurrencyCode!, promotionType: MFPCampaignPromotionType, searchQuery: String, searchType: MFPProductSearchType, eventId: ObjectIdType, offset: Int = 0, limit: Int = 20, sort: ProductSort, countries: [CountryCode!]): GenericScalar
   eligibleProducts(promotionType: MFPCampaignPromotionType, searchQuery: String, searchType: MFPProductSearchType, eventId: ObjectIdType, offset: Int = 0, limit: Int = 20, sort: ProductSort): [EligibleProductInfo!]
   eligibleProductsCount(promotionType: MFPCampaignPromotionType, searchQuery: String, searchType: MFPProductSearchType, eventId: ObjectIdType): Int
   activeWhitelistProducts(merchantId: ObjectIdType, productIds: [ObjectIdType!], offset: Int = 0, limit: Int = 25, sort: WhitelistProductSort): [WhitelistProductInfo!]
@@ -7197,6 +7148,10 @@ enum MfpCampaignPriceDiscounted {
   SHIPPING
 }
 
+type MisleadingViolationTaggingManagement {
+  violationReasons: [TaggingViolationReason!]!
+}
+
 enum MobilePlatformType {
   ANDROID
   IOS
@@ -8734,8 +8689,8 @@ type PolicyPublicSchema {
 type PolicySchema {
   admin: PolicyAdminSchema
   finalSaleCategories(merchantId: ObjectIdType!): [FinalSaleCategorySchema!]
-  merchantWarningCount(merchantId: ObjectIdType, id: ObjectIdType, banned: Boolean, fined: Boolean, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], isMisleading: Boolean, disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!]): Int
-  merchantWarnings(offset: Int = 0, limit: Int, merchantId: ObjectIdType, id: ObjectIdType, banned: Boolean, fined: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, sort: MerchantWarningSort, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!]): [MerchantWarningSchema!]
+  merchantWarningCount(merchantId: ObjectIdType, id: ObjectIdType, banned: Boolean, fined: Boolean, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], isMisleading: Boolean, disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!], category: CounterfeitReasonCode, subcategory: TaggingViolationSubReasonCode): Int
+  merchantWarnings(offset: Int = 0, limit: Int, merchantId: ObjectIdType, id: ObjectIdType, banned: Boolean, fined: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, sort: MerchantWarningSort, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!], category: CounterfeitReasonCode, subcategory: TaggingViolationSubReasonCode): [MerchantWarningSchema!]
   merchantWarning(id: ObjectIdType): MerchantWarningSchema
   detailedWarningReasons(reasons: [MerchantWarningReason!], states: [MerchantWarningState!], id: ObjectIdType, searchProofIdTypes: [MerchantWarningProofType!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput): [DetailedMerchantWarningReasonSchema!]
   merchantWarningReasons: [MerchantWarningReasonSchema!]
@@ -9019,6 +8974,7 @@ type ProductCatalogMutations {
   upsertVideo(input: VideoUpsertInput): UpsertVideo
   removeVideo(input: RemoveVideoInput!): RemoveVideo
   forceApproveProduct(input: ForceApproveProductInput!): ForceApproveProduct
+  uploadProductComplianceDocument(input: [ProductComplianceDocumentInput!]!): UploadProductComplianceDocuments
 }
 
 type ProductCatalogSchema {
@@ -9133,6 +9089,21 @@ enum ProductCategoryDisputeTrueTagState {
   DISPUTED
   APPROVED
   PROPOSED
+}
+
+input ProductComplianceDocumentInput {
+  productId: ObjectIdType!
+  sourceUrl: String!
+  documentLabel: String!
+  fileName: String!
+  fileExtension: String!
+  delete: Boolean!
+}
+
+type ProductComplianceDocumentSchema {
+  s3Url: String!
+  documentLabel: String!
+  fileName: String
 }
 
 type ProductComplianceMutations {
@@ -9476,6 +9447,7 @@ type ProductSchema {
   hasBrand: Boolean
   isWishExpress: Boolean!
   flatRateShippingCountryCandidates: [FlatRateShippingCountryCandidate!]
+  productComplianceDocuments: [ProductComplianceDocumentSchema!]
 }
 
 enum ProductSearchType {
@@ -9756,6 +9728,7 @@ enum ProductsCSVTemplateType {
   ENABLED
   SHIPPING
   CONTENT
+  ALL_COLUMNS
   PRICE_AND_INVENTORY
 }
 
@@ -11539,6 +11512,8 @@ type ShippingSchema {
   warehouseCountryShipping(shippingTypes: [WarehouseShippingType!] = [1, 2]): [WarehouseCountryShippingSchema!]
   calculatedShippingEnabled: Boolean
   wishpostEstimatedShipping: [WishPostShippingSchema!]
+  maxCalculatedShippingPrice(countries: [CountryCode!]): CurrencyValue
+  maxMerchantSetShippingPrice(countries: [CountryCode!]): CurrencyValue
 }
 
 type ShippingSettingMutations {
@@ -11815,6 +11790,8 @@ type TaggingMutations {
 
 type TaggingServiceSchema {
   ipViolationTaggingManagement: IPViolationTaggingManagement
+  misleadingViolationTaggingManagement: MisleadingViolationTaggingManagement
+  inappropriateViolationTaggingManagement: InappropriateViolationTaggingManagement
   productVideoContentTaggerJob: ProductVideoTaggerJobSchema
   productVideoIpTaggerJob: ProductVideoTaggerJobSchema
   generalTaggingManagement: GeneralTaggingManagement
@@ -13089,6 +13066,13 @@ type UploadEUVATTaxQuestionnaire {
 
 type UploadMutations {
   initiateUpload(input: InitiateUploadInput!): InitiateUploadMutation
+}
+
+type UploadProductComplianceDocuments {
+  ok: Boolean!
+  failures: [String!]
+  productId: ObjectIdType
+  fileUrls: [String!]
 }
 
 type UpsertConfirmedDeliveryCarrier {

@@ -6,7 +6,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
 
 interface CounterfeitReasonFilterProps {
-  readonly onConfirm: (claim: OptionType) => void;
+  readonly onConfirm: (claim: OptionType | null) => void;
 }
 
 type OptionType = (typeof CounterfeitReasonOptions)[number];
@@ -30,9 +30,7 @@ const CounterfeitReasonFilter: React.FC<CounterfeitReasonFilterProps> = ({
       groupBy={(option) => CounterfeitReasonsDictionary[option].category}
       onChange={(_, newValue) => {
         setSelectedOption(newValue);
-        if (newValue != null) {
-          onConfirm(newValue);
-        }
+        onConfirm(newValue);
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Parent Category"} />

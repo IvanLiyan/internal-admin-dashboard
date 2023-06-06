@@ -32,7 +32,7 @@ const BulkProcessRequestRow: React.FC<{
           </IconButton>
         </TableCell>
         {TableColumns.map((col) => (
-          <TableCell key={col} align="right">
+          <TableCell key={col} align="left">
             {row[col]}
           </TableCell>
         ))}
@@ -45,7 +45,7 @@ const BulkProcessRequestRow: React.FC<{
                 <TableHead>
                   <TableRow>
                     {ExpandRowColumns.map((col) => (
-                      <TableCell key={col} align="right">
+                      <TableCell key={col} align="left">
                         {ExpandRowLabels[col]}
                       </TableCell>
                     ))}
@@ -55,7 +55,7 @@ const BulkProcessRequestRow: React.FC<{
                   {row.infractions.map((item) => (
                     <TableRow key={`${row.requestId}-${item.infractionId}`}>
                       {ExpandRowColumns.map((ec) => (
-                        <TableCell key={ec} align="right">
+                        <TableCell key={ec} align="left">
                           {item[ec]}
                         </TableCell>
                       ))}

@@ -7,7 +7,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
 
 interface CounterfeitSubreasonFilterProps {
-  readonly onConfirm: (claim: OptionType) => void;
+  readonly onConfirm: (claim: OptionType | null) => void;
 }
 
 type OptionType = (typeof CounterfeitSubreasonOptions)[number];
@@ -37,9 +37,7 @@ const CounterfeitSubreasonFilter: React.FC<CounterfeitSubreasonFilterProps> = ({
       }
       onChange={(_, newValue) => {
         setSelectedOption(newValue);
-        if (newValue != null) {
-          onConfirm(newValue);
-        }
+        onConfirm(newValue);
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Sub Category"} />

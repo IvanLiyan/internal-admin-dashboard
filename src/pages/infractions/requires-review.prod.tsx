@@ -1,6 +1,7 @@
 import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
+import AlternatingTableRow from "@app/infractions/components/AlternatingTableRow";
 import CompactTableCell from "@app/infractions/components/CompactTableCell";
 import TableContextProvider from "@app/infractions/components/TableContext";
 import TableHeading from "@app/infractions/components/TableHeading";
@@ -13,6 +14,7 @@ import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
+import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
 import {
   initTableState,
   tableStateReducer,
@@ -23,22 +25,28 @@ import {
   useTableData,
   useTableQuery,
 } from "@app/infractions/toolkit/table";
+import { Visibility } from "@mui/icons-material";
 import {
   Button,
   Checkbox,
+  IconButton,
   Paper,
   Stack,
   Table,
   TableBody,
   TableContainer,
   TablePagination,
-  TableRow,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { NextPage } from "next";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 const RequiresReviewPage: NextPage<Record<string, never>> = () => {
+  const [msgPreview, setMsgPreview] = useState<{
+    open: boolean;
+    id: string | null;
+  }>({ open: false, id: null });
+
   const [state, dispatch] = useReducer(
     tableStateReducer,
     { order: "ASC", orderBy: "created", states: ["REQUIRES_ADMIN_REVIEW"] },
@@ -55,11 +63,10 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
 
   useEffect(() => {
     dispatch({
-      selected: state.selected.filter((id) =>
-        tableData.some((row) => row.infractionId == id && !row.bulkStatus)
-      ),
+      actionType: "VALIDATE_SELECTION",
+      validRows: tableData,
     });
-  }, [state.selected, tableData]);
+  }, [tableData]);
 
   return (
     <PageRoot title="Infractions Require Admin Approval">
@@ -79,13 +86,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                   dispatch({ search: token });
                 }}
                 size="small"
-                placeholder="Search"
+                placeholder="Search by MID/PID/OID/IID"
                 sx={{ minWidth: 400, mx: 1 }}
-                searchBy={{
-                  keys: ["ID", "Merchant Name"],
-                  onSearchByChange: (searchBy) => dispatch({ searchBy }),
-                  defaultKey: "ID",
-                }}
               />
               <TablePagination
                 showFirstButton
@@ -138,8 +140,8 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                 }}
               />
               <CounterfeitReasonFilter
-                onConfirm={() => {
-                  return;
+                onConfirm={(category) => {
+                  dispatch({ category });
                 }}
               />
             </Stack>
@@ -155,13 +157,13 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                   order={state.order == "ASC" ? "asc" : "desc"}
                   orderBy={state.orderBy}
                   onSelectAllClick={onSelectAll}
-                  rowCount={tableData.length}
+                  rowCount={tableData.filter((row) => !row.bulkStatus).length}
                 />
                 <TableBody>
                   {tableData.map((row) => {
                     const isItemSelected = isSelected(row.infractionId);
                     return (
-                      <TableRow
+                      <AlternatingTableRow
                         hover
                         tabIndex={-1}
                         key={row.infractionId}
@@ -177,10 +179,22 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                           />
                         </CompactTableCell>
                         {RequiresReviewTableColumns.map((col) => (
-                          <CompactTableCell key={col} align="right">
+                          <CompactTableCell key={col} align="left">
                             {row[col]}
                           </CompactTableCell>
                         ))}
+                        <CompactTableCell align="center">
+                          <IconButton
+                            onClick={() => {
+                              setMsgPreview({
+                                open: true,
+                                id: row.infractionId,
+                              });
+                            }}
+                          >
+                            <Visibility />
+                          </IconButton>
+                        </CompactTableCell>
                         <CompactTableCell align="center">
                           <Button
                             disabled={row.bulkStatus}
@@ -194,12 +208,21 @@ const RequiresReviewPage: NextPage<Record<string, never>> = () => {
                           <ConfirmButton infraction={row} />
                           <ClaimButton infraction={row} />
                         </CompactTableCell>
-                      </TableRow>
+                      </AlternatingTableRow>
                     );
                   })}
                 </TableBody>
               </Table>
             </TableContainer>
+          )}
+          {msgPreview.open && (
+            <MessagePreviewDialog
+              infractionId={msgPreview.id}
+              open={msgPreview.open}
+              handleClose={() => {
+                setMsgPreview({ open: false, id: null });
+              }}
+            />
           )}
         </TableContextProvider>
       </Paper>

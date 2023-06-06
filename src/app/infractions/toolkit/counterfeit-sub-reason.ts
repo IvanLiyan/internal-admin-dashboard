@@ -1,7 +1,7 @@
-import { CounterfeitReason, TaggingViolationSubReasonCode } from "@schema";
+import { CounterfeitReasonCode, TaggingViolationSubReasonCode } from "@schema";
 
 type CategoryWithSubreasons = ExtractStrict<
-  CounterfeitReason,
+  CounterfeitReasonCode,
   | "SMOKING"
   | "NUDITY"
   | "HATE_CRIME"
