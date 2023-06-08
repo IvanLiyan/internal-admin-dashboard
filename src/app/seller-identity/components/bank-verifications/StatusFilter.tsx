@@ -1,7 +1,4 @@
-import {
-  TableDispatchContext,
-  TableStateContext,
-} from "@app/seller-identity/toolkit/bank-verifications/context";
+import { useTableContext } from "@app/seller-identity/toolkit/bank-verifications/context";
 import { VerificationStatusLabel } from "@app/seller-identity/toolkit/bank-verifications/table";
 import { FilterAlt } from "@mui/icons-material";
 import {
@@ -11,13 +8,11 @@ import {
   Popover,
   TextField,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 const StatusFilter: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-
-  const state = useContext(TableStateContext);
-  const dispatchContext = useContext(TableDispatchContext);
+  const { queryState, dispatch } = useTableContext();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -32,7 +27,7 @@ const StatusFilter: React.FC = () => {
   return (
     <>
       <IconButton onClick={handleClick}>
-        <Badge badgeContent={state?.status && 1}>
+        <Badge badgeContent={queryState.status && 1}>
           <FilterAlt />
         </Badge>
       </IconButton>
@@ -47,9 +42,9 @@ const StatusFilter: React.FC = () => {
           sx={{ minWidth: 200, m: 1 }}
           options={["APPROVED", "PENDING", "REJECTED", "SUBMITTED"] as const}
           getOptionLabel={(option) => VerificationStatusLabel[option]}
-          value={state?.status}
+          value={queryState.status}
           onChange={(_, newValue) => {
-            dispatchContext?.dispatch({ status: newValue });
+            dispatch({ status: newValue });
           }}
           renderInput={(params) => (
             <TextField {...params} label={"Filter by Status"} />

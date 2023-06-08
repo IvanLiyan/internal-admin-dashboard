@@ -1,3 +1,4 @@
+import { useTableContext } from "@app/infractions/toolkit/context";
 import {
   InfractionOptions,
   InfractionsDictionary,
@@ -5,18 +6,15 @@ import {
 import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
 
-interface ReasonFilterProps {
-  readonly onConfirm: (claim: InfractionType[] | null | undefined) => void;
-}
-
 type InfractionType = (typeof InfractionOptions)[number];
 type OptionType = {
   type: InfractionType[];
   label: string;
 };
 
-const ReasonFilter: React.FC<ReasonFilterProps> = ({ onConfirm }) => {
+const ReasonFilter: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+  const { dispatch } = useTableContext();
 
   return (
     <Autocomplete
@@ -52,7 +50,7 @@ const ReasonFilter: React.FC<ReasonFilterProps> = ({ onConfirm }) => {
       groupBy={(option) => InfractionsDictionary[option.type[0]].category}
       onChange={(_, newValue) => {
         setSelectedOption(newValue);
-        onConfirm(newValue?.type);
+        dispatch({ reasons: newValue?.type });
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Reason"} />

@@ -4,10 +4,7 @@ import {
   useBulkDisputeAction,
   useDisputeAction,
 } from "@app/infractions/toolkit/action";
-import {
-  TableDispatchContext,
-  TableStateContext,
-} from "@app/infractions/toolkit/context";
+import { useTableContext } from "@app/infractions/toolkit/context";
 import { TableData } from "@app/infractions/toolkit/table";
 import {
   Button,
@@ -21,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { CancelReason } from "@schema";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 type Props = ButtonProps & {
   infraction?: Pick<TableData, "infractionId" | "bulkStatus">;
@@ -33,8 +30,7 @@ const DeleteButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
   const [cancelReason, setCancelReason] =
     useState<CancelReason>("POLICY_UPDATE");
 
-  const state = useContext(TableStateContext);
-  const dispatchContext = useContext(TableDispatchContext);
+  const { queryState, reexecuteQuery } = useTableContext();
   const handleBulkAction = useBulkDisputeAction();
 
   return (
@@ -78,17 +74,17 @@ const DeleteButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
                       result.data?.policy?.merchantWarning
                         ?.upsertMerchantWarning?.ok
                     ) {
-                      dispatchContext?.reexecuteQuery({
+                      reexecuteQuery({
                         requestPolicy: "cache-and-network",
                       });
                     }
                   });
                 } else {
                   handleBulkAction("DELETE", {
-                    warningIds: state?.selected || [],
+                    warningIds: queryState.selected || [],
                   }).then((result) => {
                     if (result.data?.policy?.bulkUpsertMerchantWarning?.ok) {
-                      dispatchContext?.reexecuteQuery({
+                      reexecuteQuery({
                         requestPolicy: "cache-and-network",
                       });
                     }
@@ -105,7 +101,7 @@ const DeleteButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
         {...buttonProps}
         disabled={
           !!infraction?.bulkStatus ||
-          (infraction == null && !state?.selected.length)
+          (infraction == null && !queryState.selected.length)
         }
         size="small"
         onClick={() => {

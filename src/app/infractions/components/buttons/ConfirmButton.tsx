@@ -2,10 +2,7 @@ import {
   useBulkDisputeAction,
   useDisputeAction,
 } from "@app/infractions/toolkit/action";
-import {
-  TableDispatchContext,
-  TableStateContext,
-} from "@app/infractions/toolkit/context";
+import { useTableContext } from "@app/infractions/toolkit/context";
 import { TableData } from "@app/infractions/toolkit/table";
 import {
   Box,
@@ -17,7 +14,7 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 type Props = ButtonProps & {
   infraction?: Pick<TableData, "infractionId" | "merchantName" | "bulkStatus">;
@@ -27,8 +24,7 @@ const ConfirmButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
   const { onConfirm } = useDisputeAction();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const state = useContext(TableStateContext);
-  const dispatchContext = useContext(TableDispatchContext);
+  const { queryState, reexecuteQuery } = useTableContext();
   const handleBulkAction = useBulkDisputeAction();
 
   return (
@@ -48,7 +44,7 @@ const ConfirmButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
             ) : (
               <Typography>
                 Are you sure you want to confirm the{" "}
-                {state?.selected.length || 0} selected infractions?
+                {queryState.selected.length || 0} selected infractions?
               </Typography>
             )}
           </DialogContent>
@@ -64,17 +60,17 @@ const ConfirmButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
                       result.data?.policy?.merchantWarning
                         ?.upsertMerchantWarning?.ok
                     ) {
-                      dispatchContext?.reexecuteQuery({
+                      reexecuteQuery({
                         requestPolicy: "cache-and-network",
                       });
                     }
                   });
                 } else {
                   handleBulkAction("CONFIRM", {
-                    warningIds: state?.selected || [],
+                    warningIds: queryState.selected || [],
                   }).then((result) => {
                     if (result.data?.policy?.bulkUpsertMerchantWarning?.ok) {
-                      dispatchContext?.reexecuteQuery({
+                      reexecuteQuery({
                         requestPolicy: "cache-and-network",
                       });
                     }
@@ -91,7 +87,7 @@ const ConfirmButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
         {...buttonProps}
         disabled={
           !!infraction?.bulkStatus ||
-          (infraction == null && !state?.selected.length)
+          (infraction == null && !queryState.selected.length)
         }
         size="small"
         onClick={() => {

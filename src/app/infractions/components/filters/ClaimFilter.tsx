@@ -1,10 +1,7 @@
+import { useTableContext } from "@app/infractions/toolkit/context";
 import { Autocomplete, TextField } from "@mui/material";
 import { MerchantWarningClaimStatus } from "@schema";
 import { useState } from "react";
-
-interface ClaimFilterProps {
-  readonly onConfirm: (claim: MerchantWarningClaimStatus | null) => void;
-}
 
 const Label: { [T in MerchantWarningClaimStatus]: string } = {
   ALL: "All",
@@ -13,9 +10,10 @@ const Label: { [T in MerchantWarningClaimStatus]: string } = {
   NOT_CLAIMED: "Not Claimed",
 };
 
-const ClaimFilter: React.FC<ClaimFilterProps> = ({ onConfirm }) => {
+const ClaimFilter: React.FC = () => {
   const [selectedOptions, setSelectedOptions] =
     useState<MerchantWarningClaimStatus | null>(null);
+  const { dispatch } = useTableContext();
 
   return (
     <Autocomplete
@@ -26,7 +24,7 @@ const ClaimFilter: React.FC<ClaimFilterProps> = ({ onConfirm }) => {
       value={selectedOptions}
       onChange={(_, newValue) => {
         setSelectedOptions(newValue);
-        onConfirm(newValue);
+        dispatch({ claimStatus: newValue });
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Claim"} />

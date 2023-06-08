@@ -1,8 +1,7 @@
 import { useDisputeAction } from "@app/infractions/toolkit/action";
-import { TableDispatchContext } from "@app/infractions/toolkit/context";
+import { useTableContext } from "@app/infractions/toolkit/context";
 import { TableData } from "@app/infractions/toolkit/table";
 import { Button, ButtonProps } from "@mui/material";
-import { useContext } from "react";
 
 type Props = ButtonProps & {
   infraction: Pick<
@@ -13,7 +12,7 @@ type Props = ButtonProps & {
 
 const ClaimButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
   const { onClaim } = useDisputeAction();
-  const dispatchContext = useContext(TableDispatchContext);
+  const { reexecuteQuery } = useTableContext();
 
   return (
     <Button
@@ -25,7 +24,7 @@ const ClaimButton: React.FC<Props> = ({ infraction, ...buttonProps }) => {
           claimInput: { warningIds: [infraction.infractionId] },
         }).then((result) => {
           if (result.data?.policy?.merchantWarning?.upsertMerchantWarning?.ok) {
-            dispatchContext?.reexecuteQuery({
+            reexecuteQuery({
               requestPolicy: "cache-and-network",
             });
           }

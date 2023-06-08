@@ -12,7 +12,7 @@ import {
   TaggingViolationSubReasonCode,
 } from "@schema";
 
-export const initTableState = (states: Action): State => {
+export const initQueryState = (states: Action): QueryState => {
   return {
     search: "",
     searchBy: "ID",
@@ -33,7 +33,7 @@ export const initTableState = (states: Action): State => {
   };
 };
 
-export type State = {
+export type QueryState = {
   search: string;
   searchBy: SearchTypes;
   order: SortOrderType;
@@ -52,27 +52,34 @@ export type State = {
 };
 
 export type Action =
-  | Partial<State>
+  | Partial<QueryState>
   | {
       actionType: "VALIDATE_SELECTION";
       validRows: ReadonlyArray<TableData>;
     };
 
-export const tableStateReducer = (state: State, action: Action): State => {
+export const queryStateReducer = (
+  state: QueryState,
+  action: Action
+): QueryState => {
   if ("actionType" in action) {
-    const newSelection = state.selected.filter((id) =>
-      action.validRows.some((row) => row.infractionId == id && !row.bulkStatus)
-    );
-    if (
-      newSelection.every((id) => state.selected.includes(id)) &&
-      state.selected.every((id) => newSelection.includes(id))
-    ) {
-      return state;
+    if (action.actionType == "VALIDATE_SELECTION") {
+      const newSelection = state.selected.filter((id) =>
+        action.validRows.some(
+          (row) => row.infractionId == id && !row.bulkStatus
+        )
+      );
+      if (
+        newSelection.every((id) => state.selected.includes(id)) &&
+        state.selected.every((id) => newSelection.includes(id))
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        selected: newSelection,
+      };
     }
-    return {
-      ...state,
-      selected: newSelection,
-    };
   }
 
   const newState = {

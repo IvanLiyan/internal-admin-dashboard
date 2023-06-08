@@ -1,5 +1,6 @@
 import CompactTableCell from "@app/infractions/components/CompactTableCell";
-import { ColumnLabel } from "@app/infractions/toolkit/table";
+import { useTableContext } from "@app/infractions/toolkit/context";
+import { ColumnLabel, useSelectHandlers } from "@app/infractions/toolkit/table";
 import {
   Checkbox,
   SortDirection,
@@ -7,22 +8,24 @@ import {
   TableRow,
   TableSortLabel,
 } from "@mui/material";
-import React from "react";
 
 interface Props {
   readonly columns: ReadonlyArray<keyof typeof ColumnLabel>;
-  readonly order: SortDirection;
-  readonly orderBy: keyof typeof ColumnLabel;
-  readonly numSelected: number;
-  readonly rowCount: number;
-  readonly onSelectAllClick: (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  readonly sortableColumns: ReadonlyArray<keyof typeof ColumnLabel>;
 }
 
 const TableHeading = (props: Props) => {
-  const { columns, onSelectAllClick, order, orderBy, numSelected, rowCount } =
-    props;
+  const { columns, sortableColumns } = props;
+  const { tableData, queryState, dispatch } = useTableContext();
+  const { onSelectAll } = useSelectHandlers(queryState, dispatch, tableData);
+
+  const sortKey = queryState.orderBy;
+  const sortDirection: SortDirection =
+    queryState.order == "ASC" ? "asc" : "desc";
+
+  const numSelected = queryState.selected.length;
+  const rowCount = tableData.filter((row) => !row.bulkStatus).length;
+
   return (
     <TableHead>
       <TableRow>
@@ -31,24 +34,29 @@ const TableHeading = (props: Props) => {
             color="primary"
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
+            onChange={onSelectAll}
           />
         </CompactTableCell>
         {columns.map((headCell) => {
           const key = headCell;
           const label = ColumnLabel[headCell];
           return (
-            <CompactTableCell
-              key={key}
-              align={"left"}
-              sortDirection={orderBy === key ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === key}
-                direction={orderBy === key && order ? order : undefined}
-              >
-                {label}
-              </TableSortLabel>
+            <CompactTableCell key={key} align={"left"}>
+              {sortableColumns.includes(key) ? (
+                <TableSortLabel
+                  active={queryState.orderBy === key}
+                  direction={key === sortKey ? sortDirection : undefined}
+                  onClick={() => {
+                    const isAsc =
+                      queryState.orderBy === key && queryState.order === "ASC";
+                    dispatch({ order: isAsc ? "DESC" : "ASC", orderBy: key });
+                  }}
+                >
+                  {label}
+                </TableSortLabel>
+              ) : (
+                label
+              )}
             </CompactTableCell>
           );
         })}

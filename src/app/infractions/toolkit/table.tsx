@@ -1,5 +1,5 @@
 import { CounterfeitSubreasonsDictionary } from "@app/infractions/toolkit/counterfeit-sub-reason";
-import { Action, State } from "@app/infractions/toolkit/reducer";
+import { Action, QueryState } from "@app/infractions/toolkit/reducer";
 import { ResultOf, VariablesOf } from "@graphql-typed-document-node/core";
 import { Link } from "@mui/material";
 import { MerchantWarningSortFieldType } from "@schema";
@@ -307,7 +307,7 @@ const useSearchVars = <T extends SearchTypes>(
   return {};
 };
 
-export const useTableQuery = (state: State) => {
+export const useTableQuery = (state: QueryState) => {
   const gqlOrderBy = OrderBy[state.orderBy];
   return useQuery({
     query: BulkDisputeQuery,
@@ -337,7 +337,7 @@ export const useTableQuery = (state: State) => {
 };
 
 export const useSelectHandlers = (
-  state: State,
+  state: QueryState,
   dispatch: Dispatch<Action>,
   tableData: ReturnType<typeof useTableData>
 ) => {

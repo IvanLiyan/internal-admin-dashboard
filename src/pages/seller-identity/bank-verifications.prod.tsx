@@ -1,11 +1,11 @@
 import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
-import StatusFilter from "@app/seller-identity/components/StatusFilter";
-import TableContextProvider from "@app/seller-identity/components/bank-verifications/TableContext";
+import StatusFilter from "@app/seller-identity/components/bank-verifications/StatusFilter";
+import { TableContext } from "@app/seller-identity/toolkit/bank-verifications/context";
 import {
-  initTableState,
-  tableStateReducer,
+  initQueryState,
+  queryStateReducer,
 } from "@app/seller-identity/toolkit/bank-verifications/reducer";
 import {
   BankAccountVerificationsQuery,
@@ -31,16 +31,20 @@ import { useReducer } from "react";
 import { useQuery } from "urql";
 
 const BankVerificationsPage: NextPage<Record<string, never>> = () => {
-  const [state, dispatch] = useReducer(tableStateReducer, {}, initTableState);
+  const [queryState, dispatch] = useReducer(
+    queryStateReducer,
+    {},
+    initQueryState
+  );
   const router = useRouter();
 
   const [{ fetching, data }] = useQuery({
     query: BankAccountVerificationsQuery,
     variables: {
-      limit: state.limit,
-      merchantId: state.merchantId,
-      offset: state.offset,
-      state: state.status,
+      limit: queryState.limit,
+      merchantId: queryState.merchantId,
+      offset: queryState.offset,
+      state: queryState.status,
     },
   });
 
@@ -49,7 +53,7 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
   return (
     <PageRoot title="Bank Account Verification">
       <Paper>
-        <TableContextProvider state={state} dispatch={{ dispatch }}>
+        <TableContext.Provider value={{ dispatch, queryState }}>
           <Stack
             padding={1}
             direction={"row"}
@@ -68,8 +72,8 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
               rowsPerPageOptions={[10, 50, 100]}
               component={"div"}
               count={data?.merchantIdentity?.bankAccountVerificationsCount || 0}
-              rowsPerPage={state.limit}
-              page={state.page}
+              rowsPerPage={queryState.limit}
+              page={queryState.page}
               onPageChange={(_, page) => dispatch({ page })}
               onRowsPerPageChange={(event) =>
                 dispatch({ limit: parseInt(event.target.value) })
@@ -123,7 +127,7 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
               </Table>
             </TableContainer>
           )}
-        </TableContextProvider>
+        </TableContext.Provider>
       </Paper>
     </PageRoot>
   );

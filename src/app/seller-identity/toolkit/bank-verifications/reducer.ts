@@ -1,15 +1,15 @@
 import { BankAccountVerificationStatus } from "@schema";
 
-export type State = {
+export type QueryState = {
   merchantId: string | null;
   page: number;
   limit: number;
   offset: number;
   status: BankAccountVerificationStatus | null;
 };
-export type Action = Partial<Omit<State, "offset">>;
+export type Action = Partial<Omit<QueryState, "offset">>;
 
-export const initTableState = (action: Action): State => {
+export const initQueryState = (action: Action): QueryState => {
   return {
     page: 0,
     limit: 10,
@@ -19,7 +19,10 @@ export const initTableState = (action: Action): State => {
     ...action,
   };
 };
-export const tableStateReducer = (state: State, action: Action): State => {
+export const queryStateReducer = (
+  state: QueryState,
+  action: Action
+): QueryState => {
   const newState = {
     ...state,
     ...action,

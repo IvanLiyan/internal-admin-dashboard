@@ -1,13 +1,20 @@
-import { Action, State } from "@app/infractions/toolkit/reducer";
-import { Dispatch, createContext } from "react";
+import { Action, QueryState } from "@app/infractions/toolkit/reducer";
+import { TableData } from "@app/infractions/toolkit/table";
+import { Dispatch, createContext, useContext } from "react";
 import { UseQueryExecute } from "urql";
 
-export const TableStateContext = createContext<State | null>(null);
-
-type tableDispatchContext = {
+type tableContext = {
+  readonly tableData: ReadonlyArray<TableData>;
+  readonly queryState: QueryState;
   readonly dispatch: Dispatch<Action>;
   readonly reexecuteQuery: UseQueryExecute;
 };
-export const TableDispatchContext = createContext<tableDispatchContext | null>(
-  null
-);
+
+export const TableContext = createContext<tableContext | null>(null);
+export const useTableContext = () => {
+  const ctx = useContext(TableContext);
+  if (!ctx) {
+    throw new Error("No TableContext.Provider found");
+  }
+  return ctx;
+};

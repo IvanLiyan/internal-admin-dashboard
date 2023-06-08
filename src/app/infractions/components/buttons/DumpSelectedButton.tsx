@@ -1,29 +1,24 @@
 import { useDisputeAction } from "@app/infractions/toolkit/action";
-import {
-  TableDispatchContext,
-  TableStateContext,
-} from "@app/infractions/toolkit/context";
+import { useTableContext } from "@app/infractions/toolkit/context";
 import { Button, ButtonProps } from "@mui/material";
-import { useContext } from "react";
 
 const DumpSelectedButton: React.FC<ButtonProps> = ({ ...buttonProps }) => {
   const { onDump } = useDisputeAction();
-  const state = useContext(TableStateContext);
-  const dispatchContext = useContext(TableDispatchContext);
+  const { queryState, reexecuteQuery } = useTableContext();
 
   return (
     <Button
       {...buttonProps}
       size="small"
       variant="text"
-      disabled={!state?.selected.length}
+      disabled={!queryState.selected.length}
       onClick={() => {
-        onDump({ claimInput: { warningIds: state?.selected } }).then(
+        onDump({ claimInput: { warningIds: queryState.selected } }).then(
           (result) => {
             if (
               result.data?.policy?.merchantWarning?.upsertMerchantWarning?.ok
             ) {
-              dispatchContext?.reexecuteQuery({
+              reexecuteQuery({
                 requestPolicy: "cache-and-network",
               });
             }

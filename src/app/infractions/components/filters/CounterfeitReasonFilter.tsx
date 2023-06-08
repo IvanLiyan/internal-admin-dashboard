@@ -1,3 +1,4 @@
+import { useTableContext } from "@app/infractions/toolkit/context";
 import {
   CounterfeitReasonOptions,
   CounterfeitReasonsDictionary,
@@ -5,16 +6,11 @@ import {
 import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
 
-interface CounterfeitReasonFilterProps {
-  readonly onConfirm: (claim: OptionType | null) => void;
-}
-
 type OptionType = (typeof CounterfeitReasonOptions)[number];
 
-const CounterfeitReasonFilter: React.FC<CounterfeitReasonFilterProps> = ({
-  onConfirm,
-}) => {
+const CounterfeitReasonFilter: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+  const { dispatch } = useTableContext();
 
   return (
     <Autocomplete
@@ -30,7 +26,7 @@ const CounterfeitReasonFilter: React.FC<CounterfeitReasonFilterProps> = ({
       groupBy={(option) => CounterfeitReasonsDictionary[option].category}
       onChange={(_, newValue) => {
         setSelectedOption(newValue);
-        onConfirm(newValue);
+        dispatch({ category: newValue });
       }}
       renderInput={(params) => (
         <TextField {...params} label={"Filter by Parent Category"} />

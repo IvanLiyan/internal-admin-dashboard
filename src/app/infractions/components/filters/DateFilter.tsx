@@ -1,18 +1,12 @@
-import { useState } from "react";
+import { useTableContext } from "@app/infractions/toolkit/context";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
+import { useState } from "react";
 
-interface DateFilterProps {
-  readonly onChangeStartDate: (date: Date | null) => void;
-  readonly onChangeEndDate: (date: Date | null) => void;
-}
-
-const DateFilter: React.FC<DateFilterProps> = ({
-  onChangeStartDate,
-  onChangeEndDate,
-}) => {
+const DateFilter: React.FC = () => {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const { dispatch } = useTableContext();
 
   return (
     <>
@@ -29,7 +23,9 @@ const DateFilter: React.FC<DateFilterProps> = ({
         }}
         onChange={(newValue) => {
           setStartDate(newValue);
-          onChangeStartDate(newValue == null ? null : dayjs(newValue).toDate());
+          dispatch({
+            issueDateStart: newValue == null ? null : dayjs(newValue).unix(),
+          });
         }}
       />
       <DatePicker
@@ -45,7 +41,9 @@ const DateFilter: React.FC<DateFilterProps> = ({
         }}
         onChange={(newValue) => {
           setEndDate(newValue);
-          onChangeEndDate(newValue == null ? null : dayjs(newValue).toDate());
+          dispatch({
+            issueDateEnd: newValue == null ? null : dayjs(newValue).unix(),
+          });
         }}
       />
     </>

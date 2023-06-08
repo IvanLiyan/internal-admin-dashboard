@@ -3,7 +3,6 @@ import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
 import AlternatingTableRow from "@app/infractions/components/AlternatingTableRow";
 import CompactTableCell from "@app/infractions/components/CompactTableCell";
-import TableContextProvider from "@app/infractions/components/TableContext";
 import TableHeading from "@app/infractions/components/TableHeading";
 import ClaimButton from "@app/infractions/components/buttons/ClaimButton";
 import ClaimSelectedButton from "@app/infractions/components/buttons/ClaimSelectedButton";
@@ -14,9 +13,10 @@ import CounterfeitSubreasonFilter from "@app/infractions/components/filters/Coun
 import DateFilter from "@app/infractions/components/filters/DateFilter";
 import ReasonFilter from "@app/infractions/components/filters/ReasonFilter";
 import MessagePreviewDialog from "@app/infractions/components/modals/MessagePreviewDialog";
+import { TableContext } from "@app/infractions/toolkit/context";
 import {
-  initTableState,
-  tableStateReducer,
+  initQueryState,
+  queryStateReducer,
 } from "@app/infractions/toolkit/reducer";
 import {
   PaymentReleaseReviewTableColumns,
@@ -36,9 +36,8 @@ import {
   TableContainer,
   TablePagination,
 } from "@mui/material";
-import dayjs from "dayjs";
 import { NextPage } from "next";
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
   const [msgPreview, setMsgPreview] = useState<{
@@ -46,26 +45,28 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
     id: string | null;
   }>({ open: false, id: null });
 
-  const [state, dispatch] = useReducer(
-    tableStateReducer,
+  const [queryState, dispatch] = useReducer(
+    queryStateReducer,
     { order: "ASC", orderBy: "lastUpdated", states: ["REQUEST_PAYMENT"] },
-    initTableState
+    initQueryState
   );
-  const [{ data, fetching }, reexecuteQuery] = useTableQuery(state);
+  const [{ data, fetching }, reexecuteQuery] = useTableQuery(queryState);
   const tableData = useTableData(data);
-  const { onSelect, onSelectAll } = useSelectHandlers(
-    state,
-    dispatch,
-    tableData
-  );
-  const isSelected = (name: string) => state.selected.indexOf(name) !== -1;
+  const { onSelect } = useSelectHandlers(queryState, dispatch, tableData);
+  const isSelected = (name: string) => queryState.selected.includes(name);
+
+  useEffect(() => {
+    dispatch({
+      actionType: "VALIDATE_SELECTION",
+      validRows: tableData,
+    });
+  }, [tableData]);
 
   return (
     <PageRoot title="Payment Release Review">
       <Paper>
-        <TableContextProvider
-          state={state}
-          dispatch={{ dispatch, reexecuteQuery }}
+        <TableContext.Provider
+          value={{ dispatch, queryState, reexecuteQuery, tableData }}
         >
           <Stack>
             <Stack
@@ -87,8 +88,8 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
                 rowsPerPageOptions={[10, 50, 100]}
                 component={"div"}
                 count={data?.policy?.merchantWarningCount || 0}
-                rowsPerPage={state.limit}
-                page={state.page}
+                rowsPerPage={queryState.limit}
+                page={queryState.page}
                 onPageChange={(_, page) => {
                   dispatch({ page });
                 }}
@@ -105,40 +106,11 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
             </Stack>
             <Stack direction={"row"} spacing={1} m={1}>
               {/* Place filters here */}
-              <DateFilter
-                onChangeStartDate={(startDate) => {
-                  dispatch({
-                    issueDateStart:
-                      startDate != null ? dayjs(startDate).unix() : null,
-                  });
-                }}
-                onChangeEndDate={(endDate) => {
-                  dispatch({
-                    issueDateEnd:
-                      endDate != null ? dayjs(endDate).unix() : null,
-                  });
-                }}
-              />
-              <ClaimFilter
-                onConfirm={(status) => {
-                  dispatch({ claimStatus: status });
-                }}
-              />
-              <ReasonFilter
-                onConfirm={(reason) => {
-                  dispatch({ reasons: reason });
-                }}
-              />
-              <CounterfeitReasonFilter
-                onConfirm={(category) => {
-                  dispatch({ category });
-                }}
-              />
-              <CounterfeitSubreasonFilter
-                onConfirm={(subcategory) => {
-                  dispatch({ subcategory });
-                }}
-              />
+              <DateFilter />
+              <ClaimFilter />
+              <ReasonFilter />
+              <CounterfeitReasonFilter />
+              <CounterfeitSubreasonFilter />
             </Stack>
           </Stack>
           {fetching ? (
@@ -148,11 +120,7 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
               <Table size={"medium"}>
                 <TableHeading
                   columns={PaymentReleaseReviewTableColumns}
-                  numSelected={state.selected.length}
-                  order={state.order == "ASC" ? "asc" : "desc"}
-                  orderBy={state.orderBy}
-                  onSelectAllClick={onSelectAll}
-                  rowCount={tableData.length}
+                  sortableColumns={["lastUpdated", "created"]}
                 />
                 <TableBody>
                   {tableData?.map((row) => {
@@ -215,7 +183,7 @@ const PaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
               }}
             />
           )}
-        </TableContextProvider>
+        </TableContext.Provider>
       </Paper>
     </PageRoot>
   );
