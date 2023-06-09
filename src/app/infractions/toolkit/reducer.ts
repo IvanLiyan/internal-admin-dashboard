@@ -80,6 +80,7 @@ export const queryStateReducer = (
         selected: newSelection,
       };
     }
+    throw new Error(`unknown action type: ${action.actionType}`);
   }
 
   const newState = {

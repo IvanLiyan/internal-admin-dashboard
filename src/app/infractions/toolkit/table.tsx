@@ -333,6 +333,7 @@ export const useTableQuery = (state: QueryState) => {
       subcategory: state.subcategory,
       ...useSearchVars(state.searchBy, state.search),
     },
+    requestPolicy: "cache-and-network",
   });
 };
 

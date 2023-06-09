@@ -40,7 +40,7 @@ const MessagePreviewDialog: React.FC<Props> = ({
 
   return (
     <Dialog maxWidth={"md"} onClose={handleClose} {...props}>
-      <DialogTitle>Message Preview</DialogTitle>
+      <DialogTitle>Message Preview - {infractionId}</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={1}>
           {fetching ? (

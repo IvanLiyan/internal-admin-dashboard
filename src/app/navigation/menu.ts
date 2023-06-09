@@ -25,6 +25,14 @@ export const MenuData: MenuItemProps[] = [
         href: "/infractions/payment-release-review",
       },
       {
+        text: "CN Payment Release Review",
+        href: "/infractions/cn-payment-release-review",
+      },
+      {
+        text: "US Payment Release Review",
+        href: "/infractions/us-payment-release-review",
+      },
+      {
         text: "Awaiting Merchant",
         href: "/infractions/awaiting-merchant",
       },
