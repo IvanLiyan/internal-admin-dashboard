@@ -92,7 +92,7 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
                     return (
                       <TableCell
                         key={key}
-                        align={"right"}
+                        align={"left"}
                         sortDirection={orderBy === key ? "asc" : false}
                       >
                         <TableSortLabel
