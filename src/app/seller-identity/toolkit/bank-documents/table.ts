@@ -49,7 +49,7 @@ export const BankAccountDocumentsQuery = graphql(`
             state
             documentFile {
               id
-              fileUrl
+              fileUrl(console: true)
             }
             uploadedAt {
               unix

@@ -5687,7 +5687,7 @@ enum MerchantFeedJobStatus {
 type MerchantFileSchema {
   id: ObjectIdType!
   displayFilename: String!
-  fileUrl: String!
+  fileUrl(console: Boolean): String!
   isImageFile: Boolean!
 }
 
@@ -8130,6 +8130,7 @@ enum PermissionType {
   REVIEW_ONEOFF_REQ_ENABLE_DISABLE_CSP_FOR_ALL_ELIGIBLE_PRODUCTS
   COUNTERFEIT_TAG_RESOLUTION
   MANAGE_WHITE_GLOVE
+  CAN_UPDATE_CSP_CONFIG
   CAN_VIEW_ORDERS
   CAN_VIEW_CN_INFRACTIONS
   CAN_GET_COLLECTIONBOOST
@@ -8991,7 +8992,8 @@ type ProductCatalogSchema {
   csvProductImportJobsCount(feedType: ProductCSVJobType): Int!
   csvProductColumnNames: [String!]!
   csvProductColumnEnums: [ProductCSVColumnName!]!
-  csvAllHeaderNames: [String!]!
+  csvAllHeaderNames(subcategoryIds: [Int!] = []): [String!]!
+  csvEditVariationsHeaderNames(subcategoryIds: [Int!] = []): [String!]!
   csvShippingHeaderNames: [String!]!
   csvPriceInventoryHeaderNames: [String!]!
   csvTitleImagesDescriptionHeaderNames: [String!]!
@@ -9101,9 +9103,9 @@ input ProductComplianceDocumentInput {
 }
 
 type ProductComplianceDocumentSchema {
-  s3Url: String!
+  fileUrl: String!
   documentLabel: String!
-  fileName: String
+  fileName: String!
 }
 
 type ProductComplianceMutations {
@@ -9128,6 +9130,7 @@ type ProductComplianceSchema {
   germanyProductUniqueIdentificationNumberCount(categories: [GermanyProductUniqueIdentificationNumberCategory!], states: [GermanyProductUniqueIdentificationNumberStatus!]): Int
   germanyProductUniqueIdentificationNumbers(categories: [GermanyProductUniqueIdentificationNumberCategory!], states: [GermanyProductUniqueIdentificationNumberStatus!]): [GermanyProductUniqueIdentificationNumberSchema!]
   extendedProducerResponsibility: ExtendedProducerResponsibilitySchema!
+  euComplianceInScope: Boolean!
 }
 
 enum ProductComplianceSearchType {
@@ -13070,8 +13073,7 @@ type UploadMutations {
 
 type UploadProductComplianceDocuments {
   ok: Boolean!
-  failures: [String!]
-  productId: ObjectIdType
+  failure: String
   fileUrls: [String!]
 }
 
