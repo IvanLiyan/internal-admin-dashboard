@@ -2,7 +2,7 @@ import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import Searchbox from "@app/core/components/Searchbox";
 import StatusFilter from "@app/seller-identity/components/bank-verifications/StatusFilter";
-import { TableContext } from "@app/seller-identity/toolkit/bank-verifications/context";
+import { BankVerificationsTableContext } from "@app/seller-identity/toolkit/bank-verifications/context";
 import {
   initQueryState,
   queryStateReducer,
@@ -46,6 +46,7 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
       offset: queryState.offset,
       state: queryState.status,
     },
+    requestPolicy: "cache-and-network",
   });
 
   const tableData = useTableData(data);
@@ -53,7 +54,9 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
   return (
     <PageRoot title="Bank Account Verification">
       <Paper>
-        <TableContext.Provider value={{ dispatch, queryState }}>
+        <BankVerificationsTableContext.Provider
+          value={{ dispatch, queryState }}
+        >
           <Stack
             padding={1}
             direction={"row"}
@@ -127,7 +130,7 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
               </Table>
             </TableContainer>
           )}
-        </TableContext.Provider>
+        </BankVerificationsTableContext.Provider>
       </Paper>
     </PageRoot>
   );

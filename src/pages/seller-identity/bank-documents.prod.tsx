@@ -1,6 +1,7 @@
 import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
 import CommentButton from "@app/seller-identity/components/bank-documents/CommentButton";
+import { BankDocumentsTableContext } from "@app/seller-identity/toolkit/bank-documents/context";
 import {
   BankAccountDocumentsQuery,
   ColumnLabel,
@@ -24,11 +25,12 @@ import { useQuery } from "urql";
 const BankDocumentsPage: NextPage<Record<string, never>> = () => {
   const { mid } = useRouter().query;
 
-  const [{ fetching, data }] = useQuery({
+  const [{ fetching, data }, reexecuteQuery] = useQuery({
     query: BankAccountDocumentsQuery,
     variables: {
       merchantId: typeof mid === "string" ? mid : null,
     },
+    requestPolicy: "cache-and-network",
   });
 
   const tableData = useTableData(data);
@@ -40,51 +42,54 @@ const BankDocumentsPage: NextPage<Record<string, never>> = () => {
   return (
     <PageRoot title="Bank Account Documents">
       <Paper>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{ColumnLabel.documentState}</TableCell>
-                <TableCell>{ColumnLabel.documentType}</TableCell>
-                <TableCell>{ColumnLabel.uploadedAt}</TableCell>
-                <TableCell>{ColumnLabel.reviewedAt}</TableCell>
-                <TableCell>{ColumnLabel.reviewer}</TableCell>
-                <TableCell>{ColumnLabel.comment}</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tableData.map((row) => (
-                <TableRow key={row.documentId}>
+        <BankDocumentsTableContext.Provider value={{ reexecuteQuery }}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
                   {TableColumns.map((col) => (
-                    <TableCell key={col}>{row[col]}</TableCell>
+                    <TableCell key={col}>{ColumnLabel[col]}</TableCell>
                   ))}
-                  <TableCell>
-                    <Button
-                      onClick={() => window.open(row.documentUrl, "_blank")}
-                    >
-                      View
-                    </Button>
-                    <CommentButton
-                      docAction={"APPROVED"}
-                      mid={row.mid}
-                      row={row}
-                    >
-                      Approve
-                    </CommentButton>
-                    <CommentButton
-                      docAction={"REJECTED"}
-                      mid={row.mid}
-                      row={row}
-                    >
-                      Reject
-                    </CommentButton>
-                  </TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {tableData.map((row) => (
+                  <TableRow key={row.documentId}>
+                    {TableColumns.map((col) => (
+                      <TableCell key={col}>{row[col]}</TableCell>
+                    ))}
+                    <TableCell>
+                      <Button
+                        onClick={() => window.open(row.documentUrl, "_blank")}
+                      >
+                        View
+                      </Button>
+                      {row.documentState == "SUBMITTED" && (
+                        <>
+                          <CommentButton
+                            docAction={"APPROVED"}
+                            mid={row.mid}
+                            row={row}
+                          >
+                            Approve
+                          </CommentButton>
+                          <CommentButton
+                            docAction={"REJECTED"}
+                            mid={row.mid}
+                            row={row}
+                          >
+                            Reject
+                          </CommentButton>
+                        </>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </BankDocumentsTableContext.Provider>
       </Paper>
     </PageRoot>
   );

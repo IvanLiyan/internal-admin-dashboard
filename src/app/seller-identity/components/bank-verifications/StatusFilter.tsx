@@ -1,4 +1,4 @@
-import { useTableContext } from "@app/seller-identity/toolkit/bank-verifications/context";
+import { useBankVerificationsTableContext } from "@app/seller-identity/toolkit/bank-verifications/context";
 import { VerificationStatusLabel } from "@app/seller-identity/toolkit/bank-verifications/table";
 import { FilterAlt } from "@mui/icons-material";
 import {
@@ -12,7 +12,7 @@ import { useState } from "react";
 
 const StatusFilter: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const { queryState, dispatch } = useTableContext();
+  const { queryState, dispatch } = useBankVerificationsTableContext();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

@@ -4,15 +4,16 @@ import {
 } from "@app/seller-identity/toolkit/bank-verifications/reducer";
 import { Dispatch, createContext, useContext } from "react";
 
-type tableContext = {
+type bankVerificationTableContext = {
   readonly queryState: QueryState;
   readonly dispatch: Dispatch<Action>;
 };
-export const TableContext = createContext<tableContext | null>(null);
-export const useTableContext = () => {
-  const ctx = useContext(TableContext);
+export const BankVerificationsTableContext =
+  createContext<bankVerificationTableContext | null>(null);
+export const useBankVerificationsTableContext = () => {
+  const ctx = useContext(BankVerificationsTableContext);
   if (!ctx) {
-    throw new Error("TableContext.Provider not found");
+    throw new Error("BankVerificationsTableContext.Provider not found");
   }
   return ctx;
 };

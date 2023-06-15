@@ -19,6 +19,7 @@ export type TableData = {
 };
 
 export const ColumnLabel = {
+  mid: "MID",
   documentState: "Status",
   documentType: "Type",
   uploadedAt: "Uploaded At",
@@ -28,6 +29,7 @@ export const ColumnLabel = {
 } as const;
 
 export const TableColumns = [
+  "mid",
   "documentState",
   "documentType",
   "uploadedAt",

@@ -1,17 +1,24 @@
 import { useToast } from "@app/core/toast/ToastProvider";
 import { ReviewBankDocumentMutation } from "@app/seller-identity/toolkit/bank-documents/action";
+import { useBankDocumentsTableContext } from "@app/seller-identity/toolkit/bank-documents/context";
 import { TableData } from "@app/seller-identity/toolkit/bank-documents/table";
 import {
-  Box,
   Button,
   ButtonProps,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
 } from "@mui/material";
-import { BankAccountVerificationStatus } from "@schema";
+import {
+  BankAccountDocumentType,
+  BankAccountVerificationStatus,
+} from "@schema";
 import { useState } from "react";
 import { useMutation } from "urql";
 
@@ -34,16 +41,19 @@ const CommentButton: React.FC<Props> = ({
   const [open, setOpen] = useState(false);
   const [, review] = useMutation(ReviewBankDocumentMutation);
   const [comment, setComment] = useState<string>("");
+  const [docType, setDocType] = useState<BankAccountDocumentType | null>(null);
   const toast = useToast();
 
+  const { reexecuteQuery } = useBankDocumentsTableContext();
+
   const onSubmit = async () => {
-    if (mid == null) {
+    if (mid == null || docType == null) {
       return;
     }
     return review({
       input: {
         documentId: row.documentId,
-        documentType: row.documentType,
+        documentType: docType,
         merchantId: mid,
         state: docAction,
         comment: comment,
@@ -60,6 +70,7 @@ const CommentButton: React.FC<Props> = ({
         );
       } else {
         toast.alert("success", `${docAction} action completed successfully`);
+        reexecuteQuery();
       }
       return result;
     });
@@ -75,8 +86,9 @@ const CommentButton: React.FC<Props> = ({
       >
         <DialogTitle>Provide comment</DialogTitle>
         <DialogContent>
-          <Box pt={1}>
+          <FormControl sx={{ mt: 2 }} fullWidth>
             <TextField
+              multiline
               fullWidth
               label="Comment"
               value={comment}
@@ -84,11 +96,40 @@ const CommentButton: React.FC<Props> = ({
                 setComment(event.target.value);
               }}
             />
-          </Box>
+          </FormControl>
+
+          <FormControl sx={{ mt: 2 }} fullWidth>
+            <InputLabel id="document-type-select-label">
+              Document type
+            </InputLabel>
+            <Select
+              labelId="document-type-select-label"
+              fullWidth
+              label={"Document type"}
+              required
+              value={docType ?? undefined}
+              variant="outlined"
+              onChange={(event) =>
+                setDocType(event.target.value as BankAccountDocumentType)
+              }
+            >
+              {(
+                [
+                  "BANK_DOCUMENT",
+                  "GOVERNMENT_DOCUMENT",
+                  "UNIDENTIFIED",
+                ] as const
+              ).map((bankDocType) => (
+                <MenuItem key={bankDocType} value={bankDocType}>
+                  {bankDocType}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button
-            disabled={!mid}
+            disabled={!mid || !docType}
             onClick={() => {
               setOpen(false);
               onSubmit();
