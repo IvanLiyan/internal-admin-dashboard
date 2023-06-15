@@ -26,9 +26,7 @@ const ClaimFilter: React.FC = () => {
         setSelectedOptions(newValue);
         dispatch({ claimStatus: newValue });
       }}
-      renderInput={(params) => (
-        <TextField {...params} label={"Filter by Claim"} />
-      )}
+      renderInput={(params) => <TextField {...params} label={"Claim"} />}
     />
   );
 };

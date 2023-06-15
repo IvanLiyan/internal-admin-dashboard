@@ -35,9 +35,7 @@ const CounterfeitSubreasonFilter: React.FC = () => {
         setSelectedOption(newValue);
         dispatch({ subcategory: newValue });
       }}
-      renderInput={(params) => (
-        <TextField {...params} label={"Filter by Sub Category"} />
-      )}
+      renderInput={(params) => <TextField {...params} label={"Sub Category"} />}
     />
   );
 };

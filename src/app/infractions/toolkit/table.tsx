@@ -158,6 +158,7 @@ export const BulkDisputeQuery = graphql(`
     $searchProofIdTypes: [MerchantWarningProofType!]
     $category: CounterfeitReasonCode
     $subcategory: TaggingViolationSubReasonCode
+    $correspondenceStatus: MerchantWarningCorrespondenceStatus
   ) {
     currentUser {
       id
@@ -174,6 +175,7 @@ export const BulkDisputeQuery = graphql(`
         searchProofIdTypes: $searchProofIdTypes
         category: $category
         subcategory: $subcategory
+        correspondenceStatus: $correspondenceStatus
       )
       merchantWarnings(
         ids: $ids
@@ -189,6 +191,7 @@ export const BulkDisputeQuery = graphql(`
         searchProofIdTypes: $searchProofIdTypes
         category: $category
         subcategory: $subcategory
+        correspondenceStatus: $correspondenceStatus
       ) {
         id
         creatorName
@@ -334,6 +337,7 @@ export const useTableQuery = (state: QueryState) => {
       claimStatus: state.claimStatus,
       category: state.category,
       subcategory: state.subcategory,
+      correspondenceStatus: state.correspondenceStatus,
       ...useSearchVars(state.searchBy, state.search),
     },
     requestPolicy: "cache-and-network",

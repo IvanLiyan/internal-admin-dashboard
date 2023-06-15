@@ -6,6 +6,7 @@ import {
 import {
   CounterfeitReasonCode,
   MerchantWarningClaimStatus,
+  MerchantWarningCorrespondenceStatus,
   MerchantWarningReason,
   MerchantWarningState,
   SortOrderType,
@@ -29,6 +30,7 @@ export const initQueryState = (states: Action): QueryState => {
     claimStatus: null,
     category: null,
     subcategory: null,
+    correspondenceStatus: null,
     ...states,
   };
 };
@@ -49,6 +51,7 @@ export type QueryState = {
   claimStatus: MerchantWarningClaimStatus | null;
   category: CounterfeitReasonCode | null;
   subcategory: TaggingViolationSubReasonCode | null;
+  correspondenceStatus: MerchantWarningCorrespondenceStatus | null;
 };
 
 export type Action =

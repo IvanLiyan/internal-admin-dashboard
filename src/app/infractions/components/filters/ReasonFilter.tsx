@@ -52,9 +52,7 @@ const ReasonFilter: React.FC = () => {
         setSelectedOption(newValue);
         dispatch({ reasons: newValue?.type });
       }}
-      renderInput={(params) => (
-        <TextField {...params} label={"Filter by Reason"} />
-      )}
+      renderInput={(params) => <TextField {...params} label={"Reason"} />}
     />
   );
 };

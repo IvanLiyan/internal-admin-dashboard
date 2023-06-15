@@ -8,6 +8,7 @@ import ClaimButton from "@app/infractions/components/buttons/ClaimButton";
 import ClaimSelectedButton from "@app/infractions/components/buttons/ClaimSelectedButton";
 import DumpSelectedButton from "@app/infractions/components/buttons/DumpSelectedButton";
 import ClaimFilter from "@app/infractions/components/filters/ClaimFilter";
+import CorrespondenceStatusFilter from "@app/infractions/components/filters/CorrespondenceStatusFilter";
 import CounterfeitReasonFilter from "@app/infractions/components/filters/CounterfeitReasonFilter";
 import CounterfeitSubreasonFilter from "@app/infractions/components/filters/CounterfeitSubreasonFilter";
 import DateFilter from "@app/infractions/components/filters/DateFilter";
@@ -124,6 +125,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
               <ReasonFilter />
               <CounterfeitReasonFilter />
               <CounterfeitSubreasonFilter />
+              <CorrespondenceStatusFilter />
             </Stack>
           </Stack>
           {fetching ? (

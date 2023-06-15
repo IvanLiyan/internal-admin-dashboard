@@ -29,7 +29,7 @@ const CounterfeitReasonFilter: React.FC = () => {
         dispatch({ category: newValue });
       }}
       renderInput={(params) => (
-        <TextField {...params} label={"Filter by Parent Category"} />
+        <TextField {...params} label={"Parent Category"} />
       )}
     />
   );
