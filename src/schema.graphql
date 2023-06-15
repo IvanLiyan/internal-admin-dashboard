@@ -5139,13 +5139,15 @@ type MFPCampaignSchema {
   state: MFPCampaignState!
   unqualifiedProductVariations: [MFPUnqualifiedVariationData!]
   discountDetails: [MFPVariationDiscountData!]
+  discountDetailsProductCount: Int
   flashSaleDetails: [MFPVariationDiscountData!]
+  flashSaleDetailsProductCount: Int
   countries: [Country!]
   skipShipping: Boolean!
   event: CampaignEventInfo
   genericUnqualifiedProductVariations: GenericScalar
-  genericDiscountDetails(performanceStartDate: DatetimeInput, performanceEndDate: DatetimeInput): GenericScalar
-  genericFlashSaleDetails(performanceStartDate: DatetimeInput, performanceEndDate: DatetimeInput): GenericScalar
+  genericDiscountDetails(performanceStartDate: DatetimeInput, performanceEndDate: DatetimeInput, offset: Int, limit: Int): GenericScalar
+  genericFlashSaleDetails(performanceStartDate: DatetimeInput, performanceEndDate: DatetimeInput, offset: Int, limit: Int): GenericScalar
 }
 
 enum MFPCampaignSearchType {
@@ -7081,6 +7083,7 @@ type MerchantWarningSchema {
   replies: [MerchantWarningReplySchema!]
   resolved: Boolean!
   bulkProcessing: Boolean
+  urgencyScore: Float
 }
 
 input MerchantWarningSort {
@@ -7092,6 +7095,7 @@ enum MerchantWarningSortFieldType {
   CREATED_TIME
   PRODUCT_GMV_AT_AUDIT
   LAST_UPDATE
+  URGENCY_SCORE
 }
 
 enum MerchantWarningState {
@@ -8690,8 +8694,8 @@ type PolicyPublicSchema {
 type PolicySchema {
   admin: PolicyAdminSchema
   finalSaleCategories(merchantId: ObjectIdType!): [FinalSaleCategorySchema!]
-  merchantWarningCount(merchantId: ObjectIdType, id: ObjectIdType, banned: Boolean, fined: Boolean, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], isMisleading: Boolean, disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!], category: CounterfeitReasonCode, subcategory: TaggingViolationSubReasonCode): Int
-  merchantWarnings(offset: Int = 0, limit: Int, merchantId: ObjectIdType, id: ObjectIdType, banned: Boolean, fined: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, sort: MerchantWarningSort, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!], category: CounterfeitReasonCode, subcategory: TaggingViolationSubReasonCode): [MerchantWarningSchema!]
+  merchantWarningCount(merchantId: ObjectIdType, id: ObjectIdType, ids: [ObjectIdType!], banned: Boolean, fined: Boolean, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], isMisleading: Boolean, disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!], category: CounterfeitReasonCode, subcategory: TaggingViolationSubReasonCode, correspondenceStatus: MerchantWarningCorrespondenceStatus): Int
+  merchantWarnings(offset: Int = 0, limit: Int, merchantId: ObjectIdType, id: ObjectIdType, ids: [ObjectIdType!], banned: Boolean, fined: Boolean, auditStatuses: [MerchantWarningAuditStatus!], claimStatus: MerchantWarningClaimStatus, sort: MerchantWarningSort, reasons: [MerchantWarningReason!], states: [MerchantWarningState!], disputePendingEditReview: Boolean, disputePendingBrandAuth: Boolean, searchProofIdTypes: [MerchantWarningProofType!], detailedReasons: [DetailedMerchantWarningReason!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput, wssImpact: [WSSImpactState!], category: CounterfeitReasonCode, subcategory: TaggingViolationSubReasonCode, correspondenceStatus: MerchantWarningCorrespondenceStatus): [MerchantWarningSchema!]
   merchantWarning(id: ObjectIdType): MerchantWarningSchema
   detailedWarningReasons(reasons: [MerchantWarningReason!], states: [MerchantWarningState!], id: ObjectIdType, searchProofIdTypes: [MerchantWarningProofType!], issueDateStart: DatetimeInput, issueDateEnd: DatetimeInput): [DetailedMerchantWarningReasonSchema!]
   merchantWarningReasons: [MerchantWarningReasonSchema!]

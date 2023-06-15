@@ -19,7 +19,7 @@ interface SearchboxProps<T extends string> {
 }
 
 const Searchbox = <T extends string>(
-  props: TextFieldProps & Omit<SearchboxProps<T>, "onChange" | "onInput">
+  props: TextFieldProps & SearchboxProps<T>
 ) => {
   const { onConfirm, searchBy, ...remainingProps } = props;
   const [searchText, setSearchText] = useState("");
@@ -30,14 +30,14 @@ const Searchbox = <T extends string>(
   return (
     <TextField
       value={searchText}
-      {...remainingProps}
-      onKeyDown={(event) => {
+      onKeyUp={(event) => {
         if (event.key === "Enter") {
           onConfirm(searchText);
         }
       }}
+      onBlur={() => onConfirm(searchText)}
       onChange={(event) => {
-        setSearchText(event.target.value);
+        setSearchText(event.target.value.trim());
       }}
       InputProps={{
         startAdornment: (
@@ -75,6 +75,7 @@ const Searchbox = <T extends string>(
           </InputAdornment>
         ),
       }}
+      {...remainingProps}
     />
   );
 };

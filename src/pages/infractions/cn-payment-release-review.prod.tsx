@@ -75,6 +75,8 @@ const USPaymentReleaseReviewPage: NextPage<Record<string, never>> = () => {
               alignItems="center"
             >
               <Searchbox
+                multiline
+                maxRows={5}
                 onConfirm={(token) => {
                   dispatch({ search: token });
                 }}

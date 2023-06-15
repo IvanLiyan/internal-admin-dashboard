@@ -53,6 +53,8 @@ const BulkProcessStatusPage: NextPage<Record<string, never>> = () => {
             alignItems="center"
           >
             <Searchbox
+              multiline
+              maxRows={5}
               onConfirm={(token) => {
                 setSearch(token);
               }}

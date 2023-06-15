@@ -146,6 +146,7 @@ export const RequiresReviewTableColumns = [
 export const BulkDisputeQuery = graphql(`
   query Disputes_GetInfractions(
     $id: ObjectIdType
+    $ids: [ObjectIdType!]
     $offset: Int
     $limit: Int
     $states: [MerchantWarningState!]
@@ -163,6 +164,7 @@ export const BulkDisputeQuery = graphql(`
     }
     policy {
       merchantWarningCount(
+        ids: $ids
         id: $id
         states: $states
         claimStatus: $claimStatus
@@ -174,6 +176,7 @@ export const BulkDisputeQuery = graphql(`
         subcategory: $subcategory
       )
       merchantWarnings(
+        ids: $ids
         id: $id
         offset: $offset
         limit: $limit
@@ -300,7 +303,7 @@ const useSearchVars = <T extends SearchTypes>(
   switch (searchBy) {
     case "ID":
       return {
-        id: query,
+        ids: query.split(",").map((token) => token.trim()),
         searchProofIdTypes: ["MERCHANT", "PRODUCT", "ORDER"],
       };
   }
