@@ -50,7 +50,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
 
   const [queryState, dispatch] = useReducer(
     queryStateReducer,
-    { order: "ASC", orderBy: "lastUpdated", states: ["AWAITING_ADMIN"] },
+    { order: "DESC", orderBy: "urgencyScore", states: ["AWAITING_ADMIN"] },
     initQueryState
   );
   const [{ data, fetching }, reexecuteQuery] = useTableQuery(queryState);
@@ -135,7 +135,7 @@ const ActionRequiredPage: NextPage<Record<string, never>> = () => {
               <Table>
                 <TableHeading
                   columns={ActionRequiredTableColumns}
-                  sortableColumns={["created", "lastUpdated"]}
+                  sortableColumns={["created", "lastUpdated", "urgencyScore"]}
                 />
                 <TableBody>
                   {tableData?.map((row) => {
