@@ -293,7 +293,8 @@ export const useTableData = (
         correspondenceStatus: i.correspondenceStatus ?? "N/A",
         claimed: i.claimedBy?.id == data.currentUser?.id,
         bulkStatus: !!i.bulkProcessing,
-        urgencyScore: i.urgencyScore == null ? "N/A": (i.urgencyScore * 100).toFixed(2) ,
+        urgencyScore:
+          i.urgencyScore == null ? "N/A" : (i.urgencyScore * 100).toFixed(2),
       };
     }) || []
   );
