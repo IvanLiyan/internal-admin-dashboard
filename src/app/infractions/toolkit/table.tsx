@@ -38,6 +38,7 @@ export const ColumnLabel = {
   wssTier: "WSS Tier",
   wssImpact: "WSS Impact",
   correspondenceStatus: "Correspondence Status",
+  urgencyScore: "Urgency Score",
 } as const;
 
 const OrderBy: {
@@ -45,12 +46,14 @@ const OrderBy: {
 } = {
   created: "CREATED_TIME",
   lastUpdated: "LAST_UPDATE",
+  urgencyScore: "URGENCY_SCORE",
 };
 
 export const ActionRequiredTableColumns = [
   "created",
   "creator",
   "lastUpdated",
+  "urgencyScore",
   "merchantName",
   "merchantId",
   "infractionId",
@@ -200,6 +203,7 @@ export const BulkDisputeQuery = graphql(`
         banned
         correspondenceStatus
         wssImpact
+        urgencyScore
         bulkProcessing
         productTrueTagInfo {
           subreason {
@@ -289,6 +293,8 @@ export const useTableData = (
         correspondenceStatus: i.correspondenceStatus ?? "N/A",
         claimed: i.claimedBy?.id == data.currentUser?.id,
         bulkStatus: !!i.bulkProcessing,
+        urgencyScore:
+          i.urgencyScore == null ? "N/A" : (i.urgencyScore * 100).toFixed(2),
       };
     }) || []
   );
