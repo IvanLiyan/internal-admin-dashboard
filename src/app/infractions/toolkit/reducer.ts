@@ -31,6 +31,8 @@ export const initQueryState = (states: Action): QueryState => {
     category: null,
     subcategory: null,
     correspondenceStatus: null,
+    disputePendingEditReview: false,
+    disputePendingBrandAuth: false,
     ...states,
   };
 };
@@ -52,6 +54,8 @@ export type QueryState = {
   category: CounterfeitReasonCode | null;
   subcategory: TaggingViolationSubReasonCode | null;
   correspondenceStatus: MerchantWarningCorrespondenceStatus | null;
+  disputePendingEditReview: boolean | null;
+  disputePendingBrandAuth: boolean | null;
 };
 
 export type Action =
