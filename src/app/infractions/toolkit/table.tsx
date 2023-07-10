@@ -162,6 +162,8 @@ export const BulkDisputeQuery = graphql(`
     $category: CounterfeitReasonCode
     $subcategory: TaggingViolationSubReasonCode
     $correspondenceStatus: MerchantWarningCorrespondenceStatus
+    $disputePendingEditReview: Boolean
+    $disputePendingBrandAuth: Boolean
   ) {
     currentUser {
       id
@@ -179,6 +181,8 @@ export const BulkDisputeQuery = graphql(`
         category: $category
         subcategory: $subcategory
         correspondenceStatus: $correspondenceStatus
+        disputePendingEditReview: $disputePendingEditReview
+        disputePendingBrandAuth: $disputePendingBrandAuth
       )
       merchantWarnings(
         ids: $ids
@@ -195,6 +199,8 @@ export const BulkDisputeQuery = graphql(`
         category: $category
         subcategory: $subcategory
         correspondenceStatus: $correspondenceStatus
+        disputePendingEditReview: $disputePendingEditReview
+        disputePendingBrandAuth: $disputePendingBrandAuth
       ) {
         id
         creatorName
@@ -344,6 +350,8 @@ export const useTableQuery = (state: QueryState) => {
       category: state.category,
       subcategory: state.subcategory,
       correspondenceStatus: state.correspondenceStatus,
+      disputePendingEditReview: state.disputePendingEditReview,
+      disputePendingBrandAuth: state.disputePendingBrandAuth,
       ...useSearchVars(state.searchBy, state.search),
     },
     requestPolicy: "cache-and-network",
