@@ -22,7 +22,12 @@ const client = createClient({
   },
 });
 
-const independentSubpaths = ["/dev-login", "/go", "/login"];
+const independentSubpaths = [
+  "/dev-login",
+  "/go",
+  "/login",
+  "/notice-portal/intake",
+];
 
 export default function App({ Component, pageProps, router }: AppProps) {
   if (independentSubpaths.some((path) => router.pathname.includes(path))) {
