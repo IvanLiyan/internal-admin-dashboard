@@ -85,7 +85,7 @@ const FileInput: React.FC<FileInputProps> = ({
   attachments = [],
 }) => {
   const toast = useToast();
-  const [uploadFileResult, uploadFile] = useMutation(InitiateUpload);
+  const [_, uploadFile] = useMutation(InitiateUpload);
   const [internalAttachments, setInternalAttachments] = useState<
     AttachmentInfo[]
   >([...attachments]);
@@ -113,7 +113,6 @@ const FileInput: React.FC<FileInputProps> = ({
   };
 
   const onUploadFiles = async (acceptedFiles: ReadonlyArray<File>) => {
-    console.log(acceptedFiles);
     const totalAttachments = acceptedFiles.length + internalAttachments.length;
     if (maxAttachments && totalAttachments > maxAttachments) {
       toast.alert(
@@ -143,7 +142,6 @@ const FileInput: React.FC<FileInputProps> = ({
         toast.alert("error", "Could not read the file you uploaded");
         return;
       }
-
       newPendingAttachments.push(newPendingAttachment);
       setPendingAttachments(newPendingAttachments);
 
@@ -162,23 +160,34 @@ const FileInput: React.FC<FileInputProps> = ({
       });
 
       const downloadUrl = response?.downloadUrl;
+      console.log(downloadUrl);
       if (downloadUrl == null || response?.ok == false) {
+        newPendingAttachments = newPendingAttachments.filter(
+          (i) => i.id !== newPendingAttachment.id
+        );
         removePendingAttachment(newPendingAttachment);
         return;
       }
+
       runInAction(() => {
-        newAttachments.push({
-          id: `${new Date().getTime()}`,
-          ext: ext,
-          url: downloadUrl || "",
-          fileName: file.name,
-          file: file,
-          serverParams: {
+        newAttachments = [
+          ...newAttachments,
+          {
+            id: `${new Date().getTime()}`,
+            ext: ext,
             url: downloadUrl || "",
-            original_filename: file.name,
+            fileName: file.name,
+            file: file,
+            serverParams: {
+              url: downloadUrl || "",
+              original_filename: file.name,
+            },
           },
-        });
+        ];
         onAttachmentsChanged(newAttachments);
+        newPendingAttachments = newPendingAttachments.filter(
+          (i) => i.id !== newPendingAttachment.id
+        );
         removePendingAttachment(newPendingAttachment);
       });
     }
@@ -190,7 +199,7 @@ const FileInput: React.FC<FileInputProps> = ({
   ): Promise<
     Pick<InitiateUploadMutation, "ok" | "message" | "downloadUrl">
   > => {
-    console.log(input);
+    const uploadFileResult = await uploadFile({ input });
 
     if (uploadFileResult.data == null || uploadFileResult.error) {
       return {
@@ -205,7 +214,6 @@ const FileInput: React.FC<FileInputProps> = ({
         initiateUpload: { ok, message, uploadUrl, uploadHeaders, downloadUrl },
       },
     } = uploadFileResult.data;
-    console.log(uploadFileResult.data);
 
     if (
       !ok ||
