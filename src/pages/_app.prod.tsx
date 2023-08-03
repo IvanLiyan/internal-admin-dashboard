@@ -30,13 +30,6 @@ const independentSubpaths = [
 ];
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  if (independentSubpaths.some((path) => router.pathname.includes(path))) {
-    return (
-      <Provider value={client}>
-        <Component {...pageProps} />
-      </Provider>
-    );
-  }
   const theme = createTheme({
     typography: {
       fontFamily: "Proxima",
@@ -46,6 +39,18 @@ export default function App({ Component, pageProps, router }: AppProps) {
       fontWeightBold: 700,
     },
   });
+
+  if (independentSubpaths.some((path) => router.pathname.includes(path))) {
+    return (
+      <Provider value={client}>
+        <ThemeProvider theme={theme}>
+          <ToastProvider>
+            <Component {...pageProps} />
+          </ToastProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+  }
 
   return (
     <Provider value={client}>

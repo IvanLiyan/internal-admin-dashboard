@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { Box, Typography } from "@mui/material";
-import PublicPageLayout from "@app/notice-portal/components/PublicPageLayout.prod";
-import NoticeIntakeForm from "@app/notice-portal/components/intake/NoticeIntakeForm.prod";
+import PublicPageLayout from "@app/notice-portal/components/PublicPageLayout";
+import NoticeIntakeForm from "@app/notice-portal/components/intake/NoticeIntakeForm";
 
 const NoticeIntakePage: NextPage<Record<string, never>> = () => {
   return (

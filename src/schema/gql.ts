@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  query AuthQuery {\n    currentUser {\n      id\n      roles {\n        id\n      }\n    }\n  }\n": types.AuthQueryDocument,
+    "\n  mutation Toolkit_InitialUpload($input: InitiateUploadInput!) {\n    uploads {\n      initiateUpload(input: $input) {\n        ok\n        message\n        uploadUrl\n        uploadHeaders\n        downloadUrl\n      }\n    }\n  }\n": types.Toolkit_InitialUploadDocument,
     "\n  mutation Disputes_BulkAction($input: BulkUpsertMerchantWarningInput) {\n    policy {\n      bulkUpsertMerchantWarning(input: $input) {\n        ok\n        message\n      }\n    }\n  }\n": types.Disputes_BulkActionDocument,
     "\n  mutation Dispute_Action($input: UpsertMerchantWarningInput) {\n    policy {\n      merchantWarning {\n        upsertMerchantWarning(input: $input) {\n          ok\n          message\n        }\n      }\n    }\n  }\n": types.Dispute_ActionDocument,
     "\n  query Disputes_BulkStatus(\n    $offset: Int\n    $limit: Int\n    $search: String\n    $types: [BulkMerchantWarningAction!]\n  ) {\n    policy {\n      merchantWarningBulkProcessCount(search: $search, types: $types)\n      merchantWarningBulkProcesses(\n        offset: $offset\n        limit: $limit\n        search: $search\n        types: $types\n      ) {\n        id\n        submitted {\n          unix\n        }\n        type\n        requestedBy\n        requestedWarningIds\n        results {\n          warningId\n          success\n          error\n        }\n      }\n    }\n  }\n": types.Disputes_BulkStatusDocument,
@@ -44,6 +45,10 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query AuthQuery {\n    currentUser {\n      id\n      roles {\n        id\n      }\n    }\n  }\n"): (typeof documents)["\n  query AuthQuery {\n    currentUser {\n      id\n      roles {\n        id\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation Toolkit_InitialUpload($input: InitiateUploadInput!) {\n    uploads {\n      initiateUpload(input: $input) {\n        ok\n        message\n        uploadUrl\n        uploadHeaders\n        downloadUrl\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Toolkit_InitialUpload($input: InitiateUploadInput!) {\n    uploads {\n      initiateUpload(input: $input) {\n        ok\n        message\n        uploadUrl\n        uploadHeaders\n        downloadUrl\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -9,8 +9,12 @@ import {
   FormGroup,
   FormGroupProps,
 } from "@mui/material";
+import FileInput, {
+  AttachmentInfo,
+  FileInputProps,
+} from "@app/core/components/FileInput";
 
-const NoticeIntakeForm = () => {
+const NoticeIntakeForm: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [wishUrls, setWishUrls] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -21,6 +25,12 @@ const NoticeIntakeForm = () => {
     sx: {
       mb: 3,
     },
+  };
+
+  const fileInputProps: FileInputProps = {
+    maxSizeMB: 1000,
+    bucket: "TEMP_UPLOADS_V2",
+    onUpload: (files: ReadonlyArray<AttachmentInfo>) => console.log(files),
   };
 
   return (
@@ -85,6 +95,7 @@ const NoticeIntakeForm = () => {
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           You can upload up to 5 supporting documents
         </Typography>
+        <FileInput {...fileInputProps} />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
         <FormControlLabel
