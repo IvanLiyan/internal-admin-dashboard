@@ -1,6 +1,7 @@
 import AuthProvider from "@app/core/auth/AuthProvider";
 import ToastProvider from "@app/core/toast/ToastProvider";
 import { NavigationBar } from "@app/navigation/NavigationBar";
+import { PublicNavigationBar } from "@app/navigation/PublicNavigationBar";
 import { Container, ThemeProvider, createTheme } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -45,7 +46,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
       <Provider value={client}>
         <ThemeProvider theme={theme}>
           <ToastProvider>
-            <Component {...pageProps} />
+            <PublicNavigationBar />
+            <Container maxWidth={false} sx={{ mt: 2 }}>
+              <Component {...pageProps} />
+            </Container>
           </ToastProvider>
         </ThemeProvider>
       </Provider>

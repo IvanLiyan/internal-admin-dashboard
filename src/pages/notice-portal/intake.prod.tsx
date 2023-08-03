@@ -10,10 +10,11 @@ const NoticeIntakePage: NextPage<Record<string, never>> = () => {
           Report Illegal Content
         </Typography>
         <Typography>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Error
-          maiores laborum odit porro delectus sequi voluptas nam, ipsam nulla
-          dicta maxime quis qui, neque molestiae dolorem quidem quas dolorum
-          commodi.
+          Fill out the report below to notify Wish of any type of illegal
+          product listings on the platform. Our admins will review your notice
+          and take appriopriate action against each notified product. You will
+          recieve email commuincation to keep you updated with the progress of
+          your notice.
         </Typography>
       </Box>
       <NoticeIntakeForm />
