@@ -1,11 +1,10 @@
 import { NextPage } from "next";
-import { Box, Typography } from "@mui/material";
-import PublicPageLayout from "@app/notice-portal/components/PublicPageLayout";
+import { Box, Container, Typography } from "@mui/material";
 import NoticeIntakeForm from "@app/notice-portal/components/intake/NoticeIntakeForm";
 
 const NoticeIntakePage: NextPage<Record<string, never>> = () => {
   return (
-    <PublicPageLayout>
+    <Container sx={{ mt: 5, pb: 5 }}>
       <Box sx={{ mb: 5 }}>
         <Typography variant="h3" sx={{ fontWeight: "fontWeightBold" }}>
           Report Illegal Content
@@ -18,7 +17,7 @@ const NoticeIntakePage: NextPage<Record<string, never>> = () => {
         </Typography>
       </Box>
       <NoticeIntakeForm />
-    </PublicPageLayout>
+    </Container>
   );
 };
 

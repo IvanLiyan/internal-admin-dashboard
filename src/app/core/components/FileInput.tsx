@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { observer } from "mobx-react";
 import { runInAction } from "mobx";
 import { MouseEventHandler, useState } from "react";
@@ -7,7 +8,6 @@ import Dropzone, { DropzoneState } from "react-dropzone";
 import {
   Box,
   Button,
-  Container,
   IconButton,
   Paper,
   Stack,
@@ -58,8 +58,8 @@ export type AttachmentInfo = {
   readonly id: string;
   readonly url: string;
   readonly file: File;
+  readonly fileName: string;
   readonly ext?: string | null | undefined;
-  readonly fileName?: string;
   readonly serverParams?: AttachmentServerParams;
 };
 
@@ -73,8 +73,8 @@ export type FileInputProps = {
   readonly maxSizeMB: number;
   readonly bucket: ClientWritableBucket;
   readonly onUpload: (files: ReadonlyArray<AttachmentInfo>) => unknown;
+  readonly attachments: ReadonlyArray<AttachmentInfo>;
   readonly maxAttachments?: number;
-  readonly attachments?: ReadonlyArray<AttachmentInfo>;
 };
 
 const FileInput: React.FC<FileInputProps> = ({
@@ -82,15 +82,12 @@ const FileInput: React.FC<FileInputProps> = ({
   bucket,
   onUpload,
   maxAttachments,
-  attachments = [],
+  attachments,
 }) => {
   const toast = useToast();
-  const [_, uploadFile] = useMutation(InitiateUpload);
-  const [internalAttachments, setInternalAttachments] = useState<
-    AttachmentInfo[]
-  >([...attachments]);
+  const [, uploadFile] = useMutation(InitiateUpload);
   const [pendingAttachments, setPendingAttachments] = useState<
-    PendingAttachment[]
+    ReadonlyArray<PendingAttachment>
   >([]);
 
   const removePendingAttachment = (pendingAttachment: PendingAttachment) => {
@@ -101,19 +98,18 @@ const FileInput: React.FC<FileInputProps> = ({
 
   const removeInternalAttachment = (internalAttachment: AttachmentInfo) => {
     onAttachmentsChanged(
-      internalAttachments.filter((a) => a.id !== internalAttachment.id)
+      attachments.filter((a) => a.id !== internalAttachment.id)
     );
   };
 
   const onAttachmentsChanged = (
     newAttachments: ReadonlyArray<AttachmentInfo>
   ) => {
-    setInternalAttachments([...newAttachments]);
     onUpload(newAttachments);
   };
 
   const onUploadFiles = async (acceptedFiles: ReadonlyArray<File>) => {
-    const totalAttachments = acceptedFiles.length + internalAttachments.length;
+    const totalAttachments = acceptedFiles.length + attachments.length;
     if (maxAttachments && totalAttachments > maxAttachments) {
       toast.alert(
         "error",
@@ -122,7 +118,7 @@ const FileInput: React.FC<FileInputProps> = ({
       return;
     }
 
-    let newAttachments = [...internalAttachments];
+    let newAttachments = [...attachments];
     let newPendingAttachments = [...pendingAttachments];
     for (const file of acceptedFiles) {
       const ext = file.name.split(".").pop()?.toLowerCase();
@@ -160,7 +156,6 @@ const FileInput: React.FC<FileInputProps> = ({
       });
 
       const downloadUrl = response?.downloadUrl;
-      console.log(downloadUrl);
       if (downloadUrl == null || response?.ok == false) {
         newPendingAttachments = newPendingAttachments.filter(
           (i) => i.id !== newPendingAttachment.id
@@ -267,7 +262,7 @@ const FileInput: React.FC<FileInputProps> = ({
   };
 
   const renderAttachments = () => {
-    if (internalAttachments.length == 0 && pendingAttachments.length == 0) {
+    if (attachments.length == 0 && pendingAttachments.length == 0) {
       return;
     }
     return (
@@ -281,11 +276,12 @@ const FileInput: React.FC<FileInputProps> = ({
           flexDirection: "row",
           alignItems: "center",
           mt: 2,
+          p: 2,
+          borderRadius: "5px",
+          backgroundColor: "grey.200",
         }}
       >
-        {internalAttachments.map((attachment) =>
-          renderInternalAttachment(attachment)
-        )}
+        {attachments.map((attachment) => renderInternalAttachment(attachment))}
         {pendingAttachments.map((pendingAttachment) =>
           renderPendingAttachment(pendingAttachment)
         )}
@@ -301,12 +297,12 @@ const FileInput: React.FC<FileInputProps> = ({
     isPending = false
   ) => {
     return (
-      <Box sx={{ width: 200, height: 200 }} key={key}>
+      <Box sx={{ width: 200, height: 175 }} key={key}>
         <Paper
           variant="outlined"
           sx={{
             width: "100%",
-            height: "75%",
+            height: "80%",
             position: "relative",
             display: "flex",
             justifyContent: "center",
@@ -316,7 +312,7 @@ const FileInput: React.FC<FileInputProps> = ({
           {isPending || url == null ? (
             <InsertDriveFile fontSize="medium" />
           ) : (
-            <img src={url} alt={fileName} draggable={false} />
+            <Image src={url} alt={fileName} draggable={false} />
           )}
           <IconButton
             sx={{
@@ -332,7 +328,7 @@ const FileInput: React.FC<FileInputProps> = ({
             <Delete fontSize="small" />
           </IconButton>
         </Paper>
-        <Typography sx={{ width: 200 }} variant="caption">
+        <Typography sx={{ width: 200, height: "20%" }} variant="caption">
           {fileName}
         </Typography>
       </Box>
@@ -362,7 +358,7 @@ const FileInput: React.FC<FileInputProps> = ({
   return (
     <Box>
       <Dropzone
-        maxSize={maxSizeMB * 1000}
+        maxSize={maxSizeMB * 1000000}
         maxFiles={maxAttachments || 0}
         onDropAccepted={onUploadFiles}
       >

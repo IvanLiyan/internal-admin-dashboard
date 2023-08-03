@@ -1,4 +1,11 @@
 import { useState } from "react";
+import { gql, useMutation } from "urql";
+import {
+  PublicDsaMutationsCreateNoticeArgs,
+  CreateNotice,
+  DsaMutations,
+  PublicDsaMutations,
+} from "@schema";
 import {
   Box,
   Button,
@@ -13,13 +20,41 @@ import FileInput, {
   AttachmentInfo,
   FileInputProps,
 } from "@app/core/components/FileInput";
+import { useToast } from "@app/core/toast/ToastProvider";
+
+type CreateNoticeResponse = {
+  readonly dsa: Pick<DsaMutations, "public"> & {
+    readonly public: Pick<PublicDsaMutations, "createNotice"> & {
+      readonly createNotice: CreateNotice;
+    };
+  };
+};
+
+const CreateNotice = gql<
+  CreateNoticeResponse,
+  PublicDsaMutationsCreateNoticeArgs
+>`
+  mutation NoticePortal_CreateNotice($input: CreateNoticeInput!) {
+    dsa {
+      public {
+        createNotice(input: $input) {
+          ok
+          message
+        }
+      }
+    }
+  }
+`;
 
 const NoticeIntakeForm: React.FC = () => {
+  const toast = useToast();
   const [description, setDescription] = useState<string>("");
-  const [wishUrls, setWishUrls] = useState<string>("");
+  const [wishUrls, setWishUrls] = useState<string[]>([]);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [checked, setChecked] = useState<boolean>(false);
+  const [files, setFiles] = useState<ReadonlyArray<AttachmentInfo>>([]);
+  const [, createNotice] = useMutation(CreateNotice);
 
   const baseFormGroupProps: FormGroupProps = {
     sx: {
@@ -29,8 +64,62 @@ const NoticeIntakeForm: React.FC = () => {
 
   const fileInputProps: FileInputProps = {
     maxSizeMB: 1000,
+    maxAttachments: 2,
     bucket: "TEMP_UPLOADS_V2",
-    onUpload: (files: ReadonlyArray<AttachmentInfo>) => console.log(files),
+    attachments: files,
+    onUpload: setFiles,
+  };
+
+  const resetForm = () => {
+    setDescription("");
+    setWishUrls([]);
+    setName("");
+    setEmail("");
+    setChecked(false);
+    setFiles([]);
+  };
+
+  const canSubmit = () => {
+    return description && wishUrls.length && name && email && checked;
+  };
+
+  const onSubmit = async () => {
+    const inputArgs: PublicDsaMutationsCreateNoticeArgs = {
+      input: {
+        description: description,
+        notifierEmail: email,
+        notifierName: name,
+        productIds: wishUrls.map((url) => url.trim().split("/").pop() || ""),
+        supportFiles: files.map((file) => {
+          return {
+            fileName: file.fileName,
+            url: file.url,
+          };
+        }),
+      },
+    };
+
+    const { data, error } = await createNotice(inputArgs);
+    if (error || data == null) {
+      toast.alert("error", "Something went wrong");
+      return;
+    }
+
+    const {
+      dsa: {
+        public: {
+          createNotice: { ok, message },
+        },
+      },
+    } = data;
+
+    if (!ok) {
+      toast.alert("error", message);
+      return;
+    }
+
+    toast.alert("success", "Notice created successfully");
+    resetForm();
   };
 
   return (
@@ -53,7 +142,7 @@ const NoticeIntakeForm: React.FC = () => {
       <FormGroup {...baseFormGroupProps}>
         <Typography>Wish URLs*</Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Add the Wish URLs you're reporting. Separate multiple URLs with
+          Add the Wish URLs you&apos;re reporting. Separate multiple URLs with
           newlines
         </Typography>
         <TextField
@@ -62,8 +151,8 @@ const NoticeIntakeForm: React.FC = () => {
           required
           placeholder="URLs"
           rows={4}
-          value={wishUrls}
-          onChange={(e) => setWishUrls(e.target.value)}
+          value={wishUrls.join("\n")}
+          onChange={(e) => setWishUrls(e.target.value.split("\n"))}
         />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
@@ -112,6 +201,8 @@ const NoticeIntakeForm: React.FC = () => {
         disableRipple
         disableElevation
         sx={{ borderRadius: 10, textTransform: "capitalize" }}
+        disabled={!canSubmit()}
+        onClick={onSubmit}
       >
         Submit
       </Button>
