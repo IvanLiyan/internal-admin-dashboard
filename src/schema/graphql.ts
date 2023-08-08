@@ -626,7 +626,7 @@ export type AttributeFieldTagResultSchema = {
 export type AttributeInput = {
   id?: InputMaybe<Scalars['Int']>;
   name?: InputMaybe<Scalars['String']>;
-  value: Array<AttributeValueInput>;
+  value?: InputMaybe<Array<AttributeValueInput>>;
 };
 
 export type AttributeLevel =
@@ -1684,6 +1684,8 @@ export type BusinessDocTypes =
   | 'RECENT_BUSINESS_RETURNS'
   | 'SHARE_ALLOCATION_CERTIFICATE'
   | 'TAX_FORM'
+  | 'TAX_FORM_W_8'
+  | 'TAX_FORM_W_9'
   | 'UTILITY_BILL_STATEMENT';
 
 export type BuyerFraudReasonCategory =
@@ -2056,6 +2058,16 @@ export type ChangeLocaleInput = {
   locale: Locale;
 };
 
+export type ChangeMftOptOutInput = {
+  isOptedOut: Scalars['Boolean'];
+};
+
+export type ChangeMftOptOutMutation = {
+  __typename?: 'ChangeMFTOptOutMutation';
+  error?: Maybe<Scalars['String']>;
+  ok?: Maybe<Scalars['String']>;
+};
+
 export type ChangePasswordInput = {
   curPassword?: InputMaybe<Scalars['String']>;
   newPassword?: InputMaybe<Scalars['String']>;
@@ -2271,6 +2283,16 @@ export type ClaimInfractionInput = {
   warningIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
 };
 
+export type ClaimNotices = {
+  __typename?: 'ClaimNotices';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type ClaimNoticesInput = {
+  noticeIds: Array<Scalars['ObjectIdType']>;
+};
+
 export type ClearAllUiState = {
   __typename?: 'ClearAllUIState';
   message?: Maybe<Scalars['String']>;
@@ -2432,6 +2454,28 @@ export type CommerceTransactionTaxRemitType =
   | 'NO_REMIT'
   | 'TBD_REMIT'
   | 'WISH_REMIT';
+
+export type CompleteDisputeReview = {
+  __typename?: 'CompleteDisputeReview';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type CompleteDisputeReviewInput = {
+  disputeReviewResponse: Scalars['String'];
+  noticeId: Scalars['ObjectIdType'];
+};
+
+export type CompleteNoticeReview = {
+  __typename?: 'CompleteNoticeReview';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type CompleteNoticeReviewInput = {
+  noticeId: Scalars['ObjectIdType'];
+  reviewResponse: Scalars['String'];
+};
 
 export type ConfirmedDeliveryCarriers = {
   __typename?: 'ConfirmedDeliveryCarriers';
@@ -2973,6 +3017,35 @@ export type CreateLqdCampaign = {
   ok: Scalars['Boolean'];
 };
 
+export type CreateNotice = {
+  __typename?: 'CreateNotice';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type CreateNoticeInput = {
+  description: Scalars['String'];
+  notifierEmail: Scalars['String'];
+  notifierName: Scalars['String'];
+  productIds: Array<Scalars['ObjectIdType']>;
+  supportFiles?: InputMaybe<Array<FileInput>>;
+};
+
+export type CreateNotifier = {
+  __typename?: 'CreateNotifier';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type CreateNotifierInput = {
+  countryCodes: Array<CountryCode>;
+  email: Scalars['String'];
+  isTrustedFlagger?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['String']>;
+  notifierType: NotifierType;
+  organization: Scalars['String'];
+};
+
 export type CreateProductTaxonomyCategoryDispute = {
   __typename?: 'CreateProductTaxonomyCategoryDispute';
   ok: Scalars['Boolean'];
@@ -3405,6 +3478,99 @@ export type CustomerSupportTicketType =
   | 'POST_CUSTOMER_SUPPORT'
   | 'PRE_PURCHASE';
 
+export type DsaCannedResponseSchema = {
+  __typename?: 'DSACannedResponseSchema';
+  content: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type DsaHub = {
+  __typename?: 'DSAHub';
+  notice?: Maybe<NoticeSchema>;
+  noticeCount: Scalars['Int'];
+  notices: Array<NoticeSchema>;
+  notifierCount: Scalars['Int'];
+  notifierOrganizations: Array<Scalars['String']>;
+  notifiers: Array<NotifierSchema>;
+  reviewCannedResponses: Array<DsaCannedResponseSchema>;
+};
+
+
+export type DsaHubNoticeArgs = {
+  noticeId: Scalars['ObjectIdType'];
+};
+
+
+export type DsaHubNoticeCountArgs = {
+  queryInput: NoticeQueryInput;
+};
+
+
+export type DsaHubNoticesArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
+  queryInput: NoticeQueryInput;
+};
+
+
+export type DsaHubNotifierCountArgs = {
+  queryInput: NotifierQueryInput;
+};
+
+
+export type DsaHubNotifiersArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
+  queryInput: NotifierQueryInput;
+};
+
+export type DsaMutations = {
+  __typename?: 'DSAMutations';
+  claimNotices?: Maybe<ClaimNotices>;
+  completeDisputeReview?: Maybe<CompleteDisputeReview>;
+  completeNoticeReview?: Maybe<CompleteNoticeReview>;
+  createNotifier?: Maybe<CreateNotifier>;
+  public?: Maybe<PublicDsaMutations>;
+  removeNotifier?: Maybe<RemoveNotifier>;
+  unclaimNotices?: Maybe<UnclaimNotices>;
+  updateNotifier?: Maybe<UpdateNotifier>;
+};
+
+
+export type DsaMutationsClaimNoticesArgs = {
+  input: ClaimNoticesInput;
+};
+
+
+export type DsaMutationsCompleteDisputeReviewArgs = {
+  input: CompleteDisputeReviewInput;
+};
+
+
+export type DsaMutationsCompleteNoticeReviewArgs = {
+  input: CompleteNoticeReviewInput;
+};
+
+
+export type DsaMutationsCreateNotifierArgs = {
+  input: CreateNotifierInput;
+};
+
+
+export type DsaMutationsRemoveNotifierArgs = {
+  input: RemoveNotifierInput;
+};
+
+
+export type DsaMutationsUnclaimNoticesArgs = {
+  input: UnclaimNoticesInput;
+};
+
+
+export type DsaMutationsUpdateNotifierArgs = {
+  input: UpdateNotifierInput;
+};
+
 export type Datetime = {
   __typename?: 'Datetime';
   datetime: Scalars['String'];
@@ -3455,6 +3621,8 @@ export type DedupImageLibraryHub = {
 
 export type DedupImageLibraryHubImageCountArgs = {
   imageType: DedupImageType;
+  inappropriateReasons?: InputMaybe<Array<CounterfeitReasonCode>>;
+  inappropriateSubcategories?: InputMaybe<Array<TaggingViolationSubReasonCode>>;
   lastUpdateTimeEnd?: InputMaybe<DatetimeInput>;
   lastUpdateTimeStart?: InputMaybe<DatetimeInput>;
   query?: InputMaybe<Scalars['String']>;
@@ -3463,6 +3631,8 @@ export type DedupImageLibraryHubImageCountArgs = {
 
 export type DedupImageLibraryHubImagesArgs = {
   imageType: DedupImageType;
+  inappropriateReasons?: InputMaybe<Array<CounterfeitReasonCode>>;
+  inappropriateSubcategories?: InputMaybe<Array<TaggingViolationSubReasonCode>>;
   lastUpdateTimeEnd?: InputMaybe<DatetimeInput>;
   lastUpdateTimeStart?: InputMaybe<DatetimeInput>;
   limit?: InputMaybe<Scalars['Int']>;
@@ -3474,14 +3644,14 @@ export type DedupImageLibraryHubImagesArgs = {
 export type DedupImageSchema = {
   __typename?: 'DedupImageSchema';
   brand?: Maybe<BrandSchema>;
-  counterfeitReason?: Maybe<CounterfeitReasonCode>;
-  counterfeitSubcategory?: Maybe<TaggingViolationSubReasonCode>;
+  counterfeitReason?: Maybe<TaggingViolationReason>;
+  counterfeitSubcategory?: Maybe<TaggingViolationSubcategory>;
   createdTime: Datetime;
   id: Scalars['ObjectIdType'];
   imagePhash: Scalars['String'];
   imageType: DedupImageType;
-  inappropriateReason?: Maybe<CounterfeitReasonCode>;
-  inappropriateSubcategory?: Maybe<TaggingViolationSubReasonCode>;
+  inappropriateReason?: Maybe<TaggingViolationReason>;
+  inappropriateSubcategory?: Maybe<TaggingViolationSubcategory>;
   sampleImageUrl?: Maybe<Scalars['String']>;
   source?: Maybe<DedupSource>;
   updateTime: Datetime;
@@ -3815,6 +3985,19 @@ export type DisputeMessageType =
   | 'PAID'
   | 'REOPEN'
   | 'REPLY';
+
+export type DisputeNotice = {
+  __typename?: 'DisputeNotice';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type DisputeNoticeInput = {
+  disputeDescription: Scalars['String'];
+  disputeSupportFiles?: InputMaybe<Array<FileInput>>;
+  noticeId: Scalars['ObjectIdType'];
+  productIds: Array<Scalars['ObjectIdType']>;
+};
 
 export type DisputeReason =
   | 'AUTHORIZED_TO_SELL'
@@ -5294,6 +5477,12 @@ export type InappropriateViolationSchema = {
 export type InappropriateViolationTaggingManagement = {
   __typename?: 'InappropriateViolationTaggingManagement';
   violationReasons: Array<TaggingViolationReason>;
+  violationSubcategories: Array<TaggingViolationSubcategory>;
+};
+
+
+export type InappropriateViolationTaggingManagementViolationSubcategoriesArgs = {
+  inappropirateReason?: InputMaybe<CounterfeitReasonCode>;
 };
 
 export type InfoCollectedForPaymentProvider = {
@@ -5562,6 +5751,7 @@ export type KycProfilePaymentStatus =
 
 export type KycProfileVerificationAdminStatus =
   | 'APPROVED'
+  | 'INVALID'
   | 'IN_PROGRESS'
   | 'NOT_SET'
   | 'ON_HOLD'
@@ -6621,6 +6811,7 @@ export type MfpVariationUnqualifiedReason =
   | 'LOW_RATING'
   | 'MERCHANT_ELIGIBILITY'
   | 'MININUM_VARIATION_PERCENTAGE'
+  | 'NEGATIVE_PRODUCT_PRICE'
   | 'NOT_IN_STOCK'
   | 'NOT_OWNED_BY_MERCHANT'
   | 'PRODUCT_CATEGORY'
@@ -6981,6 +7172,25 @@ export type MarketingStatsOffsiteBoostArgs = {
   startDate: DatetimeInput;
 };
 
+export type MerchantActionsRequiredSchema = {
+  __typename?: 'MerchantActionsRequiredSchema';
+  actionsCompleted: Array<MerchantActionsType>;
+  actionsRequired: Array<MerchantActionsType>;
+  currentAction: MerchantActionsType;
+  id: Scalars['ObjectIdType'];
+  merchantId: Scalars['ObjectIdType'];
+  state: MerchantActionsRequiredStateType;
+};
+
+export type MerchantActionsRequiredStateType =
+  | 'COMPLETED'
+  | 'IN_PROGRESS'
+  | 'REJECTED';
+
+export type MerchantActionsType =
+  | 'BANK_VERIFICATION'
+  | 'SELLER_PROFILE_VERIFICATION';
+
 export type MerchantAnnouncementCategory =
   | 'ACCOUNT_SETTINGS'
   | 'API'
@@ -7224,6 +7434,14 @@ export type MerchantFineSchema = {
   timestamp?: Maybe<Datetime>;
 };
 
+export type MerchantFulfillmentTimeInfoInput = {
+  carrierPickupTime?: InputMaybe<Scalars['String']>;
+  merchantHandlingTime?: InputMaybe<Scalars['Int']>;
+  pickupCarrier?: InputMaybe<PickupCarrier>;
+  workdayCalendar?: InputMaybe<WorkdayCalenderInput>;
+  workdayOverrideCalendar?: InputMaybe<Array<InputMaybe<WorkDayOverrideInput>>>;
+};
+
 export type MerchantGamingReviewFieldTicketType =
   | 'lastSourceUpsertDate';
 
@@ -7463,6 +7681,7 @@ export type MerchantMutation = {
   merchantSenderAddress: MerchantSenderAddressMutations;
   merchantTaxIdentification: MerchantTaxIdentificationMutations;
   merchantTermsAgreed?: Maybe<MerchantTermsAgreedMutations>;
+  mftOptOut?: Maybe<ChangeMftOptOutMutation>;
   returnSettings: MerchantReturnSettingsMutations;
   returnWarehouseSettings?: Maybe<MerchantReturnWarehouseMutations>;
   sellerIdentityCnVerification: SellerIdentityCnVerificationMutations;
@@ -7481,6 +7700,11 @@ export type MerchantMutationChangeDisplayNameArgs = {
 
 export type MerchantMutationChangePreferredUnitsArgs = {
   input: ChangePreferredUnitsInput;
+};
+
+
+export type MerchantMutationMftOptOutArgs = {
+  input: ChangeMftOptOutInput;
 };
 
 export type MerchantOnboardingStep =
@@ -8021,15 +8245,18 @@ export type MerchantSchema = {
   isBba?: Maybe<Scalars['Boolean']>;
   isCnForFulfillment: Scalars['Boolean'];
   isCnMerchant: Scalars['Boolean'];
+  isConsignmentMode?: Maybe<Scalars['Boolean']>;
   isFactory: Scalars['Boolean'];
   isFlatRateShippingOptedIn?: Maybe<Scalars['Boolean']>;
   isIdentifiedUsTax?: Maybe<Scalars['Boolean']>;
+  isMerchantFulfillmentTimeOptOut?: Maybe<Scalars['Boolean']>;
   isMerchantInCalculatedShippingBeta: Scalars['Boolean'];
   isPayable: Scalars['Boolean'];
   isStoreMerchant: Scalars['Boolean'];
   isUnityEnabled: Scalars['Boolean'];
   isWhiteGlove: Scalars['Boolean'];
   isWishBlueSelfInventory: Scalars['Boolean'];
+  latestActionsRequired?: Maybe<MerchantActionsRequiredSchema>;
   lead: UserSchema;
   marketing: MarketingMerchantPropertySchema;
   maxDeliveryDays: Scalars['Int'];
@@ -8630,13 +8857,18 @@ export type MerchantWarehouseMutationsUpsertWarehouseArgs = {
 export type MerchantWarehouseSchema = {
   __typename?: 'MerchantWarehouseSchema';
   address?: Maybe<AddressSchema>;
+  carrierPickupTime?: Maybe<Scalars['String']>;
   enabledCountries: Array<Country>;
   id: Scalars['String'];
+  merchantHandlingTime?: Maybe<Scalars['Int']>;
+  pickupCarrier?: Maybe<PickupCarrier>;
   unitId: Scalars['String'];
   verificationRequest?: Maybe<WarehouseVerificationRequestSchema>;
   verificationState?: Maybe<WarehouseVerificationState>;
   weekStats?: Maybe<Array<MerchantWarehouseWeekStatsSchema>>;
   weekStatsCount: Scalars['Int'];
+  workdayCalendar?: Maybe<WorkdayCalender>;
+  workdayOverrideCalendar?: Maybe<Array<WorkDayOverride>>;
 };
 
 
@@ -8962,6 +9194,7 @@ export type MerchantWarningSchema = {
   counterfeitReasonText?: Maybe<Scalars['String']>;
   createdTime: Datetime;
   creatorName?: Maybe<Scalars['String']>;
+  disputeCutoffDay: Scalars['Int'];
   effectiveDisputeDeadlineDate: Datetime;
   fine?: Maybe<MerchantFineSchema>;
   fineAmount?: Maybe<CurrencyValue>;
@@ -8974,6 +9207,8 @@ export type MerchantWarningSchema = {
   order?: Maybe<OrderSchema>;
   outstandingMerchantActions?: Maybe<Array<MerchantWarningFixAction>>;
   product?: Maybe<ProductSchema>;
+  productCount?: Maybe<Scalars['Int']>;
+  productEditRequestCount?: Maybe<Scalars['Int']>;
   productGmvAtAudit?: Maybe<CurrencyValue>;
   productTrueTagInfo?: Maybe<ProductTrueTagInfoSchema>;
   products?: Maybe<Array<ProductSchema>>;
@@ -8991,6 +9226,12 @@ export type MerchantWarningSchema = {
 
 export type MerchantWarningSchemaFineAmountArgs = {
   localized?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type MerchantWarningSchemaProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
 };
 
 export type MerchantWarningSort = {
@@ -9123,6 +9364,78 @@ export type NavigationResultType =
   | 'PRODUCT'
   | 'WARNING';
 
+export type NoticePriority =
+  | 'DEFAULT'
+  | 'HIGH';
+
+export type NoticeProductSchema = {
+  __typename?: 'NoticeProductSchema';
+  product: ProductSchema;
+  status: NoticeProductStatus;
+};
+
+export type NoticeProductStatus =
+  | 'ALREADY_REMOVED'
+  | 'DISPUTED'
+  | 'GEO_BLOCKED'
+  | 'INAPPROPRIATE_REMOVED'
+  | 'IP_REMOVED'
+  | 'REPORTED';
+
+export type NoticeQueryInput = {
+  endDate?: InputMaybe<DatetimeInput>;
+  notifierEmail?: InputMaybe<Scalars['String']>;
+  notifierOrganization?: InputMaybe<Scalars['String']>;
+  productId?: InputMaybe<Scalars['ObjectIdType']>;
+  sort?: InputMaybe<Array<NoticeQuerySortInput>>;
+  startDate?: InputMaybe<DatetimeInput>;
+  statuses?: InputMaybe<Array<NoticeStatus>>;
+};
+
+export type NoticeQuerySortInput = {
+  field: NoticeSortField;
+  order: SortOrderType;
+};
+
+export type NoticeSchema = {
+  __typename?: 'NoticeSchema';
+  datetimeCreated: Datetime;
+  datetimeDisputeReviewed?: Maybe<Datetime>;
+  datetimeDisputed?: Maybe<Datetime>;
+  datetimeReviewed?: Maybe<Datetime>;
+  description: Scalars['String'];
+  disputeDescription?: Maybe<Scalars['String']>;
+  disputeEligibility: Scalars['Boolean'];
+  disputeReviewResponse?: Maybe<Scalars['String']>;
+  disputeReviewer?: Maybe<UserSchema>;
+  disputeSupportFiles?: Maybe<Array<MerchantFileSchema>>;
+  id: Scalars['ObjectIdType'];
+  lastClaimedUser?: Maybe<UserSchema>;
+  notifier?: Maybe<NotifierSchema>;
+  notifierEmail: Scalars['String'];
+  notifierName: Scalars['String'];
+  priority: NoticePriority;
+  products: Array<NoticeProductSchema>;
+  reviewResponse?: Maybe<Scalars['String']>;
+  reviewer?: Maybe<UserSchema>;
+  status: NoticeStatus;
+  supportFiles: Array<MerchantFileSchema>;
+};
+
+export type NoticeSortField =
+  | 'DATETIME_CREATED'
+  | 'DATETIME_DISPUTED'
+  | 'PRIORITY';
+
+export type NoticeStatus =
+  | 'DISPUTE_PENDING_REVIEW'
+  | 'DISPUTE_UNDER_REVIEW'
+  | 'PARTIALLY_REJECTED'
+  | 'PENDING_REVIEW'
+  | 'REJECTED'
+  | 'RESOLVED'
+  | 'UNDER_REVIEW';
+
 export type NotificationsServiceSchema = {
   __typename?: 'NotificationsServiceSchema';
   notificationCount: Scalars['Int'];
@@ -9132,6 +9445,30 @@ export type NotificationsServiceSchema = {
 export type NotificationsServiceSchemaNotificationCountArgs = {
   viewed?: InputMaybe<Scalars['Boolean']>;
 };
+
+export type NotifierQueryInput = {
+  countryCode?: InputMaybe<CountryCode>;
+  email?: InputMaybe<Scalars['String']>;
+  isTrustedFlagger?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['String']>;
+  organization?: InputMaybe<Scalars['String']>;
+  type: NotifierType;
+};
+
+export type NotifierSchema = {
+  __typename?: 'NotifierSchema';
+  countries: Array<Country>;
+  email: Scalars['String'];
+  id: Scalars['ObjectIdType'];
+  isTrustedFlagger: Scalars['Boolean'];
+  name?: Maybe<Scalars['String']>;
+  organization: Scalars['String'];
+  type: NotifierType;
+};
+
+export type NotifierType =
+  | 'EMAIL_ADDRESS'
+  | 'EMAIL_DOMAIN';
 
 export type NotifyPasswordRecoveryMutation = {
   __typename?: 'NotifyPasswordRecoveryMutation';
@@ -9174,6 +9511,18 @@ export type OffsiteBoostStats = {
   endDate: Datetime;
   startDate: Datetime;
 };
+
+export type OidcCredentialSchema = {
+  __typename?: 'OidcCredentialSchema';
+  authEmail: Scalars['String'];
+  authProvider: OidcProviderEnum;
+  id: Scalars['ObjectIdType'];
+};
+
+export type OidcProviderEnum =
+  | 'GOOGLE'
+  | 'WISH_AUTH'
+  | 'WISH_OKTA';
 
 export type OnboardingSchema = {
   __typename?: 'OnboardingSchema';
@@ -9588,6 +9937,8 @@ export type OrderSalesTaxDetailsSchemaSalesTaxArgs = {
 export type OrderSchema = {
   __typename?: 'OrderSchema';
   acceptableShippingOrigins: Array<Country>;
+  adjustedProductPrice?: Maybe<CurrencyValue>;
+  adjustedShippingPrice?: Maybe<CurrencyValue>;
   advancedLogistics?: Maybe<OrderAdvancedLogisticsInfoSchema>;
   availableShippingProviders: Array<ShippingProviderSchema>;
   badges: Array<OrderBadge>;
@@ -10225,6 +10576,7 @@ export type PermissionType =
   | 'CAN_TOGGLE_MERCHANT_AUTOBAN'
   | 'CAN_TRANSFER_ANY_MERCHANTS'
   | 'CAN_TRANSFER_MERCHANTS'
+  | 'CAN_TRIGGER_BANK_ACCOUNT_VERIFICATION'
   | 'CAN_UNCOMBINE_APLUS_ORDERS'
   | 'CAN_UNENROLL_WHITE_GLOVE'
   | 'CAN_UPDATE_COLLECTIONBOOST'
@@ -10598,6 +10950,10 @@ export type PermissionType =
   | 'WISH_LOCAL_DETAIL_TAG'
   | 'WISH_LOCAL_TAG_STATUS_CHECK'
   | 'YANWEN_LOGISTIC';
+
+export type PickupCarrier =
+  | 'WISE'
+  | 'YANWEN';
 
 export type PictureType =
   | 'BACK'
@@ -11997,6 +12353,7 @@ export type ProductSchema = {
   categoryExperienceEligibility?: Maybe<Scalars['Boolean']>;
   chemicalNames?: Maybe<Array<Scalars['String']>>;
   condition?: Maybe<CommerceProductCondition>;
+  consignmentOriginalPid?: Maybe<Scalars['ObjectIdType']>;
   countryBlocks?: Maybe<Array<ProductCountryBlockSchema>>;
   createTime: Datetime;
   demoVideo?: Maybe<ProductVideo>;
@@ -12011,6 +12368,7 @@ export type ProductSchema = {
   id: Scalars['ObjectIdType'];
   infractions: Array<InfractionSchema>;
   invalidCategoryNote?: Maybe<Scalars['String']>;
+  isConsignmentEligible?: Maybe<Scalars['Boolean']>;
   isEuCompliant: Scalars['Boolean'];
   isLtl?: Maybe<Scalars['Boolean']>;
   isPromoted: Scalars['Boolean'];
@@ -12228,6 +12586,7 @@ export type ProductUpsertInput = {
   attributes?: InputMaybe<Array<AttributeInput>>;
   chemicalNames?: InputMaybe<Array<Scalars['String']>>;
   condition?: InputMaybe<CommerceProductCondition>;
+  consignmentOriginalPid?: InputMaybe<Scalars['ObjectIdType']>;
   countryShipping?: InputMaybe<Array<WarehouseCountryShippingInput>>;
   defaultShipping?: InputMaybe<Array<DefaultShippingInput>>;
   demoVideoSourceUrl?: InputMaybe<Scalars['String']>;
@@ -12236,6 +12595,7 @@ export type ProductUpsertInput = {
   enabled?: InputMaybe<Scalars['Boolean']>;
   id?: InputMaybe<Scalars['ObjectIdType']>;
   images?: InputMaybe<Array<ImageInput>>;
+  isConsignmentEligible?: InputMaybe<Scalars['Boolean']>;
   maxQuantity?: InputMaybe<Scalars['Int']>;
   msrp?: InputMaybe<CurrencyInput>;
   name?: InputMaybe<Scalars['String']>;
@@ -12306,6 +12666,7 @@ export type ProductVideoContentReviewTraits = {
   hasPartialNudity?: InputMaybe<Scalars['Boolean']>;
   hasPersonTalking?: InputMaybe<Scalars['Boolean']>;
   hasSexualWellness?: InputMaybe<Scalars['Boolean']>;
+  hasUnverifiedOrMisleadingClaim?: InputMaybe<Scalars['Boolean']>;
   hasWeapon?: InputMaybe<Scalars['Boolean']>;
   isBlank?: InputMaybe<Scalars['Boolean']>;
   isBlurry?: InputMaybe<Scalars['Boolean']>;
@@ -12493,6 +12854,22 @@ export type PromotableProduct = {
   __typename?: 'PromotableProduct';
   isInTrendingCategory: Scalars['Boolean'];
   product: ProductSchema;
+};
+
+export type PublicDsaMutations = {
+  __typename?: 'PublicDSAMutations';
+  createNotice?: Maybe<CreateNotice>;
+  disputeNotice?: Maybe<DisputeNotice>;
+};
+
+
+export type PublicDsaMutationsCreateNoticeArgs = {
+  input: CreateNoticeInput;
+};
+
+
+export type PublicDsaMutationsDisputeNoticeArgs = {
+  input: DisputeNoticeInput;
 };
 
 export type PublicShippingProviderDocs = {
@@ -12909,6 +13286,16 @@ export type RemoveFromPlus = {
 
 export type RemoveFromPlusInput = {
   merchantIds: Array<Scalars['ObjectIdType']>;
+};
+
+export type RemoveNotifier = {
+  __typename?: 'RemoveNotifier';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type RemoveNotifierInput = {
+  notifierId: Scalars['ObjectIdType'];
 };
 
 export type RemoveProduct = {
@@ -13540,6 +13927,7 @@ export type RoleType =
   | 'ACCENTURE_DETAIL_WORKER'
   | 'ACCENTURE_FRAUD_LEAD'
   | 'ACCENTURE_FRAUD_WORKER'
+  | 'ACCENTURE_INFRACTION_WORKER'
   | 'ACCENTURE_TAGGER_LEAD'
   | 'ACCENTURE_TAGGER_WORKER'
   | 'ACCENTURE_WORKER'
@@ -13641,6 +14029,7 @@ export type RootMutation = {
   currentMerchant?: Maybe<MerchantMutation>;
   currentUser?: Maybe<UserMutation>;
   customerSupportTickets?: Maybe<CustomerSupportTicketMutations>;
+  dsa?: Maybe<DsaMutations>;
   fulfillment: FulfillmentMutation;
   gating?: Maybe<MerchantUserGateMutations>;
   identity?: Maybe<IdentityMutations>;
@@ -13678,6 +14067,7 @@ export type RootQuery = {
   currentMerchant?: Maybe<MerchantSchema>;
   currentProperLocale: Scalars['String'];
   currentUser?: Maybe<UserSchema>;
+  dsa?: Maybe<DsaHub>;
   fulfillment?: Maybe<FulfillmentSchema>;
   identity?: Maybe<IdentityServiceSchema>;
   listingQualityInsights?: Maybe<ListingQualityInsightsSchema>;
@@ -13812,6 +14202,7 @@ export type SellerIdentityBusinessLocation = {
 export type SellerIdentityBusinessProof = {
   imageListStr: Scalars['JSONString'];
   layoutTag?: InputMaybe<Scalars['String']>;
+  proofId?: InputMaybe<Scalars['String']>;
   proofOfBizDocType: BusinessDocTypes;
   proofOfBizExpirationDate?: InputMaybe<DatetimeInput>;
 };
@@ -14880,12 +15271,14 @@ export type TaggingViolationSubReasonCode =
   | 'ASSAULT_WEAPON_CONVERSION_PIECES'
   | 'BENZENE'
   | 'BEVERAGES'
+  | 'BLOOD_COLLECTION_TUBES'
   | 'BLUE_RAY'
   | 'BLURRED_LOGOS'
   | 'BLURRED_TAGS'
   | 'BLURRED_WATERMARKS'
   | 'BRANDING_CHANGE'
   | 'BRAND_DISCREPANCY'
+  | 'BRASS_OR_METAL_KNUCKLES'
   | 'BULLION'
   | 'BULLYING'
   | 'BUTANE'
@@ -15019,6 +15412,7 @@ export type TaggingViolationSubReasonCode =
   | 'STANDALONE_LITHIUM_BATTERY'
   | 'SUBSCRIPTIONS_OR_MEMBERSHIPS'
   | 'SURPRISE_BOX'
+  | 'SYRINGES'
   | 'TERRORIST_PROMOTION_GROUPS'
   | 'TIRE_SPIKES'
   | 'TITLE_IMAGE_MISMATCH'
@@ -15120,6 +15514,8 @@ export type TaxAuthoritySchema = {
 };
 
 export type TaxAuthorityType =
+  | 'ADDITIONAL_FEE'
+  | 'ADDITIONAL_SALES_AND_USE_TAX'
   | 'BMP'
   | 'CBT'
   | 'CGST'
@@ -15152,6 +15548,7 @@ export type TaxAuthorityType =
   | 'FCP_ST'
   | 'FEE'
   | 'GCT'
+  | 'GENERAL_SALES_AND_USE_TAX'
   | 'GIT'
   | 'GST'
   | 'HST'
@@ -16078,6 +16475,16 @@ export type UsTaxMarketplaceMunicipalities = {
   stateCode: Scalars['String'];
 };
 
+export type UnclaimNotices = {
+  __typename?: 'UnclaimNotices';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type UnclaimNoticesInput = {
+  noticeIds: Array<Scalars['ObjectIdType']>;
+};
+
 export type Union = {
   __typename?: 'Union';
   code: Scalars['String'];
@@ -16151,6 +16558,20 @@ export type UpdateMerchantGamingReviewTicket = {
   __typename?: 'UpdateMerchantGamingReviewTicket';
   message?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
+};
+
+export type UpdateNotifier = {
+  __typename?: 'UpdateNotifier';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type UpdateNotifierInput = {
+  newCountryCodes?: InputMaybe<Array<CountryCode>>;
+  newIsTrustedFlagger?: InputMaybe<Scalars['Boolean']>;
+  newName?: InputMaybe<Scalars['String']>;
+  newOrganization?: InputMaybe<Scalars['String']>;
+  notifierId: Scalars['ObjectIdType'];
 };
 
 export type UpdateOffsiteBoost = {
@@ -16320,6 +16741,7 @@ export type UpdateUserInfoInput = {
   id: Scalars['ObjectIdType'];
   lastName?: InputMaybe<Scalars['String']>;
   manager?: InputMaybe<Scalars['ObjectIdType']>;
+  username?: InputMaybe<Scalars['String']>;
 };
 
 export type UpdateUserInfoMutation = {
@@ -16711,6 +17133,7 @@ export type UpsertWarehouseInput = {
   address?: InputMaybe<AddressInput>;
   enabledCountries?: InputMaybe<Array<CountryCode>>;
   id?: InputMaybe<Scalars['ObjectIdType']>;
+  merchantFulfillmentTimeInfo?: InputMaybe<MerchantFulfillmentTimeInfoInput>;
   name?: InputMaybe<Scalars['String']>;
 };
 
@@ -16909,6 +17332,7 @@ export type UserSchema = {
   id: Scalars['ObjectIdType'];
   isAdmin: Scalars['Boolean'];
   isApiUser: Scalars['Boolean'];
+  isBd?: Maybe<Scalars['Boolean']>;
   isEnabled: Scalars['Boolean'];
   isNewNav?: Maybe<Scalars['Boolean']>;
   isOnCsTeam: Scalars['Boolean'];
@@ -16920,6 +17344,7 @@ export type UserSchema = {
   merchantId?: Maybe<Scalars['ObjectIdType']>;
   name?: Maybe<Scalars['String']>;
   numCurrentDevices?: Maybe<Scalars['Int']>;
+  oidcCredentials?: Maybe<Array<OidcCredentialSchema>>;
   onboarding?: Maybe<OnboardingSchema>;
   onboardingUrl?: Maybe<Scalars['String']>;
   permissions?: Maybe<Array<PermissionSchema>>;
@@ -17037,6 +17462,7 @@ export type VariationDiscountDataInput = {
 export type VariationInput = {
   attributes?: InputMaybe<Array<AttributeInput>>;
   color?: InputMaybe<Scalars['String']>;
+  consignmentSupplyCost?: InputMaybe<Scalars['Float']>;
   cost?: InputMaybe<CurrencyInput>;
   customsHsCode?: InputMaybe<Scalars['String']>;
   declaredLocalName?: InputMaybe<Scalars['String']>;
@@ -17072,6 +17498,7 @@ export type VariationSchema = {
   __typename?: 'VariationSchema';
   attributes?: Maybe<Array<MerchantProvidedAttributeSchema>>;
   color?: Maybe<Scalars['String']>;
+  consignmentSupplyCost?: Maybe<CurrencyValue>;
   customsHsCode?: Maybe<Scalars['String']>;
   declaredLocalName?: Maybe<Scalars['String']>;
   declaredName?: Maybe<Scalars['String']>;
@@ -17413,10 +17840,12 @@ export type WssLogisticsRefundReason =
   | 'FBW_FAILED_TO_FULFILL_DUE_TO_CARRIER_RETURN'
   | 'ITEM_HELD_AT_CUSTOMS'
   | 'ITEM_MARKED_DELIVERED_BUT_DID_NOT_ARRIVE'
+  | 'ITEM_MARKED_DELIVERED_NOT_ALL_ITEMS_ARRIVED'
   | 'ITEM_NEVER_ARRIVED'
   | 'ITEM_RETURNED_TO_SENDER'
   | 'MERCHANT_SENT_TO_WRONG_ADDRESS'
   | 'NOT_QUALIFIED_SHIPPING_PROVIDER'
+  | 'REPLACEMENT_NEVER_RECEIVED'
   | 'SHIPPING_TAKING_TOO_LONG'
   | 'USER_ENTERED_INVALID_ADDRESS';
 
@@ -17990,6 +18419,38 @@ export type WishUserSignupMethod =
   | 'GOOGLE_PLUS'
   | 'PHONE_NUMBER';
 
+export type WorkDayOverride = {
+  __typename?: 'WorkDayOverride';
+  date: Scalars['String'];
+  value: Scalars['Boolean'];
+};
+
+export type WorkDayOverrideInput = {
+  date: Scalars['String'];
+  value: Scalars['Boolean'];
+};
+
+export type WorkdayCalender = {
+  __typename?: 'WorkdayCalender';
+  friday: Scalars['Boolean'];
+  monday: Scalars['Boolean'];
+  saturday: Scalars['Boolean'];
+  sunday: Scalars['Boolean'];
+  thursday: Scalars['Boolean'];
+  tuesday: Scalars['Boolean'];
+  wednesday: Scalars['Boolean'];
+};
+
+export type WorkdayCalenderInput = {
+  friday: Scalars['Boolean'];
+  monday: Scalars['Boolean'];
+  saturday: Scalars['Boolean'];
+  sunday: Scalars['Boolean'];
+  thursday: Scalars['Boolean'];
+  tuesday: Scalars['Boolean'];
+  wednesday: Scalars['Boolean'];
+};
+
 export type WssTier =
   | 'BAN'
   | 'BRONZE'
@@ -18002,6 +18463,13 @@ export type AuthQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AuthQueryQuery = { __typename?: 'RootQuery', currentUser?: { __typename?: 'UserSchema', id: string, roles?: Array<{ __typename?: 'RoleSchema', id: RoleType }> | null } | null };
+
+export type Toolkit_InitialUploadMutationVariables = Exact<{
+  input: InitiateUploadInput;
+}>;
+
+
+export type Toolkit_InitialUploadMutation = { __typename?: 'RootMutation', uploads?: { __typename?: 'UploadMutations', initiateUpload?: { __typename?: 'InitiateUploadMutation', ok: boolean, message?: string | null, uploadUrl?: string | null, uploadHeaders?: string | null, downloadUrl?: string | null } | null } | null };
 
 export type Disputes_BulkActionMutationVariables = Exact<{
   input?: InputMaybe<BulkUpsertMerchantWarningInput>;
@@ -18094,6 +18562,7 @@ export type DevOnly_GetUserQuery = { __typename?: 'RootQuery', currentUser?: { _
 
 
 export const AuthQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<AuthQueryQuery, AuthQueryQueryVariables>;
+export const Toolkit_InitialUploadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Toolkit_InitialUpload"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"InitiateUploadInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uploads"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"initiateUpload"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"uploadUrl"}},{"kind":"Field","name":{"kind":"Name","value":"uploadHeaders"}},{"kind":"Field","name":{"kind":"Name","value":"downloadUrl"}}]}}]}}]}}]} as unknown as DocumentNode<Toolkit_InitialUploadMutation, Toolkit_InitialUploadMutationVariables>;
 export const Disputes_BulkActionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Disputes_BulkAction"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"BulkUpsertMerchantWarningInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bulkUpsertMerchantWarning"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_BulkActionMutation, Disputes_BulkActionMutationVariables>;
 export const Dispute_ActionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Dispute_Action"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UpsertMerchantWarningInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarning"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertMerchantWarning"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Dispute_ActionMutation, Dispute_ActionMutationVariables>;
 export const Disputes_BulkStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_BulkStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"types"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BulkMerchantWarningAction"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcessCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarningBulkProcesses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"Variable","name":{"kind":"Name","value":"types"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"submitted"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"requestedBy"}},{"kind":"Field","name":{"kind":"Name","value":"requestedWarningIds"}},{"kind":"Field","name":{"kind":"Name","value":"results"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"warningId"}},{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_BulkStatusQuery, Disputes_BulkStatusQueryVariables>;

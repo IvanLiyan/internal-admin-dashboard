@@ -1,6 +1,7 @@
 import AuthProvider from "@app/core/auth/AuthProvider";
 import ToastProvider from "@app/core/toast/ToastProvider";
 import { NavigationBar } from "@app/navigation/NavigationBar";
+import { PublicNavigationBar } from "@app/navigation/PublicNavigationBar";
 import { Container, ThemeProvider, createTheme } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -22,16 +23,14 @@ const client = createClient({
   },
 });
 
-const independentSubpaths = ["/dev-login", "/go", "/login"];
+const independentSubpaths = [
+  "/dev-login",
+  "/go",
+  "/login",
+  "/notice-portal/intake",
+];
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  if (independentSubpaths.some((path) => router.pathname.includes(path))) {
-    return (
-      <Provider value={client}>
-        <Component {...pageProps} />
-      </Provider>
-    );
-  }
   const theme = createTheme({
     typography: {
       fontFamily: "Proxima",
@@ -41,6 +40,21 @@ export default function App({ Component, pageProps, router }: AppProps) {
       fontWeightBold: 700,
     },
   });
+
+  if (independentSubpaths.some((path) => router.pathname.includes(path))) {
+    return (
+      <Provider value={client}>
+        <ThemeProvider theme={theme}>
+          <ToastProvider>
+            <PublicNavigationBar />
+            <Container maxWidth={false} sx={{ mt: 2 }}>
+              <Component {...pageProps} />
+            </Container>
+          </ToastProvider>
+        </ThemeProvider>
+      </Provider>
+    );
+  }
 
   return (
     <Provider value={client}>
