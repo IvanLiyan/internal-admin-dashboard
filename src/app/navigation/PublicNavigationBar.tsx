@@ -9,7 +9,7 @@ export const PublicNavigationBar: React.FC = () => {
         <MenuItem disableRipple>
           <Image
             priority={true}
-            src="/internal-admin/images/wish.svg"
+            src="/internal-admin/images/wish-logo-black.svg"
             alt="Wish Logo"
             width={88}
             height={64}
