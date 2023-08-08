@@ -64,8 +64,7 @@ module.exports = (phase, { defaultConfig }) => {
       ];
     },
     images: {
-      domains: ["staging.merchant.wish.com", "merchant.wish.com"],
-      path: "",
+      unoptimized: true,
     },
   };
 

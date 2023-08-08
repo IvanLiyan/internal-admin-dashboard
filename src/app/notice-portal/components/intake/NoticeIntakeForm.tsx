@@ -154,7 +154,7 @@ const NoticeIntakeForm: React.FC = () => {
   return (
     <Box sx={{ maxWidth: "700px" }}>
       <FormGroup {...baseFormGroupProps}>
-        <Typography>Description of Content*</Typography>
+        <Typography>Description of Content *</Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Explain why you believe these listings may be illegal
         </Typography>
@@ -169,7 +169,7 @@ const NoticeIntakeForm: React.FC = () => {
         />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
-        <Typography>Wish URLs*</Typography>
+        <Typography>Wish URLs *</Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Add the Wish URLs you&apos;re reporting. Separate multiple URLs with
           newlines
@@ -187,7 +187,7 @@ const NoticeIntakeForm: React.FC = () => {
         />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
-        <Typography>Name*</Typography>
+        <Typography>Name *</Typography>
         <TextField
           fullWidth
           required
@@ -197,7 +197,7 @@ const NoticeIntakeForm: React.FC = () => {
         />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
-        <Typography>Email Address*</Typography>
+        <Typography>Email Address *</Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Trusted flaggers: use your trusted flagger email to prioritize your
           report
