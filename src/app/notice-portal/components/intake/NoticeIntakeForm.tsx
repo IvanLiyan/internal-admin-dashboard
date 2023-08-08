@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { gql, useMutation } from "urql";
 import {
   PublicDsaMutationsCreateNoticeArgs,
@@ -50,6 +50,7 @@ const NoticeIntakeForm: React.FC = () => {
   const toast = useToast();
   const [description, setDescription] = useState<string>("");
   const [wishUrls, setWishUrls] = useState<string[]>([]);
+  const [wishUrlError, setWishUrlError] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [checked, setChecked] = useState<boolean>(false);
@@ -79,7 +80,20 @@ const NoticeIntakeForm: React.FC = () => {
     setFiles([]);
   };
 
+  const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/;
+  const wishUrlRegex = /^https:\/\/www.wish.com\/c\/[a-f\d]{24}$/;
+
   const canSubmit = () => {
+    if (!email.match(emailRegex)) {
+      return false;
+    }
+
+    for (const url of wishUrls) {
+      if (!url.match(wishUrlRegex)) {
+        return false;
+      }
+    }
+
     return description && wishUrls.length && name && email && checked;
   };
 
@@ -122,6 +136,21 @@ const NoticeIntakeForm: React.FC = () => {
     resetForm();
   };
 
+  const handleWishUrlsChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const urls = e.target.value.split("\n");
+    for (const url of urls) {
+      if (!url.match(wishUrlRegex)) {
+        setWishUrlError(true);
+        setWishUrls(urls);
+        return;
+      }
+    }
+    setWishUrlError(false);
+    setWishUrls(urls);
+  };
+
   return (
     <Box sx={{ maxWidth: "700px" }}>
       <FormGroup {...baseFormGroupProps}>
@@ -152,7 +181,9 @@ const NoticeIntakeForm: React.FC = () => {
           placeholder="URLs"
           rows={4}
           value={wishUrls.join("\n")}
-          onChange={(e) => setWishUrls(e.target.value.split("\n"))}
+          onChange={handleWishUrlsChange}
+          helperText="Must be of the format https://www.wish.com/c/<product_id>"
+          error={wishUrls.length != 0 && wishUrlError}
         />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
@@ -176,6 +207,7 @@ const NoticeIntakeForm: React.FC = () => {
           required
           placeholder="Email address"
           value={email}
+          error={!email.match(emailRegex) && email != ""}
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormGroup>
@@ -189,9 +221,12 @@ const NoticeIntakeForm: React.FC = () => {
       <FormGroup {...baseFormGroupProps}>
         <FormControlLabel
           required
-          control={<Checkbox />}
-          checked={checked}
-          onChange={(e) => setChecked(e.target.checked)}
+          control={
+            <Checkbox
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+            />
+          }
           label="I confirm that the provided information is accurate and complete."
         />
       </FormGroup>

@@ -156,6 +156,8 @@ type MedicalMaterialsSubreasons = ExtractStrict<
   | "OTC_MEDICATION"
   | "OXIMETERS"
   | "CATHETERS"
+  | "BLOOD_COLLECTION_TUBES"
+  | "SYRINGES"
 >;
 
 type HazardousMaterialsSubreasons = ExtractStrict<
@@ -188,6 +190,7 @@ type WeaponSubreasons = ExtractStrict<
   | "ASSAULT_WEAPON_CONVERSION_PIECES"
   | "GUN_SILENCER_MISUSE"
   | "GUN_SILENCER_COMPONENTS"
+  | "BRASS_OR_METAL_KNUCKLES"
 >;
 
 type IllegalElectronicsSubreasons = ExtractStrict<
@@ -609,6 +612,11 @@ export const CounterfeitSubreasonsDictionary: {
   },
   CHLOROFORM: { categoryCode: "MEDICAL_MATERIALS", text: "Chloroform" },
   PENICILLIN: { categoryCode: "MEDICAL_MATERIALS", text: "Penicillin" },
+  BLOOD_COLLECTION_TUBES: {
+    categoryCode: "MEDICAL_MATERIALS",
+    text: "Blood Collection Tubes",
+  },
+  SYRINGES: { categoryCode: "MEDICAL_MATERIALS", text: "Syringes" },
   EYELASH_GROWTH_SERUM: {
     categoryCode: "MEDICAL_MATERIALS",
     text: "Eyelash Growth Serum",
@@ -684,6 +692,10 @@ export const CounterfeitSubreasonsDictionary: {
   GUN_SILENCER_COMPONENTS: {
     categoryCode: "WEAPON",
     text: "Gun Silencer Components",
+  },
+  BRASS_OR_METAL_KNUCKLES: {
+    categoryCode: "WEAPON",
+    text: "Brass or Metal Knuckles",
   },
 
   JAMMERS: { categoryCode: "ILLEGAL_ELECTRONICS", text: "Jammers" },
