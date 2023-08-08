@@ -65,7 +65,7 @@ const NoticeIntakeForm: React.FC = () => {
   const fileInputProps: FileInputProps = {
     maxSizeMB: 1000,
     maxAttachments: 5,
-    bucket: "REGULATOR_REPORT_FILE_UPLOADS",
+    bucket: "TEMP_UPLOADS_V2",
     attachments: files,
     onUpload: setFiles,
   };

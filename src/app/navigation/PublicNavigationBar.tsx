@@ -8,6 +8,7 @@ export const PublicNavigationBar: React.FC = () => {
       <Toolbar>
         <MenuItem disableRipple>
           <Image
+            priority={true}
             src="/internal-admin/images/wish.svg"
             alt="Wish Logo"
             width={88}
