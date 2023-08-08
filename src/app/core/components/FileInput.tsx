@@ -1,4 +1,4 @@
-import Image, { ImageLoaderProps } from "next/image";
+import Image from "next/image";
 import { observer } from "mobx-react";
 import { runInAction } from "mobx";
 import { MouseEventHandler, useState } from "react";
@@ -89,10 +89,6 @@ const FileInput: React.FC<FileInputProps> = ({
   const [pendingAttachments, setPendingAttachments] = useState<
     ReadonlyArray<PendingAttachment>
   >([]);
-
-  const imageLoader = ({ src, width }: ImageLoaderProps) => {
-    return `${src}?w=${width}`;
-  };
 
   const removePendingAttachment = (pendingAttachment: PendingAttachment) => {
     setPendingAttachments(
@@ -317,7 +313,6 @@ const FileInput: React.FC<FileInputProps> = ({
             <InsertDriveFile fontSize="medium" />
           ) : (
             <Image
-              loader={imageLoader}
               src={url}
               alt={fileName}
               draggable={false}

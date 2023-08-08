@@ -63,6 +63,10 @@ module.exports = (phase, { defaultConfig }) => {
         },
       ];
     },
+    images: {
+      domains: ["staging.merchant.wish.com", "merchant.wish.com"],
+      path: "",
+    },
   };
 
   return withBundleAnalyzer(nextConfig);
