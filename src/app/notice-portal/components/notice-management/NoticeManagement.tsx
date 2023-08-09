@@ -57,13 +57,17 @@ const NoticeManagement: React.FC = () => {
       </Box>
       <Box sx={{ pt: 3, pb: 3 }}>
         <TabPanel value={tab} tab={"PENDING_REVIEW"}>
-          <NoticeManagementTable />
+          <NoticeManagementTable states={["PENDING_REVIEW", "UNDER_REVIEW"]} />
         </TabPanel>
         <TabPanel value={tab} tab={"IN_DISPUTE"}>
-          <NoticeManagementTable />
+          <NoticeManagementTable
+            states={["DISPUTE_PENDING_REVIEW", "DISPUTE_UNDER_REVIEW"]}
+          />
         </TabPanel>
         <TabPanel value={tab} tab={"RESOLVED"}>
-          <NoticeManagementTable />
+          <NoticeManagementTable
+            states={["REJECTED", "RESOLVED", "PARTIALLY_REJECTED"]}
+          />
         </TabPanel>
       </Box>
     </Box>
