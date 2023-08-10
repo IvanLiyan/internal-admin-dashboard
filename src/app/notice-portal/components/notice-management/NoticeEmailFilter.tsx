@@ -1,14 +1,5 @@
 import { FilterAlt, FilterAltOutlined } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  FormControlLabel,
-  IconButton,
-  Popover,
-  Radio,
-  RadioGroup,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Popover, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
 export type NoticeEmailFilterProps = {
@@ -53,10 +44,17 @@ const NoticeEmailFilter: React.FC<NoticeEmailFilterProps> = (
         }}
       >
         <Box sx={{ p: 2 }}>
-          <Typography sx={{ mr: 1, fontWeight: "fontWeightBold" }}>
-            Select an Organization
+          <Typography sx={{ mb: 1.5, fontWeight: "fontWeightBold" }}>
+            Enter a Notifier Email
           </Typography>
-          <Box></Box>
+          <Box>
+            <TextField
+              sx={{ width: 300 }}
+              label="Notifier Email"
+              value={email}
+              onChange={(e) => onChange(e.target.value)}
+            />
+          </Box>
         </Box>
       </Popover>
     </>

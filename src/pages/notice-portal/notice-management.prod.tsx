@@ -6,7 +6,7 @@ const NoticeManagement: NextPage<Record<string, never>> = () => {
   return (
     <Container maxWidth={false} sx={{ p: 7 }} disableGutters>
       <Typography variant="h3" sx={{ fontWeight: "fontWeightBold" }}>
-        Notice Management
+        Notice Management Tool
       </Typography>
       <NoticeManagementPage />
     </Container>

@@ -1,12 +1,10 @@
 import { FilterAlt, FilterAltOutlined } from "@mui/icons-material";
 import {
+  Autocomplete,
   Box,
-  Button,
-  FormControlLabel,
   IconButton,
   Popover,
-  Radio,
-  RadioGroup,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
@@ -54,32 +52,21 @@ const NoticeOrganizationFilter: React.FC<NoticeOrganizationFilterProps> = (
         }}
       >
         <Box sx={{ p: 2 }}>
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 1.5,
-            }}
-          >
-            <Typography sx={{ mr: 1, fontWeight: "fontWeightBold" }}>
-              Select an Organization
-            </Typography>
-            <Button onClick={() => onSelect(null)}>Clear</Button>
-          </Box>
-          <Box sx={{ maxHeight: 200, overflowY: "scroll" }}>
-            <RadioGroup
+          <Typography sx={{ mb: 1.5, fontWeight: "fontWeightBold" }}>
+            Select an Organization
+          </Typography>
+          <Box>
+            <Autocomplete
               value={organization}
-              onChange={(e) => onSelect(e.target.value)}
-            >
-              {organizations.map((org) => (
-                <FormControlLabel
-                  value={org}
-                  control={<Radio disableRipple />}
-                  label={org}
-                />
-              ))}
-            </RadioGroup>
+              onChange={(_, newValue: string | null) => {
+                onSelect(newValue);
+              }}
+              options={organizations}
+              sx={{ width: 300 }}
+              renderInput={(params) => (
+                <TextField {...params} label="Organizations" />
+              )}
+            />
           </Box>
         </Box>
       </Popover>

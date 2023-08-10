@@ -11,10 +11,15 @@ import {
   TableFooter,
   TablePagination,
   TableSortLabel,
-  Box,
+  Stack,
+  Chip,
+  ChipTypeMap,
+  Button,
 } from "@mui/material";
 import NoticeDateFilter from "./NoticeDateFilter";
 import NoticeOrganizationFilter from "./NoticeOrganizationFilter";
+import NoticeEmailFilter from "./NoticeEmailFilter";
+import { SearchOption } from "./NoticeSearch";
 import {
   NoticeSchema,
   DsaHubNoticesArgs,
@@ -69,12 +74,14 @@ type CustomTableHeadCell = {
 
 export type NoticeManagementTableProps = {
   readonly states: ReadonlyArray<NoticeStatus>;
+  readonly option: SearchOption;
+  readonly searchQuery: string | null;
 };
 
 const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
   props: NoticeManagementTableProps
 ) => {
-  const { states } = props;
+  const { states, option, searchQuery } = props;
   const toast = useToast();
   const FORMAT = "YYYY-MM-DD";
   const PYTHONFORMAT = "%Y-%m-%d";
@@ -86,6 +93,7 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
   const [noticeCount, setNoticeCount] = useState<number>(0);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(25);
+  const [email, setEmail] = useState<string | null>(null);
   const [organization, setOrganization] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -94,9 +102,22 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     { field: "DATETIME_CREATED", order: "DESC" },
   ]);
 
+  const noticeStatusColors: Record<
+    NoticeStatus,
+    ChipTypeMap["props"]["color"]
+  > = {
+    PENDING_REVIEW: "primary",
+    UNDER_REVIEW: "secondary",
+    DISPUTE_PENDING_REVIEW: "primary",
+    DISPUTE_UNDER_REVIEW: "secondary",
+    RESOLVED: "success",
+    REJECTED: "error",
+    PARTIALLY_REJECTED: "warning",
+  };
+
   const tableHeaders: CustomTableHeadCell[] = [
     {
-      label: "Submission ID",
+      label: "Notice ID",
     },
     {
       label: "Date Submitted",
@@ -121,6 +142,9 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     },
     {
       label: "Email",
+      renderFilter: () => (
+        <NoticeEmailFilter email={email} onChange={setEmail} />
+      ),
     },
     {
       label: "Organization",
@@ -137,7 +161,7 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
       sortField: "PRIORITY",
     },
     {
-      label: "Action",
+      label: "Actions",
     },
   ];
 
@@ -181,8 +205,10 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
   const variables: DsaHubNoticesArgs = {
     queryInput: {
       statuses: [...states],
+      productId: option === "PRODUCT_ID" ? searchQuery || null : undefined,
       sort: [...sorts],
       notifierOrganization: organization,
+      notifierEmail: email || undefined,
       startDate: startDate
         ? {
             fmt: PYTHONFORMAT,
@@ -206,8 +232,13 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
   });
 
   useEffect(() => {
-    if (data == undefined || error) {
-      toast.alert("error", "Failed to fetch notices!");
+    if (error) {
+      toast.alert("error", `Encountered error: ${error.message}`);
+      return;
+    }
+
+    if (data == undefined) {
+      toast.alert("error", `Failed to fetch notices!`);
       return;
     }
 
@@ -218,23 +249,36 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     setNotices(notices);
     setNoticeCount(noticeCount);
     setNotifierOrganizations(notifierOrganizations);
-  }, [data, error, setNotices, setNoticeCount]);
+  }, [data, error, toast, setNotices, setNoticeCount]);
 
-  const renderNoticeRow = (notice: NoticeSchema) => {
-    return (
-      <TableRow key={notice.id}>
-        <TableCell>{notice.id}</TableCell>
-        <TableCell>{notice.datetimeCreated.datetime}</TableCell>
-        <TableCell>{notice.status}</TableCell>
-        <TableCell>{notice?.lastClaimedUser?.email || "-"}</TableCell>
-        <TableCell>{notice.notifierName}</TableCell>
-        <TableCell>{notice.notifierEmail}</TableCell>
-        <TableCell>{notice.notifier?.organization}</TableCell>
-        <TableCell>{notice.priority}</TableCell>
-        <TableCell>Actions</TableCell>
-      </TableRow>
-    );
-  };
+  const renderNoticeRow = (notice: NoticeSchema) => (
+    <TableRow key={notice.id}>
+      <TableCell>{notice.id}</TableCell>
+      <TableCell>{notice.datetimeCreated.datetime}</TableCell>
+      <TableCell>
+        <Chip
+          variant="outlined"
+          label={notice.status}
+          color={noticeStatusColors[notice.status]}
+        />
+      </TableCell>
+      <TableCell>{notice?.lastClaimedUser?.email || "-"}</TableCell>
+      <TableCell>{notice.notifierName}</TableCell>
+      <TableCell>{notice.notifierEmail}</TableCell>
+      <TableCell>{notice.notifier?.organization}</TableCell>
+      <TableCell>
+        <Chip
+          label={notice.priority}
+          color={notice.priority === "HIGH" ? "error" : "default"}
+        />
+      </TableCell>
+      <TableCell>
+        <Button variant="outlined" sx={{ textTransform: "capitalize" }}>
+          View Details
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
 
   const renderTableHeader = () => {
     return (
@@ -244,23 +288,17 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
             const field = row.sortField;
             if (!field) {
               return (
-                <TableCell>
-                  <Box
-                    sx={{
-                      display: "inline-flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
+                <TableCell key={row.label}>
+                  <Stack flexDirection="row" alignItems="center">
                     {row.label}
                     {row.renderFilter && row.renderFilter()}
-                  </Box>
+                  </Stack>
                 </TableCell>
               );
             }
 
             return (
-              <TableCell>
+              <TableCell key={row.label}>
                 <TableSortLabel
                   active={sorts.some((s) => s.field == field)}
                   direction={
