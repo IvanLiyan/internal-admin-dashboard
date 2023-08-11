@@ -2,6 +2,7 @@ import { MenuData } from "@app/navigation/menu";
 import { AppBar, Menu, MenuItem, Toolbar } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import Image from "next/image";
 
 export const NavigationBar: React.FC = () => {
   const router = useRouter();
@@ -21,6 +22,15 @@ export const NavigationBar: React.FC = () => {
   return (
     <AppBar position="sticky">
       <Toolbar>
+        <MenuItem disableRipple>
+          <Image
+            priority={true}
+            src="/internal-admin/images/wish-logo-white.svg"
+            alt="Wish Logo"
+            width={88}
+            height={64}
+          />
+        </MenuItem>
         <MenuItem
           component="a"
           href="/"
