@@ -51,6 +51,11 @@ module.exports = (phase, { defaultConfig }) => {
               destination: `${MD_URL}/md/login`,
               basePath: false,
             },
+            {
+              source: "/merchant-file/:id",
+              destination: `${MD_URL}/merchant-file/:id`,
+              basePath: false,
+            },
           ]
         : [];
     },

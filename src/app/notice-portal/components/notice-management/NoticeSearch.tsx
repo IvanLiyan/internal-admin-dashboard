@@ -11,7 +11,7 @@ const NoticeSearch: React.FC<NoticeSearchProps> = (
   props: NoticeSearchProps
 ) => {
   return (
-    <Box sx={{ mt: 4, mb: 4 }}>
+    <Box sx={{ mb: 3 }}>
       <TextFieldWithSelect {...props} />
     </Box>
   );
