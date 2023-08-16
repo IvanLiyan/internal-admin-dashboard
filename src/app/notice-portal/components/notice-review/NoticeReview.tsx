@@ -5,6 +5,7 @@ import { NoticeSchema } from "@schema";
 import ClaimNoticeButton from "./ClaimNoticeButton";
 import UnclaimNoticeButton from "./UnclaimNoticeButton";
 import SubmitReviewButton from "./SubmitReviewButton";
+import NoticeProductsTable from "./NoticeProductsTable";
 
 export type NoticeReviewProps = {
   readonly notice: NoticeSchema;
@@ -88,6 +89,7 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
         </Box>
         <Box>{...renderActionButtons()}</Box>
       </Stack>
+      <NoticeProductsTable noticeProducts={notice.products} />
     </Stack>
   );
 };
