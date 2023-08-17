@@ -72,7 +72,7 @@ const ClaimNoticeButton: React.FC<ClaimNoticeButtonProps> = (
       }}
       onClick={handleClaimNotice}
     >
-      Claim Review
+      Claim Notice
     </Button>
   );
 };

@@ -76,7 +76,7 @@ const UnclaimNoticeButton: React.FC<UnclaimNoticeButtonProps> = (
       }}
       onClick={handleUnclaimNotice}
     >
-      Unclaim Review
+      Unclaim Notice
     </Button>
   );
 };

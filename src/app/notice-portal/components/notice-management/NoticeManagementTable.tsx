@@ -280,7 +280,7 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
             disableElevation
             sx={{ textTransform: "capitalize", borderRadius: 10 }}
           >
-            View Details
+            View
           </Button>
         </Link>
       </TableCell>

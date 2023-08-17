@@ -22,6 +22,10 @@ import { useState } from "react";
 
 export type NoticeProductsTableProps = {
   readonly noticeProducts: ReadonlyArray<NoticeProductSchema>;
+  readonly selectedProducts: ReadonlyArray<NoticeProductSchema>;
+  readonly setSelectedProducts: (
+    products: ReadonlyArray<NoticeProductSchema>
+  ) => unknown;
 };
 
 type CustomTableHeadCell = {
@@ -32,12 +36,9 @@ type CustomTableHeadCell = {
 const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
   props: NoticeProductsTableProps
 ) => {
-  const { noticeProducts } = props;
+  const { noticeProducts, selectedProducts, setSelectedProducts } = props;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(25);
-  const [selectedProducts, setSelectedProducts] = useState<
-    ReadonlyArray<NoticeProductSchema>
-  >([]);
 
   const tableHeaders: CustomTableHeadCell[] = [
     {
@@ -65,11 +66,21 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
     setPage(0);
   };
 
+  const getSelectableProducts = () => {
+    const selectableNoticeProducts = noticeProducts.filter(
+      (noticeProducts) =>
+        noticeProducts.status === "REPORTED" ||
+        noticeProducts.status === "DISPUTED"
+    );
+    return selectableNoticeProducts;
+  };
+
   const onSelectAllClick = () => {
-    if (selectedProducts.length == noticeProducts.length) {
+    const selectableNoticeProducts = getSelectableProducts();
+    if (selectedProducts.length == selectableNoticeProducts.length) {
       setSelectedProducts([]);
     } else {
-      setSelectedProducts(noticeProducts);
+      setSelectedProducts(selectableNoticeProducts);
     }
   };
 
@@ -83,6 +94,11 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
       <TableRow key={noticeProduct.product.id}>
         <TableCell padding="checkbox">
           <Checkbox
+            disabled={
+              noticeProduct.status !== "REPORTED" &&
+              noticeProduct.status !== "DISPUTED"
+            }
+            sx={{ m: 1 }}
             color="primary"
             checked={noticeProductIsSelected}
             onClick={() => {
@@ -102,7 +118,11 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
         <TableCell>
           <NoticeProductTableColumn noticeProduct={noticeProduct} />
         </TableCell>
-        <TableCell>{noticeProduct.product.description}</TableCell>
+        <TableCell>
+          <Typography width={700} noWrap>
+            {noticeProduct.product.description}
+          </Typography>
+        </TableCell>
         <TableCell>
           <Chip label={noticeProduct.status} />
         </TableCell>
@@ -116,12 +136,17 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
         <TableRow>
           <TableCell padding="checkbox">
             <Checkbox
+              sx={{ m: 1 }}
               color="primary"
+              disabled={getSelectableProducts().length == 0}
               indeterminate={
                 selectedProducts.length > 0 &&
-                selectedProducts.length < noticeProducts.length
+                selectedProducts.length < getSelectableProducts().length
               }
-              checked={selectedProducts.length === noticeProducts.length}
+              checked={
+                selectedProducts.length === getSelectableProducts().length &&
+                selectedProducts.length !== 0
+              }
               onChange={onSelectAllClick}
             />
           </TableCell>

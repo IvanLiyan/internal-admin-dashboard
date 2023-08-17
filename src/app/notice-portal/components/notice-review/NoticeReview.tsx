@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Box, Button, ButtonProps, Stack } from "@mui/material";
 import { useAuth } from "@app/core/auth/AuthProvider";
-import { NoticeSchema } from "@schema";
+import { NoticeProductSchema, NoticeSchema } from "@schema";
 import ClaimNoticeButton from "./ClaimNoticeButton";
 import UnclaimNoticeButton from "./UnclaimNoticeButton";
 import SubmitReviewButton from "./SubmitReviewButton";
@@ -17,6 +17,9 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
 ) => {
   const { notice, refetchNotice } = props;
   const auth = useAuth();
+  const [selectedProducts, setSelectedProducts] = useState<
+    ReadonlyArray<NoticeProductSchema>
+  >([]);
 
   const canReviewNotice =
     notice.lastClaimedUser?.id === auth?.id &&
@@ -73,23 +76,49 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
     return buttonsToRender;
   };
 
+  const generateQueryParams = () => {
+    const productIds = selectedProducts.map(
+      (noticeProduct) => noticeProduct.product.id
+    );
+    return `notice_id=${notice.id}&product_ids=${productIds.join(",")}`;
+  };
+
   return (
     <Stack>
       <Stack direction={"row"} justifyContent={"space-between"}>
         <Box>
-          <Button {...baseButtonProps} disabled={!canReviewNotice}>
+          <Button
+            href={`/product-geoblock/create?${generateQueryParams()}`}
+            {...baseButtonProps}
+            disabled={!canReviewNotice || selectedProducts.length == 0}
+            disableRipple
+          >
             Geoblock Selected
           </Button>
-          <Button {...baseButtonProps} disabled={!canReviewNotice}>
+          <Button
+            href={`/tagging/counterfeit-tag/manual?${generateQueryParams()}`}
+            {...baseButtonProps}
+            disabled={!canReviewNotice || selectedProducts.length == 0}
+            disableRipple
+          >
             Inappropriate Manual Review Selected
           </Button>
-          <Button {...baseButtonProps} disabled={!canReviewNotice}>
+          <Button
+            href={`/tagging/ip-violation-tag/manual?${generateQueryParams()}`}
+            {...baseButtonProps}
+            disabled={!canReviewNotice || selectedProducts.length == 0}
+            disableRipple
+          >
             IP Manual Review Selected
           </Button>
         </Box>
         <Box>{...renderActionButtons()}</Box>
       </Stack>
-      <NoticeProductsTable noticeProducts={notice.products} />
+      <NoticeProductsTable
+        noticeProducts={notice.products}
+        selectedProducts={selectedProducts}
+        setSelectedProducts={setSelectedProducts}
+      />
     </Stack>
   );
 };

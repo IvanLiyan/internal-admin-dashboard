@@ -12,7 +12,7 @@ const NoticeProductTableColumn: React.FC<NoticeProductTableColumnProps> = (
   const { noticeProduct } = props;
 
   return (
-    <Stack direction="row" justifyContent={"center"} alignItems={"center"}>
+    <Stack direction="row" alignItems={"center"}>
       <Image
         src={noticeProduct.product.mainImage.wishUrl}
         alt={noticeProduct.product.name}
