@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { gql, useQuery } from "urql";
 import { useToast } from "@app/core/toast/ToastProvider";
+import Link from "next/link";
 import {
   Table,
   TableContainer,
@@ -206,6 +207,7 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     queryInput: {
       statuses: [...states],
       productId: option === "PRODUCT_ID" ? searchQuery || null : undefined,
+      noticeId: option === "NOTICE_ID" ? searchQuery || null : undefined,
       sort: [...sorts],
       notifierOrganization: organization,
       notifierEmail: email || undefined,
@@ -238,7 +240,6 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     }
 
     if (data == undefined) {
-      toast.alert("error", `Failed to fetch notices!`);
       return;
     }
 
@@ -273,9 +274,15 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
         />
       </TableCell>
       <TableCell>
-        <Button variant="outlined" sx={{ textTransform: "capitalize" }}>
-          View Details
-        </Button>
+        <Link href={`/notice-portal/review/${encodeURIComponent(notice.id)}`}>
+          <Button
+            variant="contained"
+            disableElevation
+            sx={{ textTransform: "capitalize", borderRadius: 10 }}
+          >
+            View
+          </Button>
+        </Link>
       </TableCell>
     </TableRow>
   );

@@ -29,7 +29,11 @@ const NoticeManagement: React.FC = () => {
   const baseTabProps: TabProps = {
     disableRipple: true,
     iconPosition: "start",
-    sx: { textTransform: "capitalize", width: 200 },
+    sx: {
+      textTransform: "capitalize",
+      width: 200,
+      minHeight: 0,
+    },
   };
 
   const searchOptions: Option[] = [
