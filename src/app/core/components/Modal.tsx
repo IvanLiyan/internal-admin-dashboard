@@ -32,7 +32,7 @@ const Modal: React.FC<ModalProps> = (props: ModalProps) => {
     width = 600,
     maxHeight,
     buttonText,
-    disabled,
+    disabled = false,
     onClick,
   } = props;
 

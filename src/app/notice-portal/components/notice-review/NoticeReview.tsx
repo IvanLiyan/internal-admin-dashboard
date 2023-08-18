@@ -1,11 +1,12 @@
 import { ReactNode, useState } from "react";
-import { Box, Button, ButtonProps, Stack } from "@mui/material";
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useAuth } from "@app/core/auth/AuthProvider";
 import { NoticeProductSchema, NoticeSchema } from "@schema";
 import ClaimNoticeButton from "./ClaimNoticeButton";
 import UnclaimNoticeButton from "./UnclaimNoticeButton";
 import SubmitReviewButton from "./SubmitReviewButton";
 import NoticeProductsTable from "./NoticeProductsTable";
+import Modal from "@app/core/components/Modal";
 
 export type NoticeReviewProps = {
   readonly notice: NoticeSchema;
@@ -17,6 +18,7 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
 ) => {
   const { notice, refetchNotice } = props;
   const auth = useAuth();
+  const [open, setOpen] = useState<boolean>(false);
   const [selectedProducts, setSelectedProducts] = useState<
     ReadonlyArray<NoticeProductSchema>
   >([]);
@@ -26,15 +28,6 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
     notice.status !== "RESOLVED" &&
     notice.status !== "REJECTED" &&
     notice.status !== "PARTIALLY_REJECTED";
-  const baseButtonProps: ButtonProps = {
-    variant: "outlined",
-    disableElevation: true,
-    sx: {
-      textTransform: "capitalize",
-      borderRadius: 10,
-      mr: 1,
-    },
-  };
 
   const renderActionButtons = () => {
     const buttonsToRender: ReactNode[] = [];
@@ -89,15 +82,31 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
         <Box>
           <Button
             href={`/product-geoblock/create?${generateQueryParams()}`}
-            {...baseButtonProps}
+            variant="outlined"
+            disableElevation={true}
+            sx={{
+              textTransform: "capitalize",
+              borderRadius: 10,
+              mr: 1,
+            }}
             disabled={!canReviewNotice || selectedProducts.length == 0}
             disableRipple
+            target="_blank"
+            onClick={() => setOpen(true)}
           >
             Geoblock Selected
           </Button>
           <Button
             href={`/tagging/counterfeit-tag/manual?${generateQueryParams()}`}
-            {...baseButtonProps}
+            variant="outlined"
+            disableElevation={true}
+            sx={{
+              textTransform: "capitalize",
+              borderRadius: 10,
+              mr: 1,
+            }}
+            target="_blank"
+            onClick={() => setOpen(true)}
             disabled={!canReviewNotice || selectedProducts.length == 0}
             disableRipple
           >
@@ -105,7 +114,15 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
           </Button>
           <Button
             href={`/tagging/ip-violation-tag/manual?${generateQueryParams()}`}
-            {...baseButtonProps}
+            variant="outlined"
+            disableElevation={true}
+            sx={{
+              textTransform: "capitalize",
+              borderRadius: 10,
+              mr: 1,
+            }}
+            target="_blank"
+            onClick={() => setOpen(true)}
             disabled={!canReviewNotice || selectedProducts.length == 0}
             disableRipple
           >
@@ -119,6 +136,27 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
         selectedProducts={selectedProducts}
         setSelectedProducts={setSelectedProducts}
       />
+      <Modal
+        open={open}
+        title="Action Taken"
+        onClose={() => setOpen(false)}
+        buttonText="Refresh"
+        onClick={() => {
+          setOpen(false);
+          setSelectedProducts([]);
+          refetchNotice();
+        }}
+      >
+        <Container sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: "fontWeightBold" }}>
+            Action Taken
+          </Typography>
+          <Typography>
+            Your chosen action has opened in a new tab. Complete the action
+            before you refresh this page.
+          </Typography>
+        </Container>
+      </Modal>
     </Stack>
   );
 };
