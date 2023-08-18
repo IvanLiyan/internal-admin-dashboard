@@ -103,6 +103,10 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     { field: "DATETIME_CREATED", order: "DESC" },
   ]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [searchQuery, limit, email, organization, startDate, endDate, sorts]);
+
   const noticeStatusColors: Record<
     NoticeStatus,
     ChipTypeMap["props"]["color"]
@@ -186,7 +190,6 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setLimit(parseInt(event.target.value));
-    setPage(0);
   };
 
   const handleSortClick = (field: NoticeSortField) => {
