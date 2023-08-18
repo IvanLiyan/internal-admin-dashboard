@@ -274,7 +274,11 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
         />
       </TableCell>
       <TableCell>
-        <Link href={`/notice-portal/review/${encodeURIComponent(notice.id)}`}>
+        <Link
+          href={`/notice-portal/review?notice_id=${encodeURIComponent(
+            notice.id
+          )}`}
+        >
           <Button
             variant="contained"
             disableElevation

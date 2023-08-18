@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { NextPage } from "next";
+import { useSearchParams } from "next/navigation";
 import { gql, useQuery } from "urql";
 import { Box, Container, Typography } from "@mui/material";
-import { useRouter } from "next/router";
 import { useToast } from "@app/core/toast/ToastProvider";
 import { DsaHubNoticeArgs, NoticeSchema } from "@schema";
 import NoticeDetails from "@app/notice-portal/components/notice-review/NoticeDetails";
@@ -65,18 +65,18 @@ const GetNotice = gql<GetNoticeResponse, DsaHubNoticeArgs>`
 `;
 
 const NoticeReview: NextPage<Record<string, never>> = () => {
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const toast = useToast();
   const [notice, setNotice] = useState<NoticeSchema | null>(null);
 
   const variables: DsaHubNoticeArgs = {
-    noticeId: router.query.slug as string,
+    noticeId: searchParams.get("notice_id") as string,
   };
 
   const [{ data, error }, refetch] = useQuery({
     query: GetNotice,
     variables,
-    pause: !router.query.slug,
+    pause: !searchParams.get("notice_id"),
   });
 
   const refetchNotice = useCallback(() => {
