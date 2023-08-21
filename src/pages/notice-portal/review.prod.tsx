@@ -20,17 +20,6 @@ const GetNotice = gql<GetNoticeResponse, DsaHubNoticeArgs>`
       notice(noticeId: $noticeId) {
         id
         status
-        products {
-          status
-          product {
-            id
-            name
-            description
-            mainImage {
-              wishUrl
-            }
-          }
-        }
         description
         datetimeCreated {
           datetime

@@ -132,7 +132,7 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
         <Box>{...renderActionButtons()}</Box>
       </Stack>
       <NoticeProductsTable
-        noticeProducts={notice.products}
+        noticeId={notice.id}
         selectedProducts={selectedProducts}
         setSelectedProducts={setSelectedProducts}
       />
