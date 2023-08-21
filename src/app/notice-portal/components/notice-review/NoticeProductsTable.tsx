@@ -103,6 +103,7 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
     newPage: number
   ) => {
     setPage(newPage);
+    setSelectedProducts([]);
   };
 
   const handleChangeLimit = (
