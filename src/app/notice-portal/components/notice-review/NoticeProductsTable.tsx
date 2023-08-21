@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { gql, useQuery } from "urql";
 import { useToast } from "@app/core/toast/ToastProvider";
 import NoticeProductTableColumn from "./NoticeProductTableColumn";
+import NoticeProductStatusFilter from "./NoticeProductStatusFilter";
 import {
   Table,
   TableContainer,
@@ -19,6 +20,7 @@ import {
 import {
   DsaHubNoticeArgs,
   NoticeProductSchema,
+  NoticeProductStatus,
   NoticeSchema,
   NoticeSchemaProductsArgs,
 } from "@schema";
@@ -42,7 +44,7 @@ const GetNoticeProducts = gql<GetNoticeProductsResponse, GetNoticeProductsArgs>`
   ) {
     dsa {
       notice(noticeId: $noticeId) {
-        allProducts: products(queryInput: {}, offset: 0) {
+        allProducts: products(queryInput: $queryInput, offset: 0) {
           status
         }
         products(queryInput: $queryInput, offset: $offset, limit: $limit) {
@@ -85,6 +87,9 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
   const [noticeProducts, setNoticeProducts] = useState<
     ReadonlyArray<NoticeProductSchema>
   >([]);
+  const [productStatuses, setProductStatuses] = useState<NoticeProductStatus[]>(
+    []
+  );
 
   const tableHeaders: CustomTableHeadCell[] = [
     {
@@ -95,6 +100,12 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
     },
     {
       label: "Status",
+      renderFilter: () => (
+        <NoticeProductStatusFilter
+          productStatuses={productStatuses}
+          onSelect={handleProductStatusesSelect}
+        />
+      ),
     },
   ];
 
@@ -111,13 +122,23 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
   ) => {
     setLimit(parseInt(event.target.value));
     setPage(0);
+    setSelectedProducts([]);
+  };
+
+  const handleProductStatusesSelect = (
+    newProductStatus: NoticeProductStatus[]
+  ) => {
+    setProductStatuses(newProductStatus);
+    setSelectedProducts([]);
   };
 
   const variables: GetNoticeProductsArgs = {
     noticeId: noticeId,
     offset: limit !== -1 ? page * limit : page,
     limit: limit === -1 ? undefined : limit,
-    queryInput: {},
+    queryInput: {
+      statuses: productStatuses.length ? productStatuses : undefined,
+    },
   };
 
   const [{ data, error }] = useQuery({
