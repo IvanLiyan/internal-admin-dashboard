@@ -89,7 +89,7 @@ const NoticeReview: NextPage<Record<string, never>> = () => {
     if (!notice) {
       toast.alert("error", "Notice does not exist!");
     }
-  }, [data, error, setNotice]);
+  }, [data, error, setNotice, toast]);
 
   const renderPage = () => {
     return (

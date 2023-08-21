@@ -117,7 +117,9 @@ const NoticeProductStatusFilter: React.FC<NoticeProductStatusFilterProps> = (
               )}
             >
               {productStatusMenuItems.map(({ value, text }) => (
-                <MenuItem value={value}>{text}</MenuItem>
+                <MenuItem value={value} key={value}>
+                  {text}
+                </MenuItem>
               ))}
             </Select>
           </Box>
