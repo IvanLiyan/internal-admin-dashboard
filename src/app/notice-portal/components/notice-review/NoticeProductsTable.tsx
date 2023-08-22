@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
+import { gql, useQuery } from "urql";
+import { useToast } from "@app/core/toast/ToastProvider";
 import NoticeProductTableColumn from "./NoticeProductTableColumn";
+import NoticeProductStatusFilter from "./NoticeProductStatusFilter";
 import {
   Table,
   TableContainer,
@@ -8,20 +12,59 @@ import {
   TableBody,
   TableFooter,
   TablePagination,
-  TableSortLabel,
-  Stack,
   Chip,
-  ChipTypeMap,
-  Button,
   Typography,
   Checkbox,
   Paper,
 } from "@mui/material";
-import { NoticeProductSchema } from "@schema";
-import { useState } from "react";
+import {
+  DsaHubNoticeArgs,
+  NoticeProductSchema,
+  NoticeProductStatus,
+  NoticeSchema,
+  NoticeSchemaProductsArgs,
+} from "@schema";
+
+type GetNoticeProductsResponse = {
+  readonly dsa: {
+    readonly notice: Pick<NoticeSchema, "products"> & {
+      readonly allProducts: ReadonlyArray<NoticeProductSchema>;
+    };
+  };
+};
+
+type GetNoticeProductsArgs = DsaHubNoticeArgs & NoticeSchemaProductsArgs;
+
+const GetNoticeProducts = gql<GetNoticeProductsResponse, GetNoticeProductsArgs>`
+  query GetNoticeProducts(
+    $noticeId: ObjectIdType!
+    $offset: Int!
+    $limit: Int
+    $queryInput: NoticeProductQueryInput!
+  ) {
+    dsa {
+      notice(noticeId: $noticeId) {
+        allProducts: products(queryInput: $queryInput, offset: 0) {
+          status
+        }
+        products(queryInput: $queryInput, offset: $offset, limit: $limit) {
+          status
+          product {
+            id
+            name
+            description
+            mainImage {
+              wishUrl
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 export type NoticeProductsTableProps = {
-  readonly noticeProducts: ReadonlyArray<NoticeProductSchema>;
+  readonly noticeId: string;
   readonly selectedProducts: ReadonlyArray<NoticeProductSchema>;
   readonly setSelectedProducts: (
     products: ReadonlyArray<NoticeProductSchema>
@@ -36,9 +79,17 @@ type CustomTableHeadCell = {
 const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
   props: NoticeProductsTableProps
 ) => {
-  const { noticeProducts, selectedProducts, setSelectedProducts } = props;
+  const { noticeId, selectedProducts, setSelectedProducts } = props;
+  const toast = useToast();
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(25);
+  const [limit, setLimit] = useState<number>(5);
+  const [noticeProductsCount, setNoticeProductsCount] = useState<number>(0);
+  const [noticeProducts, setNoticeProducts] = useState<
+    ReadonlyArray<NoticeProductSchema>
+  >([]);
+  const [productStatuses, setProductStatuses] = useState<NoticeProductStatus[]>(
+    []
+  );
 
   const tableHeaders: CustomTableHeadCell[] = [
     {
@@ -49,6 +100,12 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
     },
     {
       label: "Status",
+      renderFilter: () => (
+        <NoticeProductStatusFilter
+          productStatuses={productStatuses}
+          onSelect={handleProductStatusesSelect}
+        />
+      ),
     },
   ];
 
@@ -57,6 +114,7 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
     newPage: number
   ) => {
     setPage(newPage);
+    setSelectedProducts([]);
   };
 
   const handleChangeLimit = (
@@ -64,7 +122,49 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
   ) => {
     setLimit(parseInt(event.target.value));
     setPage(0);
+    setSelectedProducts([]);
   };
+
+  const handleProductStatusesSelect = (
+    newProductStatus: NoticeProductStatus[]
+  ) => {
+    setProductStatuses(newProductStatus);
+    setSelectedProducts([]);
+  };
+
+  const variables: GetNoticeProductsArgs = {
+    noticeId: noticeId,
+    offset: limit !== -1 ? page * limit : page,
+    limit: limit === -1 ? undefined : limit,
+    queryInput: {
+      statuses: productStatuses.length ? productStatuses : undefined,
+    },
+  };
+
+  const [{ data, error }] = useQuery({
+    query: GetNoticeProducts,
+    variables,
+  });
+
+  useEffect(() => {
+    if (error) {
+      toast.alert("error", `Encountered error: ${error.message}`);
+      return;
+    }
+
+    if (data == undefined) {
+      return;
+    }
+
+    const {
+      dsa: {
+        notice: { products, allProducts },
+      },
+    } = data;
+
+    setNoticeProducts(products);
+    setNoticeProductsCount(allProducts.length);
+  }, [data, error, toast, setNoticeProducts, setNoticeProductsCount]);
 
   const getSelectableProducts = () => {
     const selectableNoticeProducts = noticeProducts.filter(
@@ -119,7 +219,7 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
           <NoticeProductTableColumn noticeProduct={noticeProduct} />
         </TableCell>
         <TableCell>
-          <Typography width={700} noWrap>
+          <Typography width={600} noWrap>
             {noticeProduct.product.description}
           </Typography>
         </TableCell>
@@ -175,10 +275,10 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
           </TableBody>
           <TableFooter>
             <TablePagination
-              count={noticeProducts.length}
+              count={noticeProductsCount}
               page={page}
               onPageChange={handleChangePage}
-              rowsPerPageOptions={[5, 10, 25, 50]}
+              rowsPerPageOptions={[5, 10, 25, 50, { label: "All", value: -1 }]}
               rowsPerPage={limit}
               onRowsPerPageChange={handleChangeLimit}
               showFirstButton

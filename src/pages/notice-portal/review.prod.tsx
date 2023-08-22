@@ -20,17 +20,6 @@ const GetNotice = gql<GetNoticeResponse, DsaHubNoticeArgs>`
       notice(noticeId: $noticeId) {
         id
         status
-        products {
-          status
-          product {
-            id
-            name
-            description
-            mainImage {
-              wishUrl
-            }
-          }
-        }
         description
         datetimeCreated {
           datetime
@@ -100,7 +89,7 @@ const NoticeReview: NextPage<Record<string, never>> = () => {
     if (!notice) {
       toast.alert("error", "Notice does not exist!");
     }
-  }, [data, error, setNotice]);
+  }, [data, error, setNotice, toast]);
 
   const renderPage = () => {
     return (

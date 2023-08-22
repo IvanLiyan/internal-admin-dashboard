@@ -7363,6 +7363,11 @@ enum NoticePriority {
   HIGH
 }
 
+input NoticeProductQueryInput {
+  productId: ObjectIdType
+  statuses: [NoticeProductStatus!]
+}
+
 type NoticeProductSchema {
   product: ProductSchema!
   status: NoticeProductStatus!
@@ -7397,7 +7402,7 @@ input NoticeQuerySortInput {
 type NoticeSchema {
   id: ObjectIdType!
   status: NoticeStatus!
-  products: [NoticeProductSchema!]!
+  products(offset: Int! = 0, limit: Int, queryInput: NoticeProductQueryInput!): [NoticeProductSchema!]!
   notifierName: String!
   notifierEmail: String!
   notifier: NotifierSchema
@@ -12579,6 +12584,7 @@ enum TaxType {
   INTERNATIONAL_SA
   INTERNATIONAL_ZI
   INTERNATIONAL_DS
+  Undefined
   US_S
   INTERNATIONAL_ZC
   INTERNATIONAL_SI
@@ -14360,6 +14366,7 @@ enum WSSMetricType {
   ORDER_CANCELLATION
   UNFULFILLED_ORDER
   LATE_CONFIRMED_FULFILLMENT
+  BAD_PRODUCT_RATE
 }
 
 type WSSOrderFulfillment {
