@@ -49,7 +49,7 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
       {renderNoticeDetailRow("Email", notice.notifierEmail)}
       {renderNoticeDetailRow(
         "Organization",
-        notice.notifier?.organization || "N/A"
+        notice.notifierOrganization || "N/A"
       )}
       {renderNoticeDetailRow(
         "Submission Date",

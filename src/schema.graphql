@@ -2500,6 +2500,7 @@ type CreateNotice {
 input CreateNoticeInput {
   productIds: [ObjectIdType!]!
   notifierName: String!
+  notifierOrganization: String
   notifierEmail: String!
   description: String!
   supportFiles: [FileInput!]
@@ -7405,6 +7406,7 @@ type NoticeSchema {
   products(offset: Int! = 0, limit: Int, queryInput: NoticeProductQueryInput!): [NoticeProductSchema!]!
   notifierName: String!
   notifierEmail: String!
+  notifierOrganization: String
   notifier: NotifierSchema
   description: String!
   priority: NoticePriority!

@@ -54,10 +54,8 @@ const GetNotices = gql<GetNoticesResponse, DsaHubNoticesArgs>`
           datetime
         }
         notifierName
+        notifierOrganization
         notifierEmail
-        notifier {
-          organization
-        }
         priority
         lastClaimedUser {
           email
@@ -269,7 +267,7 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
       <TableCell>{notice?.lastClaimedUser?.email || "-"}</TableCell>
       <TableCell>{notice.notifierName}</TableCell>
       <TableCell>{notice.notifierEmail}</TableCell>
-      <TableCell>{notice.notifier?.organization}</TableCell>
+      <TableCell>{notice.notifierOrganization || "-"}</TableCell>
       <TableCell>
         <Chip
           label={notice.priority}
