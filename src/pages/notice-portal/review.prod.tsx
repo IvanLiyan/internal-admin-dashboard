@@ -29,9 +29,7 @@ const GetNotice = gql<GetNoticeResponse, DsaHubNoticeArgs>`
         }
         notifierName
         notifierEmail
-        notifier {
-          organization
-        }
+        notifierOrganization
         lastClaimedUser {
           id
           email

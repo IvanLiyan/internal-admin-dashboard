@@ -52,6 +52,7 @@ const NoticeIntakeForm: React.FC = () => {
   const [wishUrls, setWishUrls] = useState<string[]>([]);
   const [wishUrlError, setWishUrlError] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
+  const [organization, setOrganization] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [checked, setChecked] = useState<boolean>(false);
   const [files, setFiles] = useState<ReadonlyArray<AttachmentInfo>>([]);
@@ -75,6 +76,7 @@ const NoticeIntakeForm: React.FC = () => {
     setDescription("");
     setWishUrls([]);
     setName("");
+    setOrganization("");
     setEmail("");
     setChecked(false);
     setFiles([]);
@@ -102,6 +104,8 @@ const NoticeIntakeForm: React.FC = () => {
       input: {
         description: description,
         notifierEmail: email,
+        notifierOrganization:
+          organization.length > 0 ? organization : undefined,
         notifierName: name,
         productIds: wishUrls.map((url) => url.trim().split("/").pop() || ""),
         supportFiles: files.map((file) => {
@@ -194,6 +198,16 @@ const NoticeIntakeForm: React.FC = () => {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+        />
+      </FormGroup>
+      <FormGroup {...baseFormGroupProps}>
+        <Typography>Organization</Typography>
+        <TextField
+          fullWidth
+          required
+          placeholder="Organization"
+          value={organization}
+          onChange={(e) => setOrganization(e.target.value)}
         />
       </FormGroup>
       <FormGroup {...baseFormGroupProps}>
