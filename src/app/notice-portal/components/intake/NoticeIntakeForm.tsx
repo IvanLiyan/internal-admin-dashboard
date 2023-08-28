@@ -83,7 +83,7 @@ const NoticeIntakeForm: React.FC = () => {
   };
 
   const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/;
-  const wishUrlRegex = /^https:\/\/www.wish.com\/c\/[a-f\d]{24}$/;
+  const wishUrlRegex = /^https:\/\/www.wish.com\/(c|product)\/[a-f\d]{24}$/;
 
   const canSubmit = () => {
     if (!email.match(emailRegex)) {
@@ -186,7 +186,7 @@ const NoticeIntakeForm: React.FC = () => {
           rows={4}
           value={wishUrls.join("\n")}
           onChange={handleWishUrlsChange}
-          helperText="Must be of the format https://www.wish.com/c/<product_id>"
+          helperText="Must be of the format https://www.wish.com/c/<product_id> or https://www.wish.com/product/<product_id>"
           error={wishUrls.length != 0 && wishUrlError}
         />
       </FormGroup>

@@ -69,6 +69,7 @@ export type NoticeProductsTableProps = {
   readonly setSelectedProducts: (
     products: ReadonlyArray<NoticeProductSchema>
   ) => unknown;
+  readonly disableCheckboxes: boolean;
 };
 
 type CustomTableHeadCell = {
@@ -79,7 +80,8 @@ type CustomTableHeadCell = {
 const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
   props: NoticeProductsTableProps
 ) => {
-  const { noticeId, selectedProducts, setSelectedProducts } = props;
+  const { noticeId, disableCheckboxes, selectedProducts, setSelectedProducts } =
+    props;
   const toast = useToast();
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
@@ -195,8 +197,9 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
         <TableCell padding="checkbox">
           <Checkbox
             disabled={
-              noticeProduct.status !== "REPORTED" &&
-              noticeProduct.status !== "DISPUTED"
+              disableCheckboxes ||
+              (noticeProduct.status !== "REPORTED" &&
+                noticeProduct.status !== "DISPUTED")
             }
             sx={{ m: 1 }}
             color="primary"
@@ -224,7 +227,7 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
           </Typography>
         </TableCell>
         <TableCell>
-          <Chip label={noticeProduct.status} />
+          <Chip label={noticeProduct.status.split("_").join(" ")} />
         </TableCell>
       </TableRow>
     );
@@ -238,7 +241,9 @@ const NoticeProductsTable: React.FC<NoticeProductsTableProps> = (
             <Checkbox
               sx={{ m: 1 }}
               color="primary"
-              disabled={getSelectableProducts().length == 0}
+              disabled={
+                disableCheckboxes || getSelectableProducts().length == 0
+              }
               indeterminate={
                 selectedProducts.length > 0 &&
                 selectedProducts.length < getSelectableProducts().length
