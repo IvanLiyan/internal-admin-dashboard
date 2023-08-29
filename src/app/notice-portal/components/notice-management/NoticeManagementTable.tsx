@@ -260,7 +260,7 @@ const NoticeManagementTable: React.FC<NoticeManagementTableProps> = (
       <TableCell>
         <Chip
           variant="outlined"
-          label={notice.status}
+          label={notice.status.split("_").join(" ")}
           color={noticeStatusColors[notice.status]}
         />
       </TableCell>

@@ -94,7 +94,7 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
             target="_blank"
             onClick={() => setOpen(true)}
           >
-            Geoblock Selected
+            Geoblock
           </Button>
           <Button
             href={`/tagging/counterfeit-tag/manual?${generateQueryParams()}`}
@@ -110,7 +110,7 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
             disabled={!canReviewNotice || selectedProducts.length == 0}
             disableRipple
           >
-            Inappropriate Manual Review Selected
+            Inappropriate Manual Review
           </Button>
           <Button
             href={`/tagging/ip-violation-tag/manual?${generateQueryParams()}`}
@@ -126,13 +126,18 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
             disabled={!canReviewNotice || selectedProducts.length == 0}
             disableRipple
           >
-            IP Manual Review Selected
+            IP Manual Review
           </Button>
         </Box>
         <Box>{...renderActionButtons()}</Box>
       </Stack>
       <NoticeProductsTable
         noticeId={notice.id}
+        disableCheckboxes={
+          notice.status === "RESOLVED" ||
+          notice.status === "REJECTED" ||
+          notice.status === "PARTIALLY_REJECTED"
+        }
         selectedProducts={selectedProducts}
         setSelectedProducts={setSelectedProducts}
       />
@@ -144,7 +149,7 @@ const NoticeReview: React.FC<NoticeReviewProps> = (
         onClick={() => {
           setOpen(false);
           setSelectedProducts([]);
-          refetchNotice();
+          location.reload();
         }}
       >
         <Container sx={{ mt: 4, mb: 4 }}>

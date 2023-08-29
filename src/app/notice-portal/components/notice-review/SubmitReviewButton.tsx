@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { Button, Container, TextField, Typography } from "@mui/material";
 import { useToast } from "@app/core/toast/ToastProvider";
 import {
@@ -39,6 +40,7 @@ const SubmitReviewButton: React.FC<SubmitReviewButtonProps> = (
 ) => {
   const { noticeId, refetchNotice } = props;
   const toast = useToast();
+  const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [responseText, setResponseText] = useState<string>("");
   const [, submitReview] = useMutation(SubmitReview);
@@ -67,6 +69,7 @@ const SubmitReviewButton: React.FC<SubmitReviewButtonProps> = (
     toast.alert("success", "Notice reviewed successfully");
     setOpen(false);
     refetchNotice();
+    router.push("/notice-portal/notice-management");
   };
 
   return (
