@@ -63,10 +63,6 @@ export const MenuData: MenuItemProps[] = [
     text: "Notice Portal",
     subMenuItems: [
       {
-        text: "Notice Intake",
-        href: "/notice-portal/intake",
-      },
-      {
         text: "Notice Management",
         href: "/notice-portal/notice-management",
       },

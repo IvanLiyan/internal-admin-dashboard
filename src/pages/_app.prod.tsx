@@ -23,12 +23,7 @@ const client = createClient({
   },
 });
 
-const independentSubpaths = [
-  "/dev-login",
-  "/go",
-  "/login",
-  "/notice-portal/intake",
-];
+const independentSubpaths = ["/dev-login", "/go", "/login"];
 
 export default function App({ Component, pageProps, router }: AppProps) {
   const theme = createTheme({
