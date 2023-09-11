@@ -18,9 +18,6 @@ type MerchantInfractions = ExtractStrict<
   | "BAN_EARLY_STAGE_MERCHANT"
   | "INACTIVE_ACCOUNT"
   | "WISH_STANDARDS_BAN"
-  | "SUSPENDED_FOR_UNDER_PERFORMING"
-  | "PRODUCT_LIMIT_REACHED"
-  | "ADDITIONAL_TAX_INFO"
 >;
 
 type OrderInfractions = ExtractStrict<
@@ -394,18 +391,6 @@ const CategorizedInfractionsDictionary: {
   WISHPOST_NEGATIVE_BALANCE: {
     category: "Merchant Infractions",
     text: "WishPost negative account balance",
-  },
-  SUSPENDED_FOR_UNDER_PERFORMING: {
-    category: "Merchant Infractions",
-    text: "Low performing catalo",
-  },
-  PRODUCT_LIMIT_REACHED: {
-    category: "Merchant Infractions",
-    text: "Product limit reached",
-  },
-  ADDITIONAL_TAX_INFO: {
-    category: "Merchant Infractions",
-    text: "Tax information required",
   },
 };
 
