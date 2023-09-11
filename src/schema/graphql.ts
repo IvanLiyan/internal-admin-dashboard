@@ -3901,10 +3901,7 @@ export type DetailedMerchantWarningReason =
   | 'WISH_EXPRESS_POLICY_MERCHANT'
   | 'WISH_EXPRESS_POLICY_PRODUCT'
   | 'WISH_EXPRESS_POLICY_VIOLATION'
-  | 'WISH_STANDARDS_BAN'
-  | 'SUSPENDED_FOR_UNDER_PERFORMING'
-  | 'PRODUCT_LIMIT_REACHED'
-  | 'ADDITIONAL_TAX_INFO';
+  | 'WISH_STANDARDS_BAN';
 
 export type DetailedMerchantWarningReasonSchema = {
   __typename?: 'DetailedMerchantWarningReasonSchema';
@@ -9140,10 +9137,7 @@ export type MerchantWarningReason =
   | 'WISH_EXPRESS_POLICY_MERCHANT'
   | 'WISH_EXPRESS_POLICY_PRODUCT'
   | 'WISH_EXPRESS_POLICY_VIOLATION'
-  | 'WISH_STANDARDS_BAN'
-  | 'SUSPENDED_FOR_UNDER_PERFORMING'
-  | 'PRODUCT_LIMIT_REACHED'
-  | 'ADDITIONAL_TAX_INFO'
+  | 'WISH_STANDARDS_BAN';
 
 export type MerchantWarningReasonSchema = {
   __typename?: 'MerchantWarningReasonSchema';
