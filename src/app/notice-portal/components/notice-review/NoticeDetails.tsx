@@ -1,6 +1,16 @@
-import { Divider, Link, Stack, Typography, Button, TextField,
-  Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
+import {
+  Divider,
+  Link,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { MerchantFileSchema, NoticeSchema } from "@schema";
 import { useState } from "react";
 import { useToast } from "@app/core/toast/ToastProvider";
@@ -33,7 +43,7 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
 ) => {
   const { notice } = props;
   const [noteModalShow, setNoteModalShow] = useState(false);
-  const [noteContent, setNoteContent] = useState('');
+  const [noteContent, setNoteContent] = useState("");
   const toast = useToast();
   const [, upsertNote] = useMutation(UpsertNoteMutation);
 
@@ -73,43 +83,49 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
   const renderNoticeDetailNoteRow = (label: string, content: string) => {
     return (
       <Stack sx={{ mb: 1 }}>
-        <Typography sx={{ fontWeight: "fontWeightBold", display: "flex", alignItems: "center" }}>
+        <Typography
+          sx={{
+            fontWeight: "fontWeightBold",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           {`${label}:`}
-          <EditIcon sx={{ ml: 1, cursor: "pointer" }} onClick={openNoteModal}/>
+          <EditIcon sx={{ ml: 1, cursor: "pointer" }} onClick={openNoteModal} />
         </Typography>
         <Typography sx={{ wordWrap: "break-word" }}>{content}</Typography>
       </Stack>
     );
   };
 
-  const changeNoteValue = (e:{ target:{ value: string }}) => {
-    setNoteContent(e.target.value)
-  }
+  const changeNoteValue = (e: { target: { value: string } }) => {
+    setNoteContent(e.target.value);
+  };
 
   const openNoteModal = () => {
-    setNoteContent(notice.note ?? '');
+    setNoteContent(notice.note ?? "");
     setNoteModalShow(true);
-  }
+  };
 
   const closeNoteModal = () => {
     setNoteModalShow(false);
-  }
+  };
 
   const handleCancel = () => {
     setNoteModalShow(false);
-  }
+  };
 
   const handleSave = () => {
     notice.note = noteContent;
-    handleSaveNote()
+    handleSaveNote();
     setNoteModalShow(false);
-  }
+  };
 
   const handleSaveNote = async () => {
     const variables: DsaMutationsUpsertNoteArgs = {
       input: {
         noticeId: notice.id,
-        note: noteContent
+        note: noteContent,
       },
     };
     const { data, error } = await upsertNote(variables);
@@ -150,12 +166,16 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
           />
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
-          <Button variant="outlined" onClick={handleCancel}>Cancel</Button>
-          <Button variant="contained" onClick={handleSave}>Save</Button>
+          <Button variant="outlined" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleSave}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
-    )
-  }
+    );
+  };
 
   return (
     <Stack sx={{ mb: 3 }}>
