@@ -4,11 +4,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import { MerchantFileSchema, NoticeSchema } from "@schema";
 import { useState } from "react";
 import { useToast } from "@app/core/toast/ToastProvider";
-import { UpsertNote, DsaMutationsUpsertNoteArgs } from "@schema";
+import { UpsertNote, DsaMutations, DsaMutationsUpsertNoteArgs } from "@schema";
 import { gql, useMutation } from "urql";
 
 type UpsertNoteResponse = {
-  readonly upsertNote: UpsertNote;
+  readonly dsa: Pick<DsaMutations, "upsertNote"> & {
+    readonly upsertNote: UpsertNote;
+  };
 };
 
 const UpsertNoteMutation = gql<UpsertNoteResponse, DsaMutationsUpsertNoteArgs>`
