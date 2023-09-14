@@ -111,7 +111,7 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
     setNoteModalShow(false);
   };
 
-  const handleSave = async() => {
+  const handleSave = async () => {
     const variables: DsaMutationsUpsertNoteArgs = {
       input: {
         noticeId: notice.id,
