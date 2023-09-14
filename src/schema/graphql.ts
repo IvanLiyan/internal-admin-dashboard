@@ -2901,6 +2901,12 @@ export type CountryCode =
   | 'ZR'
   | 'ZW';
 
+export type CountryDiscountAmount = {
+  __typename?: 'CountryDiscountAmount';
+  country: Country;
+  discountAmount?: Maybe<CurrencyValue>;
+};
+
 export type CountryEprSchema = {
   __typename?: 'CountryEPRSchema';
   categories: Array<CategoryEprSchema>;
@@ -2918,6 +2924,14 @@ export type CountryShippingInput = {
   price?: InputMaybe<CurrencyInput>;
   regionShipping?: InputMaybe<Array<RegionShippingInput>>;
   timeToDoor?: InputMaybe<Scalars['Int']>;
+};
+
+export type CountryShippingPrice = {
+  __typename?: 'CountryShippingPrice';
+  country: Country;
+  maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
+  merchantSetShippingPrice?: Maybe<CurrencyValue>;
+  minCalculatedShippingPrice?: Maybe<CurrencyValue>;
 };
 
 export type CountryShippingSchema = {
@@ -3536,6 +3550,7 @@ export type DsaMutations = {
   removeNotifier?: Maybe<RemoveNotifier>;
   unclaimNotices?: Maybe<UnclaimNotices>;
   updateNotifier?: Maybe<UpdateNotifier>;
+  upsertNote?: Maybe<UpsertNote>;
 };
 
 
@@ -3571,6 +3586,11 @@ export type DsaMutationsUnclaimNoticesArgs = {
 
 export type DsaMutationsUpdateNotifierArgs = {
   input: UpdateNotifierInput;
+};
+
+
+export type DsaMutationsUpsertNoteArgs = {
+  input: UpsertNoteInput;
 };
 
 export type Datetime = {
@@ -3816,6 +3836,7 @@ export type DestinationShippingProfileSchema = {
 };
 
 export type DetailedMerchantWarningReason =
+  | 'ADDITIONAL_TAX_INFO'
   | 'BAD_CUSTOMER_SERVICE'
   | 'BAN_EARLY_STAGE_MERCHANT'
   | 'BRANDED_PRODUCT_GEOBLOCK'
@@ -3873,6 +3894,7 @@ export type DetailedMerchantWarningReason =
   | 'PRODUCT_HIGH_REFUND_RATIO'
   | 'PRODUCT_HIGH_REFUND_RATIO_NO_REMOVE'
   | 'PRODUCT_IS_INAPPROPRIATE'
+  | 'PRODUCT_LIMIT_REACHED'
   | 'PRODUCT_LOW_RATING'
   | 'PRODUCT_LOW_RATING_NO_REMOVE'
   | 'PROHIBITED_PRODUCT'
@@ -3886,6 +3908,7 @@ export type DetailedMerchantWarningReason =
   | 'STORE_VALIDATION_INCOMPLETE'
   | 'STRIKE_BASED_HIGH_RISK_PROHIBITED'
   | 'SUSPECTED_FRAUD'
+  | 'SUSPENDED_FOR_UNDER_PERFORMING'
   | 'TAKE_USER_OUTSIDE_WISH'
   | 'TAX_SETTING_NOT_UPDATED'
   | 'UNCONFIRMED_TRACKING_NUMBERS'
@@ -6472,6 +6495,8 @@ export type MfpCampaignCancelReason =
 
 export type MfpCampaignConstantsSchema = {
   __typename?: 'MFPCampaignConstantsSchema';
+  consumerMaxDiscountPercentage: Scalars['Float'];
+  consumerMinDiscountPercentage: Scalars['Float'];
   maxAllowedQuantity: Scalars['Int'];
   maxCampaignDelayInHour: Scalars['Int'];
   maxCampaignDurationInDays: Scalars['Int'];
@@ -6547,6 +6572,7 @@ export type MfpCampaignSearchType =
 export type MfpCampaignState =
   | 'APPROVED'
   | 'CANCELLED'
+  | 'CREATING'
   | 'PENDING';
 
 export type MfpConstantsSchema = {
@@ -6788,6 +6814,7 @@ export type MfpUnqualifiedVariationData = {
 
 export type MfpVariationDiscountData = {
   __typename?: 'MFPVariationDiscountData';
+  countryDiscountAmount?: Maybe<Array<CountryDiscountAmount>>;
   discountAmount?: Maybe<CurrencyValue>;
   discountPercentage: Scalars['Float'];
   maxQuantity?: Maybe<Scalars['Int']>;
@@ -9055,6 +9082,7 @@ export type MerchantWarningProofType =
   | 'VARIATION';
 
 export type MerchantWarningReason =
+  | 'ADDITIONAL_TAX_INFO'
   | 'BAD_CUSTOMER_SERVICE'
   | 'BAN_EARLY_STAGE_MERCHANT'
   | 'BRANDED_PRODUCT_GEOBLOCK'
@@ -9110,6 +9138,7 @@ export type MerchantWarningReason =
   | 'PRODUCT_HIGH_REFUND_RATIO'
   | 'PRODUCT_HIGH_REFUND_RATIO_NO_REMOVE'
   | 'PRODUCT_IS_INAPPROPRIATE'
+  | 'PRODUCT_LIMIT_REACHED'
   | 'PRODUCT_LOW_RATING'
   | 'PRODUCT_LOW_RATING_NO_REMOVE'
   | 'RELATED_ACCOUNT_IS_BANNED'
@@ -9122,6 +9151,7 @@ export type MerchantWarningReason =
   | 'STORE_VALIDATION_INCOMPLETE'
   | 'STRIKE_BASED_HIGH_RISK_PROHIBITED'
   | 'SUSPECTED_FRAUD'
+  | 'SUSPENDED_FOR_UNDER_PERFORMING'
   | 'TAKE_USER_OUTSIDE_WISH'
   | 'TAX_SETTING_NOT_UPDATED'
   | 'UNCONFIRMED_TRACKING_NUMBERS'
@@ -9420,6 +9450,7 @@ export type NoticeSchema = {
   disputeSupportFiles?: Maybe<Array<MerchantFileSchema>>;
   id: Scalars['ObjectIdType'];
   lastClaimedUser?: Maybe<UserSchema>;
+  note?: Maybe<Scalars['String']>;
   notifier?: Maybe<NotifierSchema>;
   notifierEmail: Scalars['String'];
   notifierName: Scalars['String'];
@@ -14876,12 +14907,18 @@ export type ShippingProviderTrackerSchema = {
 export type ShippingSchema = {
   __typename?: 'ShippingSchema';
   calculatedShippingEnabled?: Maybe<Scalars['Boolean']>;
+  countryShippingPrice?: Maybe<Array<CountryShippingPrice>>;
   defaultShipping?: Maybe<Array<DefaultShippingSchema>>;
   domesticShipping?: Maybe<Array<DomesticShippingSchema>>;
   maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
   maxMerchantSetShippingPrice?: Maybe<CurrencyValue>;
   warehouseCountryShipping?: Maybe<Array<WarehouseCountryShippingSchema>>;
   wishpostEstimatedShipping?: Maybe<Array<WishPostShippingSchema>>;
+};
+
+
+export type ShippingSchemaCountryShippingPriceArgs = {
+  countries?: InputMaybe<Array<CountryCode>>;
 };
 
 
@@ -16986,6 +17023,17 @@ export type UpsertMerchantWarningInput = {
   warningId?: InputMaybe<Scalars['ObjectIdType']>;
 };
 
+export type UpsertNote = {
+  __typename?: 'UpsertNote';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type UpsertNoteInput = {
+  note: Scalars['String'];
+  noticeId: Scalars['ObjectIdType'];
+};
+
 export type UpsertOrderInfractionDispute = {
   __typename?: 'UpsertOrderInfractionDispute';
   message?: Maybe<Scalars['String']>;
@@ -18560,6 +18608,13 @@ export type NoticePortal_ClaimNoticeMutationVariables = Exact<{
 
 export type NoticePortal_ClaimNoticeMutation = { __typename?: 'RootMutation', dsa?: { __typename?: 'DSAMutations', claimNotices?: { __typename?: 'ClaimNotices', ok: boolean, message?: string | null } | null } | null };
 
+export type UpsertNoteMutationVariables = Exact<{
+  input: UpsertNoteInput;
+}>;
+
+
+export type UpsertNoteMutation = { __typename?: 'RootMutation', dsa?: { __typename?: 'DSAMutations', upsertNote?: { __typename?: 'UpsertNote', ok: boolean, message?: string | null } | null } | null };
+
 export type GetNoticeProductsQueryVariables = Exact<{
   noticeId: Scalars['ObjectIdType'];
   offset: Scalars['Int'];
@@ -18637,6 +18692,7 @@ export const Disputes_MessagesDocument = {"kind":"Document","definitions":[{"kin
 export const Disputes_GetInfractionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Disputes_GetInfractions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"states"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningState"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningClaimStatus"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningReason"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningSort"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DatetimeInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningProofType"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"category"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CounterfeitReasonCode"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"subcategory"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"TaggingViolationSubReasonCode"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"correspondenceStatus"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MerchantWarningCorrespondenceStatus"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"disputePendingEditReview"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"disputePendingBrandAuth"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"policy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantWarningCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}},{"kind":"Argument","name":{"kind":"Name","value":"category"},"value":{"kind":"Variable","name":{"kind":"Name","value":"category"}}},{"kind":"Argument","name":{"kind":"Name","value":"subcategory"},"value":{"kind":"Variable","name":{"kind":"Name","value":"subcategory"}}},{"kind":"Argument","name":{"kind":"Name","value":"correspondenceStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"correspondenceStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"disputePendingEditReview"},"value":{"kind":"Variable","name":{"kind":"Name","value":"disputePendingEditReview"}}},{"kind":"Argument","name":{"kind":"Name","value":"disputePendingBrandAuth"},"value":{"kind":"Variable","name":{"kind":"Name","value":"disputePendingBrandAuth"}}}]},{"kind":"Field","name":{"kind":"Name","value":"merchantWarnings"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"states"},"value":{"kind":"Variable","name":{"kind":"Name","value":"states"}}},{"kind":"Argument","name":{"kind":"Name","value":"claimStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"claimStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"reasons"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reasons"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"issueDateEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issueDateEnd"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchProofIdTypes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchProofIdTypes"}}},{"kind":"Argument","name":{"kind":"Name","value":"category"},"value":{"kind":"Variable","name":{"kind":"Name","value":"category"}}},{"kind":"Argument","name":{"kind":"Name","value":"subcategory"},"value":{"kind":"Variable","name":{"kind":"Name","value":"subcategory"}}},{"kind":"Argument","name":{"kind":"Name","value":"correspondenceStatus"},"value":{"kind":"Variable","name":{"kind":"Name","value":"correspondenceStatus"}}},{"kind":"Argument","name":{"kind":"Name","value":"disputePendingEditReview"},"value":{"kind":"Variable","name":{"kind":"Name","value":"disputePendingEditReview"}}},{"kind":"Argument","name":{"kind":"Name","value":"disputePendingBrandAuth"},"value":{"kind":"Variable","name":{"kind":"Name","value":"disputePendingBrandAuth"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"creatorName"}},{"kind":"Field","name":{"kind":"Name","value":"adminReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"counterfeitReasonText"}},{"kind":"Field","name":{"kind":"Name","value":"banned"}},{"kind":"Field","name":{"kind":"Name","value":"correspondenceStatus"}},{"kind":"Field","name":{"kind":"Name","value":"wssImpact"}},{"kind":"Field","name":{"kind":"Name","value":"urgencyScore"}},{"kind":"Field","name":{"kind":"Name","value":"bulkProcessing"}},{"kind":"Field","name":{"kind":"Name","value":"productTrueTagInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subreason"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subcategory"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"claimedBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdTime"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUpdate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"merchant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"accountManager"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"bdMerchantCountry"}}]}},{"kind":"Field","name":{"kind":"Name","value":"wishSellerStandard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}}]}},{"kind":"Field","name":{"kind":"Name","value":"storeStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"thirtyDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"30"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"orders"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"sevenDayTotals"},"name":{"kind":"Name","value":"totals"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"days"},"value":{"kind":"IntValue","value":"7"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalGmv"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"display"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<Disputes_GetInfractionsQuery, Disputes_GetInfractionsQueryVariables>;
 export const GetNoticesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNotices"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"queryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"NoticeQueryInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notifierOrganizations"}},{"kind":"Field","name":{"kind":"Name","value":"noticeCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"queryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"queryInput"}}}]},{"kind":"Field","name":{"kind":"Name","value":"notices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"queryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"queryInput"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"datetimeCreated"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"datetime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"notifierName"}},{"kind":"Field","name":{"kind":"Name","value":"notifierOrganization"}},{"kind":"Field","name":{"kind":"Name","value":"notifierEmail"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"lastClaimedUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetNoticesQuery, GetNoticesQueryVariables>;
 export const NoticePortal_ClaimNoticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"NoticePortal_ClaimNotice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ClaimNoticesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"claimNotices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<NoticePortal_ClaimNoticeMutation, NoticePortal_ClaimNoticeMutationVariables>;
+export const UpsertNoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpsertNote"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpsertNoteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertNote"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<UpsertNoteMutation, UpsertNoteMutationVariables>;
 export const GetNoticeProductsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNoticeProducts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"noticeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"queryInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"NoticeProductQueryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"noticeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"noticeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"allProducts"},"name":{"kind":"Name","value":"products"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"queryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"queryInput"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"IntValue","value":"0"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"products"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"queryInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"queryInput"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"product"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"mainImage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"wishUrl"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetNoticeProductsQuery, GetNoticeProductsQueryVariables>;
 export const NoticePortal_SubmitReviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"NoticePortal_SubmitReview"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CompleteNoticeReviewInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"completeNoticeReview"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<NoticePortal_SubmitReviewMutation, NoticePortal_SubmitReviewMutationVariables>;
 export const NoticePortal_UnclaimNoticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"NoticePortal_UnclaimNotice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UnclaimNoticesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unclaimNotices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<NoticePortal_UnclaimNoticeMutation, NoticePortal_UnclaimNoticeMutationVariables>;
