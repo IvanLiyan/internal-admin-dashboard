@@ -107,21 +107,11 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
     setNoteModalShow(true);
   };
 
-  const closeNoteModal = () => {
-    setNoteModalShow(false);
-  };
-
   const handleCancel = () => {
     setNoteModalShow(false);
   };
 
-  const handleSave = () => {
-    notice.note = noteContent;
-    handleSaveNote();
-    setNoteModalShow(false);
-  };
-
-  const handleSaveNote = async () => {
+  const handleSave = async() => {
     const variables: DsaMutationsUpsertNoteArgs = {
       input: {
         noticeId: notice.id,
@@ -144,13 +134,14 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
       toast.alert("error", message);
       return;
     }
-
-    toast.alert("success", "Note upserted successfully");
+    notice.note = noteContent;
+    toast.alert("success", "success");
+    setNoteModalShow(false);
   };
 
   const renderNoteModal = () => {
     return (
-      <Dialog open={noteModalShow} fullWidth onClose={closeNoteModal}>
+      <Dialog open={noteModalShow} fullWidth onClose={handleCancel}>
         <DialogTitle>Edit/Add custom note</DialogTitle>
         <DialogContent>
           <TextField
