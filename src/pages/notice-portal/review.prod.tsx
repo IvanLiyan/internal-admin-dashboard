@@ -46,6 +46,7 @@ const GetNotice = gql<GetNoticeResponse, DsaHubNoticeArgs>`
           displayFilename
           fileUrl
         }
+        note
       }
     }
   }
