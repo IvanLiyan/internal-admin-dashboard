@@ -120,7 +120,7 @@ const NoticeDetails: React.FC<NoticeDetailsProps> = (
     };
     const { data, error } = await upsertNote(variables);
     if (error || data == null) {
-      toast.alert("error", "Something went wrong");
+      toast.alert("error", error?.toString());
       return;
     }
 
