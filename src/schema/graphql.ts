@@ -923,15 +923,18 @@ export type BankAccountDocumentSchema = {
   documentFile?: Maybe<MerchantFileSchema>;
   documentType?: Maybe<BankAccountDocumentType>;
   id: Scalars['ObjectIdType'];
+  last4Digits: Scalars['String'];
   reviewedAt?: Maybe<Datetime>;
   reviewer?: Maybe<UserSchema>;
   state: BankAccountVerificationStatus;
+  stateReason?: Maybe<BankAccountVerificationStatusReason>;
   uploadedAt: Datetime;
 };
 
 export type BankAccountDocumentType =
-  | 'BANK_DOCUMENT'
-  | 'GOVERNMENT_DOCUMENT'
+  | 'BANK_ACCOUNT_CARD'
+  | 'BANK_ACCOUNT_CERTIFICATE'
+  | 'BANK_STATEMENT'
   | 'UNIDENTIFIED';
 
 export type BankAccountVerificationMerchantMutations = {
@@ -961,6 +964,7 @@ export type BankAccountVerificationSchema = {
   lastReviewedAt?: Maybe<Datetime>;
   lastUploadedAt?: Maybe<Datetime>;
   state: BankAccountVerificationStatus;
+  stateReason?: Maybe<BankAccountVerificationStatusReason>;
 };
 
 export type BankAccountVerificationStatus =
@@ -968,6 +972,14 @@ export type BankAccountVerificationStatus =
   | 'PENDING'
   | 'REJECTED'
   | 'SUBMITTED';
+
+export type BankAccountVerificationStatusReason =
+  | 'APPROVE'
+  | 'BLURRY_IMAGE'
+  | 'INVALID_DOCUMENT'
+  | 'MISMATCH_LAST_FOUR_DIGITS'
+  | 'PARTIAL_IMAGE'
+  | 'UNQUALIFIED_BANK_DOCUMENT';
 
 export type BdSignupCodeInfo = {
   __typename?: 'BdSignupCodeInfo';
@@ -2445,6 +2457,7 @@ export type CommerceTransactionState =
   | 'SHIPPED';
 
 export type CommerceTransactionTaxEventType =
+  | 'COLORADO_DELIVERY_FEE'
   | 'REFUND_PRICE'
   | 'REFUND_SHIPPING'
   | 'SALE_PRICE'
@@ -2901,12 +2914,6 @@ export type CountryCode =
   | 'ZR'
   | 'ZW';
 
-export type CountryDiscountAmount = {
-  __typename?: 'CountryDiscountAmount';
-  country: Country;
-  discountAmount?: Maybe<CurrencyValue>;
-};
-
 export type CountryEprSchema = {
   __typename?: 'CountryEPRSchema';
   categories: Array<CategoryEprSchema>;
@@ -2924,14 +2931,6 @@ export type CountryShippingInput = {
   price?: InputMaybe<CurrencyInput>;
   regionShipping?: InputMaybe<Array<RegionShippingInput>>;
   timeToDoor?: InputMaybe<Scalars['Int']>;
-};
-
-export type CountryShippingPrice = {
-  __typename?: 'CountryShippingPrice';
-  country: Country;
-  maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
-  merchantSetShippingPrice?: Maybe<CurrencyValue>;
-  minCalculatedShippingPrice?: Maybe<CurrencyValue>;
 };
 
 export type CountryShippingSchema = {
@@ -3151,12 +3150,13 @@ export type CreateUinInput = {
 };
 
 export type CreateWhitelistProductsInput = {
-  merchantId: Scalars['ObjectIdType'];
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
   productIds: Array<Scalars['ObjectIdType']>;
 };
 
 export type CreateWhitelistProductsMutation = {
   __typename?: 'CreateWhitelistProductsMutation';
+  invalidProductIds?: Maybe<Array<Scalars['String']>>;
   message?: Maybe<Scalars['String']>;
   ok: Scalars['Boolean'];
 };
@@ -3924,10 +3924,7 @@ export type DetailedMerchantWarningReason =
   | 'WISH_EXPRESS_POLICY_MERCHANT'
   | 'WISH_EXPRESS_POLICY_PRODUCT'
   | 'WISH_EXPRESS_POLICY_VIOLATION'
-  | 'WISH_STANDARDS_BAN'
-  | 'SUSPENDED_FOR_UNDER_PERFORMING'
-  | 'PRODUCT_LIMIT_REACHED'
-  | 'ADDITIONAL_TAX_INFO';
+  | 'WISH_STANDARDS_BAN';
 
 export type DetailedMerchantWarningReasonSchema = {
   __typename?: 'DetailedMerchantWarningReasonSchema';
@@ -5076,6 +5073,7 @@ export type FulfillmentSchema = {
   fulfillmentCsv?: Maybe<FulfillmentCsvSchema>;
   historicalOrders?: Maybe<Array<OrderSchema>>;
   order?: Maybe<OrderSchema>;
+  orderBatch?: Maybe<Array<OrderSchema>>;
   orders?: Maybe<Array<OrderSchema>>;
   ordersCount?: Maybe<Scalars['Int']>;
   ordersCsvUrl?: Maybe<Scalars['String']>;
@@ -5128,6 +5126,11 @@ export type FulfillmentSchemaHistoricalOrdersArgs = {
 
 export type FulfillmentSchemaOrderArgs = {
   id: Scalars['String'];
+};
+
+
+export type FulfillmentSchemaOrderBatchArgs = {
+  ids: Scalars['String'];
 };
 
 
@@ -6543,6 +6546,7 @@ export type MfpCampaignSchema = {
   genericFlashSaleDetails?: Maybe<Scalars['GenericScalar']>;
   genericUnqualifiedProductVariations?: Maybe<Scalars['GenericScalar']>;
   id: Scalars['ObjectIdType'];
+  isNewVersion: Scalars['Boolean'];
   name: Scalars['String'];
   promotionType: MfpCampaignPromotionType;
   skipShipping: Scalars['Boolean'];
@@ -6597,6 +6601,7 @@ export type MfpDiscountCampaignConstantsSchema = {
   minimumCooldownDays: Scalars['Int'];
   minimumPercentageRequired: Scalars['Int'];
   minimumProductHistoryDays: Scalars['Int'];
+  minimumProductRatingCountRequired: Scalars['Int'];
   minimumProductRatingRequired: Scalars['Int'];
   minimumProductSaleRequired: Scalars['Int'];
   productAndShippingPriceDays: Scalars['Int'];
@@ -6615,6 +6620,7 @@ export type MfpFlashSaleConstantsSchema = {
   minimumCooldownDays: Scalars['Int'];
   minimumPercentageRequired: Scalars['Int'];
   minimumProductHistoryDays: Scalars['Int'];
+  minimumProductRatingCountRequired: Scalars['Int'];
   minimumProductRatingRequired: Scalars['Int'];
   minimumProductSaleRequired: Scalars['Int'];
   productAndShippingPriceDays: Scalars['Int'];
@@ -6679,6 +6685,7 @@ export type MfpServiceSchema = {
   campaigns?: Maybe<Array<MfpCampaignSchema>>;
   campaignsCount?: Maybe<Scalars['Int']>;
   checkEligibility?: Maybe<Scalars['GenericScalar']>;
+  countryShippingEnabled?: Maybe<Scalars['Boolean']>;
   eligibleProducts?: Maybe<Array<EligibleProductInfo>>;
   eligibleProductsCount?: Maybe<Scalars['Int']>;
   genericCampaigns?: Maybe<Array<Scalars['GenericScalar']>>;
@@ -6817,7 +6824,7 @@ export type MfpUnqualifiedVariationData = {
 
 export type MfpVariationDiscountData = {
   __typename?: 'MFPVariationDiscountData';
-  countryDiscountAmount?: Maybe<Array<CountryDiscountAmount>>;
+  countryDiscountAmount?: Maybe<Scalars['GenericScalar']>;
   discountAmount?: Maybe<CurrencyValue>;
   discountPercentage: Scalars['Float'];
   maxQuantity?: Maybe<Scalars['Int']>;
@@ -6841,6 +6848,7 @@ export type MfpVariationUnqualifiedReason =
   | 'FRS_NEGATIVE_PRICE'
   | 'INVALID_ID'
   | 'LOW_RATING'
+  | 'LOW_RATING_COUNT'
   | 'MERCHANT_ELIGIBILITY'
   | 'MININUM_VARIATION_PERCENTAGE'
   | 'NEGATIVE_PRODUCT_PRICE'
@@ -6848,6 +6856,7 @@ export type MfpVariationUnqualifiedReason =
   | 'NOT_OWNED_BY_MERCHANT'
   | 'PRODUCT_CATEGORY'
   | 'PRODUCT_LISTED_DAYS'
+  | 'PRODUCT_NOT_ACTIVE'
   | 'PRODUCT_PRICE'
   | 'PRODUCT_SHIPPING_PRICE'
   | 'PROMOTION_HISTORY'
@@ -8127,6 +8136,7 @@ export type MerchantPayoutHistoryDescription = {
 };
 
 export type MerchantPolicyAgreementSource =
+  | 'BANK_INFORMATION_VALIDATION_FLOW'
   | 'CN_SIGNUP_VALIDATION_FLOW'
   | 'EEA_KYC_VALIDATION_FLOW'
   | 'SELLER_PROFILE_VALIDATION_FLOW';
@@ -9170,10 +9180,7 @@ export type MerchantWarningReason =
   | 'WISH_EXPRESS_POLICY_MERCHANT'
   | 'WISH_EXPRESS_POLICY_PRODUCT'
   | 'WISH_EXPRESS_POLICY_VIOLATION'
-  | 'WISH_STANDARDS_BAN'
-  | 'SUSPENDED_FOR_UNDER_PERFORMING'
-  | 'PRODUCT_LIMIT_REACHED'
-  | 'ADDITIONAL_TAX_INFO';
+  | 'WISH_STANDARDS_BAN';
 
 export type MerchantWarningReasonSchema = {
   __typename?: 'MerchantWarningReasonSchema';
@@ -10851,6 +10858,7 @@ export type PermissionType =
   | 'REVIEW_ONEOFF_REQ_ENABLE_COLLECTIONBOOST'
   | 'REVIEW_ONEOFF_REQ_ENABLE_DISABLE_CSP_FOR_ALL_ELIGIBLE_PRODUCTS'
   | 'REVIEW_ONEOFF_REQ_ENABLE_DYNAMIC_PRICING'
+  | 'REVIEW_ONEOFF_REQ_ENROLL_CURRENCY_MIGRATION_DISPUTE'
   | 'REVIEW_ONEOFF_REQ_ENROLL_MERCHANT_PLUS'
   | 'REVIEW_ONEOFF_REQ_ENROLL_PB_KICKSTART'
   | 'REVIEW_ONEOFF_REQ_ENROLL_PRICE_DROP'
@@ -12593,6 +12601,7 @@ export type ProductTaxonomyCategoryDisputeHubProductDisputeEligibilityArgs = {
 export type ProductTaxonomyCategoryDisputeSchema = {
   __typename?: 'ProductTaxonomyCategoryDisputeSchema';
   adminNote?: Maybe<Scalars['String']>;
+  adminReviewerId?: Maybe<Scalars['String']>;
   adminUnchangedReason?: Maybe<ProductTaxonomyCategoryDisputeAdminUnchangedReason>;
   categoryApproved?: Maybe<TaxonomyCategorySchema>;
   categoryDisputed: TaxonomyCategorySchema;
@@ -13956,6 +13965,7 @@ export type ReviewBankAccountDocumentInput = {
   documentType: BankAccountDocumentType;
   merchantId: Scalars['ObjectIdType'];
   state: BankAccountVerificationStatus;
+  stateReason: BankAccountVerificationStatusReason;
 };
 
 export type ReviewMerchantTaxIdentificationInput = {
@@ -14913,9 +14923,9 @@ export type ShippingProviderTrackerSchema = {
 export type ShippingSchema = {
   __typename?: 'ShippingSchema';
   calculatedShippingEnabled?: Maybe<Scalars['Boolean']>;
-  countryShippingPrice?: Maybe<Array<CountryShippingPrice>>;
   defaultShipping?: Maybe<Array<DefaultShippingSchema>>;
   domesticShipping?: Maybe<Array<DomesticShippingSchema>>;
+  genericCountryShippingPriceInfo?: Maybe<Scalars['GenericScalar']>;
   maxCalculatedShippingPrice?: Maybe<CurrencyValue>;
   maxMerchantSetShippingPrice?: Maybe<CurrencyValue>;
   warehouseCountryShipping?: Maybe<Array<WarehouseCountryShippingSchema>>;
@@ -14923,7 +14933,7 @@ export type ShippingSchema = {
 };
 
 
-export type ShippingSchemaCountryShippingPriceArgs = {
+export type ShippingSchemaGenericCountryShippingPriceInfoArgs = {
   countries?: InputMaybe<Array<CountryCode>>;
 };
 
@@ -15611,6 +15621,7 @@ export type TaxAuthorityType =
   | 'GCT'
   | 'GENERAL_SALES_AND_USE_TAX'
   | 'GIT'
+  | 'GOODS_AND_SERVICES_TAX'
   | 'GST'
   | 'HST'
   | 'ICMS'
@@ -16832,6 +16843,7 @@ export type UploadBankAccountDocument = {
 
 export type UploadBankAccountDocumentInput = {
   bankDocFile: FileInput;
+  last4Digits: Scalars['String'];
 };
 
 export type UploadEuvatTaxQuestionnaire = {
@@ -18657,7 +18669,7 @@ export type SellerIdentity_BankAccountDocumentsQueryVariables = Exact<{
 }>;
 
 
-export type SellerIdentity_BankAccountDocumentsQuery = { __typename?: 'RootQuery', merchants?: { __typename?: 'MerchantServiceSchema', merchant?: { __typename?: 'MerchantSchema', state: CommerceMerchantState, bankAccountVerification?: { __typename?: 'BankAccountVerificationSchema', id: string, state: BankAccountVerificationStatus, bankAccountDocuments?: Array<{ __typename?: 'BankAccountDocumentSchema', id: string, state: BankAccountVerificationStatus, comment?: string | null, documentType?: BankAccountDocumentType | null, documentFile?: { __typename?: 'MerchantFileSchema', id: string, fileUrl: string } | null, uploadedAt: { __typename?: 'Datetime', unix: number }, reviewedAt?: { __typename?: 'Datetime', unix: number } | null, reviewer?: { __typename?: 'UserSchema', name?: string | null } | null }> | null } | null } | null } | null };
+export type SellerIdentity_BankAccountDocumentsQuery = { __typename?: 'RootQuery', merchants?: { __typename?: 'MerchantServiceSchema', merchant?: { __typename?: 'MerchantSchema', state: CommerceMerchantState, bankAccountVerification?: { __typename?: 'BankAccountVerificationSchema', id: string, state: BankAccountVerificationStatus, bankAccountDocuments?: Array<{ __typename?: 'BankAccountDocumentSchema', id: string, state: BankAccountVerificationStatus, comment?: string | null, documentType?: BankAccountDocumentType | null, last4Digits: string, stateReason?: BankAccountVerificationStatusReason | null, documentFile?: { __typename?: 'MerchantFileSchema', id: string, fileUrl: string } | null, uploadedAt: { __typename?: 'Datetime', unix: number }, reviewedAt?: { __typename?: 'Datetime', unix: number } | null, reviewer?: { __typename?: 'UserSchema', name?: string | null } | null }> | null } | null } | null } | null };
 
 export type SellerIdentity_BankAccountVerificationsQueryVariables = Exact<{
   offset?: InputMaybe<Scalars['Int']>;
@@ -18686,7 +18698,7 @@ export type GetNoticeQueryVariables = Exact<{
 }>;
 
 
-export type GetNoticeQuery = { __typename?: 'RootQuery', dsa?: { __typename?: 'DSAHub', notice?: { __typename?: 'NoticeSchema', id: string, status: NoticeStatus, description: string, notifierName: string, notifierEmail: string, notifierOrganization?: string | null, disputeDescription?: string | null, disputeReviewResponse?: string | null, datetimeCreated: { __typename?: 'Datetime', datetime: string }, datetimeDisputed?: { __typename?: 'Datetime', datetime: string } | null, lastClaimedUser?: { __typename?: 'UserSchema', id: string, email: string } | null, supportFiles: Array<{ __typename?: 'MerchantFileSchema', id: string, displayFilename: string, fileUrl: string }>, disputeSupportFiles?: Array<{ __typename?: 'MerchantFileSchema', id: string, displayFilename: string, fileUrl: string }> | null } | null } | null };
+export type GetNoticeQuery = { __typename?: 'RootQuery', dsa?: { __typename?: 'DSAHub', notice?: { __typename?: 'NoticeSchema', id: string, status: NoticeStatus, description: string, notifierName: string, notifierEmail: string, notifierOrganization?: string | null, disputeDescription?: string | null, disputeReviewResponse?: string | null, note?: string | null, datetimeCreated: { __typename?: 'Datetime', datetime: string }, datetimeDisputed?: { __typename?: 'Datetime', datetime: string } | null, lastClaimedUser?: { __typename?: 'UserSchema', id: string, email: string } | null, supportFiles: Array<{ __typename?: 'MerchantFileSchema', id: string, displayFilename: string, fileUrl: string }>, disputeSupportFiles?: Array<{ __typename?: 'MerchantFileSchema', id: string, displayFilename: string, fileUrl: string }> | null } | null } | null };
 
 
 export const AuthQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthQuery"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<AuthQueryQuery, AuthQueryQueryVariables>;
@@ -18703,8 +18715,8 @@ export const GetNoticeProductsDocument = {"kind":"Document","definitions":[{"kin
 export const NoticePortal_SubmitReviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"NoticePortal_SubmitReview"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CompleteNoticeReviewInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"completeNoticeReview"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<NoticePortal_SubmitReviewMutation, NoticePortal_SubmitReviewMutationVariables>;
 export const NoticePortal_UnclaimNoticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"NoticePortal_UnclaimNotice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UnclaimNoticesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unclaimNotices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<NoticePortal_UnclaimNoticeMutation, NoticePortal_UnclaimNoticeMutationVariables>;
 export const SellerIdentity_ReviewBankDocumentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SellerIdentity_ReviewBankDocument"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ReviewBankAccountDocumentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantIdentity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reviewDocument"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ok"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_ReviewBankDocumentMutation, SellerIdentity_ReviewBankDocumentMutationVariables>;
-export const SellerIdentity_BankAccountDocumentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountDocuments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"documentFile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"console"},"value":{"kind":"BooleanValue","value":true}}]}]}},{"kind":"Field","name":{"kind":"Name","value":"uploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"documentType"}},{"kind":"Field","name":{"kind":"Name","value":"reviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountDocumentsQuery, SellerIdentity_BankAccountDocumentsQueryVariables>;
+export const SellerIdentity_BankAccountDocumentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountDocuments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerification"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"documentFile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"console"},"value":{"kind":"BooleanValue","value":true}}]}]}},{"kind":"Field","name":{"kind":"Name","value":"uploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"documentType"}},{"kind":"Field","name":{"kind":"Name","value":"reviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"last4Digits"}},{"kind":"Field","name":{"kind":"Name","value":"stateReason"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountDocumentsQuery, SellerIdentity_BankAccountDocumentsQueryVariables>;
 export const SellerIdentity_BankAccountVerificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SellerIdentity_BankAccountVerifications"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"state"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"BankAccountVerificationStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"merchantIdentity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerificationsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"merchantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"state"},"value":{"kind":"Variable","name":{"kind":"Name","value":"state"}}}]},{"kind":"Field","name":{"kind":"Name","value":"bankAccountVerifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"merchantId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"merchantId"}}},{"kind":"Argument","name":{"kind":"Name","value":"state"},"value":{"kind":"Variable","name":{"kind":"Name","value":"state"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"lastReviewedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastUploadedAt"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unix"}}]}},{"kind":"Field","name":{"kind":"Name","value":"bankAccountDocuments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SellerIdentity_BankAccountVerificationsQuery, SellerIdentity_BankAccountVerificationsQueryVariables>;
 export const Authentication_LoginMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Authentication_LoginMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginMutationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authentication"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"loginOk"}},{"kind":"Field","name":{"kind":"Name","value":"error"}},{"kind":"Field","name":{"kind":"Name","value":"errorState"}}]}}]}}]}}]} as unknown as DocumentNode<Authentication_LoginMutationMutation, Authentication_LoginMutationMutationVariables>;
 export const DevOnly_GetUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DevOnly_GetUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DevOnly_GetUserQuery, DevOnly_GetUserQueryVariables>;
-export const GetNoticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNotice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"noticeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"noticeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"noticeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"datetimeCreated"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"datetime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"datetimeDisputed"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"datetime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"notifierName"}},{"kind":"Field","name":{"kind":"Name","value":"notifierEmail"}},{"kind":"Field","name":{"kind":"Name","value":"notifierOrganization"}},{"kind":"Field","name":{"kind":"Name","value":"lastClaimedUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"supportFiles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayFilename"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"disputeDescription"}},{"kind":"Field","name":{"kind":"Name","value":"disputeReviewResponse"}},{"kind":"Field","name":{"kind":"Name","value":"disputeSupportFiles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayFilename"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetNoticeQuery, GetNoticeQueryVariables>;
+export const GetNoticeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNotice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"noticeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectIdType"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dsa"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"notice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"noticeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"noticeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"datetimeCreated"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"datetime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"datetimeDisputed"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"datetime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"notifierName"}},{"kind":"Field","name":{"kind":"Name","value":"notifierEmail"}},{"kind":"Field","name":{"kind":"Name","value":"notifierOrganization"}},{"kind":"Field","name":{"kind":"Name","value":"lastClaimedUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"supportFiles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayFilename"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"disputeDescription"}},{"kind":"Field","name":{"kind":"Name","value":"disputeReviewResponse"}},{"kind":"Field","name":{"kind":"Name","value":"disputeSupportFiles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayFilename"}},{"kind":"Field","name":{"kind":"Name","value":"fileUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"note"}}]}}]}}]}}]} as unknown as DocumentNode<GetNoticeQuery, GetNoticeQueryVariables>;

@@ -16,6 +16,8 @@ export type TableData = {
   readonly reviewedAt: string;
   readonly reviewer: string;
   readonly comment: string;
+  readonly last4digits: string;
+  readonly reason: string;
 };
 
 export const ColumnLabel = {
@@ -26,6 +28,8 @@ export const ColumnLabel = {
   reviewedAt: "Reviewed At",
   reviewer: "Reviewer",
   comment: "Comment",
+  last4Digits: "Last 4 Digits",
+  stateReason: "Reason",
 } as const;
 
 export const TableColumns = [
@@ -36,6 +40,8 @@ export const TableColumns = [
   "reviewedAt",
   "reviewer",
   "comment",
+  "last4Digits",
+  "stateReason"
 ] as const;
 
 export const BankAccountDocumentsQuery = graphql(`
@@ -64,6 +70,8 @@ export const BankAccountDocumentsQuery = graphql(`
             reviewer {
               name
             }
+            last4Digits
+            stateReason
           }
         }
       }
@@ -77,6 +85,7 @@ export const useTableData = (
   return (
     data?.merchants?.merchant?.bankAccountVerification?.bankAccountDocuments?.map(
       (doc) => {
+        console.log('doc', doc);
         return {
           mid: data.merchants?.merchant?.bankAccountVerification?.id,
           documentId: doc.id,
@@ -92,6 +101,8 @@ export const useTableData = (
               : "n/a",
           comment: doc.comment ?? "n/a",
           reviewer: doc.reviewer?.name ?? "n/a",
+          last4Digits: doc.last4Digits ?? "n/a",
+          stateReason: doc.stateReason ?? "n/a",
         };
       }
     ) || []
