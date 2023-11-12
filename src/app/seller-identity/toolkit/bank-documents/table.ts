@@ -41,7 +41,7 @@ export const TableColumns = [
   "reviewer",
   "comment",
   "last4Digits",
-  "stateReason"
+  "stateReason",
 ] as const;
 
 export const BankAccountDocumentsQuery = graphql(`
@@ -85,7 +85,7 @@ export const useTableData = (
   return (
     data?.merchants?.merchant?.bankAccountVerification?.bankAccountDocuments?.map(
       (doc) => {
-        console.log('doc', doc);
+        console.log("doc", doc);
         return {
           mid: data.merchants?.merchant?.bankAccountVerification?.id,
           documentId: doc.id,
