@@ -16,8 +16,8 @@ export type TableData = {
   readonly reviewedAt: string;
   readonly reviewer: string;
   readonly comment: string;
-  readonly last4digits: string;
-  readonly reason: string;
+  readonly last4Digits: string;
+  readonly stateReason: string;
 };
 
 export const ColumnLabel = {
