@@ -28,15 +28,6 @@ type Props = ButtonProps & {
     BankAccountVerificationStatus,
     "APPROVED" | "REJECTED"
   >;
-  readonly stateReason: ExtractStrict<
-    BankAccountVerificationStatusReason,
-    | "MISMATCH_LAST_FOUR_DIGITS"
-    | "PARTIAL_IMAGE"
-    | "BLURRY_IMAGE"
-    | "UNQUALIFIED_BANK_DOCUMENT"
-    | "APPROVE"
-    | "INVALID_DOCUMENT"
-  >;
   readonly row: TableData;
   readonly mid: string | null | undefined;
 };
