@@ -97,84 +97,95 @@ const CommentButton: React.FC<Props> = ({
       >
         <DialogTitle>Provide comment</DialogTitle>
         <DialogContent>
-          {docAction === "APPROVED" && (
-            <FormControl sx={{ mt: 2 }} fullWidth>
-              <InputLabel id="document-type-select-label">
-                Document type
-              </InputLabel>
-              <Select
-                labelId="document-type-select-label"
-                fullWidth
-                label={"Document type"}
-                required
-                value={docType ?? undefined}
-                variant="outlined"
-                onChange={(event) =>
-                  setDocType(event.target.value as BankAccountDocumentType)
-                }
-              >
-                {(
-                  [
-                    "BANK_STATEMENT",
-                    "BANK_ACCOUNT_CERTIFICATE",
-                    "BANK_ACCOUNT_CARD",
-                    "UNIDENTIFIED",
-                  ] as const
-                ).map((bankDocType) => (
-                  <MenuItem key={bankDocType} value={bankDocType}>
-                    {bankDocType}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-          {docAction === "REJECTED" && (
-            <FormControl sx={{ mt: 2 }} fullWidth>
-              <TextField
-                multiline
-                fullWidth
-                label="Comment"
-                value={comment}
-                onChange={(event) => {
-                  setComment(event.target.value);
-                }}
-              />
-            </FormControl>
-          )}
-          {docAction === "REJECTED" && (
-            <FormControl sx={{ mt: 2 }} fullWidth>
-              <InputLabel id="document-type-select-label">
-                State reason
-              </InputLabel>
-              <Select
-                labelId="document-type-select-label"
-                fullWidth
-                label={"State reason"}
-                required
-                value={stateReason ?? undefined}
-                variant="outlined"
-                onChange={(event) =>
-                  setStateReason(
-                    event.target.value as BankAccountVerificationStatusReason
-                  )
-                }
-              >
-                {(
-                  [
-                    "BLURRY_IMAGE",
-                    "INVALID_DOCUMENT",
-                    "MISMATCH_LAST_FOUR_DIGITS",
-                    "PARTIAL_IMAGE",
-                    "UNQUALIFIED_BANK_DOCUMENT",
-                  ] as const
-                ).map((stateReason) => (
-                  <MenuItem key={stateReason} value={stateReason}>
-                    {stateReason}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
+          {(() => {
+            switch (docAction) {
+              case "APPROVED":
+                return (
+                  <FormControl sx={{ mt: 2 }} fullWidth>
+                    <InputLabel id="document-type-select-label">
+                      Document type
+                    </InputLabel>
+                    <Select
+                      labelId="document-type-select-label"
+                      fullWidth
+                      label={"Document type"}
+                      required
+                      value={docType ?? undefined}
+                      variant="outlined"
+                      onChange={(event) =>
+                        setDocType(
+                          event.target.value as BankAccountDocumentType
+                        )
+                      }
+                    >
+                      {(
+                        [
+                          "BANK_STATEMENT",
+                          "BANK_ACCOUNT_CERTIFICATE",
+                          "BANK_ACCOUNT_CARD",
+                          "UNIDENTIFIED",
+                        ] as const
+                      ).map((bankDocType) => (
+                        <MenuItem key={bankDocType} value={bankDocType}>
+                          {bankDocType}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                );
+              case "REJECTED":
+                return (
+                  <>
+                    <FormControl sx={{ mt: 2 }} fullWidth>
+                      <TextField
+                        multiline
+                        fullWidth
+                        label="Comment"
+                        value={comment}
+                        onChange={(event) => {
+                          setComment(event.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ mt: 2 }} fullWidth>
+                      <InputLabel id="document-type-select-label">
+                        State reason
+                      </InputLabel>
+                      <Select
+                        labelId="document-type-select-label"
+                        fullWidth
+                        label={"State reason"}
+                        required
+                        value={stateReason ?? undefined}
+                        variant="outlined"
+                        onChange={(event) =>
+                          setStateReason(
+                            event.target
+                              .value as BankAccountVerificationStatusReason
+                          )
+                        }
+                      >
+                        {(
+                          [
+                            "BLURRY_IMAGE",
+                            "INVALID_DOCUMENT",
+                            "MISMATCH_LAST_FOUR_DIGITS",
+                            "PARTIAL_IMAGE",
+                            "UNQUALIFIED_BANK_DOCUMENT",
+                          ] as const
+                        ).map((stateReason) => (
+                          <MenuItem key={stateReason} value={stateReason}>
+                            {stateReason}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                );
+              default:
+                return null;
+            }
+          })()}
         </DialogContent>
         <DialogActions>
           <Button
