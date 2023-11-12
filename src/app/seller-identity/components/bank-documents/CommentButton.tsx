@@ -18,6 +18,7 @@ import {
 import {
   BankAccountDocumentType,
   BankAccountVerificationStatus,
+  BankAccountVerificationStatusReason,
 } from "@schema";
 import { useState } from "react";
 import { useMutation } from "urql";
@@ -42,21 +43,31 @@ const CommentButton: React.FC<Props> = ({
   const [, review] = useMutation(ReviewBankDocumentMutation);
   const [comment, setComment] = useState<string>("");
   const [docType, setDocType] = useState<BankAccountDocumentType | null>(null);
+  const [stateReason, setStateReason] =
+    useState<BankAccountVerificationStatusReason | null>(null);
   const toast = useToast();
 
   const { reexecuteQuery } = useBankDocumentsTableContext();
 
+  const handleOpen = () => {
+    setComment("");
+    setDocType(null);
+    setStateReason(null);
+    setOpen(true);
+  };
+
   const onSubmit = async () => {
-    if (mid == null || docType == null) {
+    if (mid == null) {
       return;
     }
     return review({
       input: {
         documentId: row.documentId,
-        documentType: docType,
+        documentType: docType || "UNIDENTIFIED",
         merchantId: mid,
         state: docAction,
         comment: comment,
+        stateReason: stateReason || "APPROVE",
       },
     }).then((result) => {
       if (
@@ -86,50 +97,103 @@ const CommentButton: React.FC<Props> = ({
       >
         <DialogTitle>Provide comment</DialogTitle>
         <DialogContent>
-          <FormControl sx={{ mt: 2 }} fullWidth>
-            <TextField
-              multiline
-              fullWidth
-              label="Comment"
-              value={comment}
-              onChange={(event) => {
-                setComment(event.target.value);
-              }}
-            />
-          </FormControl>
-
-          <FormControl sx={{ mt: 2 }} fullWidth>
-            <InputLabel id="document-type-select-label">
-              Document type
-            </InputLabel>
-            <Select
-              labelId="document-type-select-label"
-              fullWidth
-              label={"Document type"}
-              required
-              value={docType ?? undefined}
-              variant="outlined"
-              onChange={(event) =>
-                setDocType(event.target.value as BankAccountDocumentType)
-              }
-            >
-              {(
-                [
-                  "BANK_DOCUMENT",
-                  "GOVERNMENT_DOCUMENT",
-                  "UNIDENTIFIED",
-                ] as const
-              ).map((bankDocType) => (
-                <MenuItem key={bankDocType} value={bankDocType}>
-                  {bankDocType}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {(() => {
+            switch (docAction) {
+              case "APPROVED":
+                return (
+                  <FormControl sx={{ mt: 2 }} fullWidth>
+                    <InputLabel id="document-type-select-label">
+                      Document type
+                    </InputLabel>
+                    <Select
+                      labelId="document-type-select-label"
+                      fullWidth
+                      label={"Document type"}
+                      required
+                      value={docType ?? undefined}
+                      variant="outlined"
+                      onChange={(event) =>
+                        setDocType(
+                          event.target.value as BankAccountDocumentType
+                        )
+                      }
+                    >
+                      {(
+                        [
+                          "BANK_STATEMENT",
+                          "BANK_ACCOUNT_CERTIFICATE",
+                          "BANK_ACCOUNT_CARD",
+                          "UNIDENTIFIED",
+                        ] as const
+                      ).map((bankDocType) => (
+                        <MenuItem key={bankDocType} value={bankDocType}>
+                          {bankDocType}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                );
+              case "REJECTED":
+                return (
+                  <>
+                    <FormControl sx={{ mt: 2 }} fullWidth>
+                      <TextField
+                        multiline
+                        fullWidth
+                        label="Comment"
+                        value={comment}
+                        onChange={(event) => {
+                          setComment(event.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ mt: 2 }} fullWidth>
+                      <InputLabel id="document-type-select-label">
+                        State reason
+                      </InputLabel>
+                      <Select
+                        labelId="document-type-select-label"
+                        fullWidth
+                        label={"State reason"}
+                        required
+                        value={stateReason ?? undefined}
+                        variant="outlined"
+                        onChange={(event) =>
+                          setStateReason(
+                            event.target
+                              .value as BankAccountVerificationStatusReason
+                          )
+                        }
+                      >
+                        {(
+                          [
+                            "BLURRY_IMAGE",
+                            "INVALID_DOCUMENT",
+                            "MISMATCH_LAST_FOUR_DIGITS",
+                            "PARTIAL_IMAGE",
+                            "UNQUALIFIED_BANK_DOCUMENT",
+                          ] as const
+                        ).map((stateReason) => (
+                          <MenuItem key={stateReason} value={stateReason}>
+                            {stateReason}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </>
+                );
+              default:
+                return null;
+            }
+          })()}
         </DialogContent>
         <DialogActions>
           <Button
-            disabled={!mid || !docType}
+            disabled={
+              !mid ||
+              (docAction === "APPROVED" && !docType) ||
+              (docAction === "REJECTED" && !stateReason)
+            }
             onClick={() => {
               setOpen(false);
               onSubmit();
@@ -139,7 +203,7 @@ const CommentButton: React.FC<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <Button {...buttonProps} onClick={() => setOpen(true)} disabled={!mid}>
+      <Button {...buttonProps} onClick={() => handleOpen()} disabled={!mid}>
         {children}
       </Button>
     </>

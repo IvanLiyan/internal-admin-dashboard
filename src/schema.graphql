@@ -738,8 +738,10 @@ enum BalanceUpdateReason {
 type BankAccountDocumentSchema {
   id: ObjectIdType!
   documentFile: MerchantFileSchema
+  last4Digits: String!
   uploadedAt: Datetime!
   state: BankAccountVerificationStatus!
+  stateReason: BankAccountVerificationStatusReason
   comment: String
   documentType: BankAccountDocumentType
   reviewedAt: Datetime
@@ -747,9 +749,10 @@ type BankAccountDocumentSchema {
 }
 
 enum BankAccountDocumentType {
-  GOVERNMENT_DOCUMENT
   UNIDENTIFIED
-  BANK_DOCUMENT
+  BANK_STATEMENT
+  BANK_ACCOUNT_CERTIFICATE
+  BANK_ACCOUNT_CARD
 }
 
 type BankAccountVerificationMerchantMutations {
@@ -763,6 +766,7 @@ type BankAccountVerificationReviewerMutations {
 type BankAccountVerificationSchema {
   id: ObjectIdType!
   state: BankAccountVerificationStatus!
+  stateReason: BankAccountVerificationStatusReason
   lastReviewedAt: Datetime
   lastUploadedAt: Datetime
   bankAccountDocuments: [BankAccountDocumentSchema!]
@@ -773,6 +777,15 @@ enum BankAccountVerificationStatus {
   REJECTED
   APPROVED
   PENDING
+}
+
+enum BankAccountVerificationStatusReason {
+  MISMATCH_LAST_FOUR_DIGITS
+  PARTIAL_IMAGE
+  BLURRY_IMAGE
+  UNQUALIFIED_BANK_DOCUMENT
+  APPROVE
+  INVALID_DOCUMENT
 }
 
 type BdSignupCodeInfo {
@@ -1938,8 +1951,9 @@ enum CommerceTransactionState {
 
 enum CommerceTransactionTaxEventType {
   REFUND_SHIPPING
-  SALE_SHIPPING
   REFUND_PRICE
+  SALE_SHIPPING
+  COLORADO_DELIVERY_FEE
   SALE_PRICE
 }
 
@@ -2383,11 +2397,6 @@ enum CountryCode {
   TV
 }
 
-type CountryDiscountAmount {
-  country: Country!
-  discountAmount: CurrencyValue
-}
-
 type CountryEPRSchema {
   country: Country!
   categoriesWithoutEpr: Int!
@@ -2404,13 +2413,6 @@ input CountryShippingInput {
   additionalPrice: CurrencyInput
   timeToDoor: Int
   regionShipping: [RegionShippingInput!]
-}
-
-type CountryShippingPrice {
-  country: Country!
-  minCalculatedShippingPrice: CurrencyValue
-  maxCalculatedShippingPrice: CurrencyValue
-  merchantSetShippingPrice: CurrencyValue
 }
 
 type CountryShippingSchema {
@@ -2614,12 +2616,13 @@ input CreateUinInput {
 }
 
 input CreateWhitelistProductsInput {
-  merchantId: ObjectIdType!
+  merchantId: ObjectIdType
   productIds: [ObjectIdType!]!
 }
 
 type CreateWhitelistProductsMutation {
   ok: Boolean!
+  invalidProductIds: [String!]
   message: String
 }
 
@@ -4089,6 +4092,7 @@ input FulfillmentOrdersFromCsvInput {
 
 type FulfillmentSchema {
   order(id: String!): OrderSchema
+  orderBatch(ids: String!): [OrderSchema!]
   orders(query: String, searchType: OrderHistorySearchType, offset: Int = 0, limit: Int = 20, sort: OrderHistorySort, states: [CommerceTransactionState!], wishExpress: Boolean): [OrderSchema!]
   historicalOrders(query: String, searchType: OrderHistorySearchType, offset: Int = 0, limit: Int = 20, sort: OrderHistorySort, wishExpress: Boolean): [OrderSchema!]
   ordersCsvUrl(query: String, searchType: OrderHistorySearchType, offset: Int = 0, limit: Int = 20, sort: OrderHistorySort, wishExpress: Boolean): String
@@ -5257,6 +5261,7 @@ enum MFPCampaignPromotionType {
 
 type MFPCampaignSchema {
   id: ObjectIdType!
+  isNewVersion: Boolean!
   name: String!
   promotionType: MFPCampaignPromotionType!
   creationTime: Datetime!
@@ -5298,6 +5303,7 @@ type MFPConstantsSchema {
 
 type MFPDiscountCampaignConstantsSchema {
   minimumProductRatingRequired: Int!
+  minimumProductRatingCountRequired: Int!
   minimumProductSaleRequired: Int!
   minimumProductHistoryDays: Int!
   minimumCooldownDays: Int!
@@ -5314,6 +5320,7 @@ type MFPDiscountCampaignConstantsSchema {
 
 type MFPFlashSaleConstantsSchema {
   minimumProductRatingRequired: Int!
+  minimumProductRatingCountRequired: Int!
   minimumProductSaleRequired: Int!
   minimumProductHistoryDays: Int!
   minimumCooldownDays: Int!
@@ -5349,6 +5356,7 @@ type MFPServiceMutations {
 }
 
 type MFPServiceSchema {
+  countryShippingEnabled: Boolean
   genericCampaigns(startAtMin: DatetimeInput, startAtMax: DatetimeInput, endAtMin: DatetimeInput, endAtMax: DatetimeInput, searchType: MFPCampaignSearchType, searchQuery: String, states: [MFPCampaignState!], promotionTypes: [MFPCampaignPromotionType!], offset: Int = 0, limit: Int = 25, performanceStartDate: DatetimeInput, performanceEndDate: DatetimeInput): [GenericScalar!]
   campaigns(startAtMin: DatetimeInput, startAtMax: DatetimeInput, endAtMin: DatetimeInput, endAtMax: DatetimeInput, searchType: MFPCampaignSearchType, searchQuery: String, states: [MFPCampaignState!], promotionTypes: [MFPCampaignPromotionType!], offset: Int = 0, limit: Int = 25, eventIds: [ObjectIdType!], eventConfig: MFPCampaignEventConfig): [MFPCampaignSchema!]
   campaignsCount(startAtMin: DatetimeInput, startAtMax: DatetimeInput, endAtMin: DatetimeInput, endAtMax: DatetimeInput, searchType: MFPCampaignSearchType, searchQuery: String, states: [MFPCampaignState!], promotionTypes: [MFPCampaignPromotionType!], eventIds: [ObjectIdType!], eventConfig: MFPCampaignEventConfig): Int
@@ -5378,7 +5386,7 @@ type MFPVariationDiscountData {
   maxQuantity: Int
   discountPercentage: Float!
   discountAmount: CurrencyValue
-  countryDiscountAmount: [CountryDiscountAmount!]
+  countryDiscountAmount: GenericScalar
   scheduledStartTime: Datetime
   scheduledEndTime: Datetime
 }
@@ -5408,6 +5416,8 @@ enum MFPVariationUnqualifiedReason {
   COMPETING_PROMOTION
   PROMOTION_HISTORY
   NEGATIVE_PRODUCT_PRICE
+  LOW_RATING_COUNT
+  PRODUCT_NOT_ACTIVE
 }
 
 enum MFPWhitelistProductSortBy {
@@ -6347,8 +6357,9 @@ type MerchantPayoutHistoryDescription {
 }
 
 enum MerchantPolicyAgreementSource {
-  CN_SIGNUP_VALIDATION_FLOW
   SELLER_PROFILE_VALIDATION_FLOW
+  CN_SIGNUP_VALIDATION_FLOW
+  BANK_INFORMATION_VALIDATION_FLOW
   EEA_KYC_VALIDATION_FLOW
 }
 
@@ -8425,6 +8436,7 @@ enum PermissionType {
   EDIT_PRODUCTS
   PROMO_MANUAL_TAG
   VIEW_GLOBAL_LEADERBOARD
+  REVIEW_ONEOFF_REQ_ENROLL_CURRENCY_MIGRATION_DISPUTE
   REVIEW_ONEOFF_REQ_ENABLE_DISABLE_CSP_FOR_ALL_ELIGIBLE_PRODUCTS
   COUNTERFEIT_TAG_RESOLUTION
   MANAGE_WHITE_GLOVE
@@ -9821,6 +9833,7 @@ type ProductTaxonomyCategoryDisputeSchema {
   datetimeResolved: Datetime
   adminUnchangedReason: ProductTaxonomyCategoryDisputeAdminUnchangedReason
   adminNote: String
+  adminReviewerId: String
   merchantNote: String
   supportFiles: [MerchantFileSchema!]
   categoryDisputed: TaxonomyCategorySchema!
@@ -10990,6 +11003,7 @@ input ReviewBankAccountDocumentInput {
   documentId: ObjectIdType!
   documentType: BankAccountDocumentType!
   state: BankAccountVerificationStatus!
+  stateReason: BankAccountVerificationStatusReason!
   comment: String
 }
 
@@ -11843,9 +11857,9 @@ type ShippingSchema {
   warehouseCountryShipping(shippingTypes: [WarehouseShippingType!] = [1, 2]): [WarehouseCountryShippingSchema!]
   calculatedShippingEnabled: Boolean
   wishpostEstimatedShipping: [WishPostShippingSchema!]
+  genericCountryShippingPriceInfo(countries: [CountryCode!]): GenericScalar
   maxCalculatedShippingPrice(countries: [CountryCode!]): CurrencyValue
   maxMerchantSetShippingPrice(countries: [CountryCode!]): CurrencyValue
-  countryShippingPrice(countries: [CountryCode!]): [CountryShippingPrice!]
 }
 
 type ShippingSettingMutations {
@@ -12396,6 +12410,7 @@ enum TaxAuthorityType {
   NHIL
   COUNTY_RENTAL
   CITY_RENTAL
+  GOODS_AND_SERVICES_TAX
   CITY_FOOD_BEVERAGE
   ITBMS
   EEE
@@ -13419,6 +13434,7 @@ type UploadBankAccountDocument {
 
 input UploadBankAccountDocumentInput {
   bankDocFile: FileInput!
+  last4Digits: String!
 }
 
 type UploadEUVATTaxQuestionnaire {
