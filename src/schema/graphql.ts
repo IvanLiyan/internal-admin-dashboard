@@ -219,6 +219,40 @@ export type AddressVerificationState =
   | 'USER_VERIFIED'
   | 'WPS_VERIFIED';
 
+export type AdminCancelMfpCampaign = {
+  __typename?: 'AdminCancelMFPCampaign';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type AdminRefreshCampaignQuantity = {
+  __typename?: 'AdminRefreshCampaignQuantity';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type AdminRefreshCampaignQuantityInput = {
+  campaignId: Scalars['ObjectIdType'];
+};
+
+export type AdminRemoveCountriesInput = {
+  campaignId: Scalars['ObjectIdType'];
+  comment: Scalars['String'];
+  countries: Array<CountryCode>;
+};
+
+export type AdminRemoveCountriesMutation = {
+  __typename?: 'AdminRemoveCountriesMutation';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type AdminRemoveProductsMutation = {
+  __typename?: 'AdminRemoveProductsMutation';
+  message?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
 export type AlertSchema = {
   __typename?: 'AlertSchema';
   date?: Maybe<Datetime>;
@@ -3236,6 +3270,21 @@ export type CurrencyValueConvertedToArgs = {
   rate: ConversionRate;
 };
 
+export type CurrentCycleListingFeeDetailsSchema = {
+  __typename?: 'CurrentCycleListingFeeDetailsSchema';
+  currentBasedWssTierLevel: Scalars['Int'];
+  currentBasedWssTierName: Scalars['String'];
+  currentCycleEndTime: Datetime;
+  currentCyclePayTime: Datetime;
+  currentCycleStartTime: Datetime;
+  currentFeeToPay: CurrencyValue;
+  currentFreeThreshold: Scalars['Int'];
+  currentItemsOverThreshold: Scalars['Int'];
+  currentPeakItems: Scalars['Int'];
+  currentPeakTime: Datetime;
+  currentUnitPrice: CurrencyValue;
+};
+
 export type CustomerIdentityInfo = {
   __typename?: 'CustomerIdentityInfo';
   number: Scalars['String'];
@@ -4145,6 +4194,26 @@ export type DownloadEuComplianceProductLinks = {
   ok: Scalars['Boolean'];
 };
 
+export type DownloadJobSchema = {
+  __typename?: 'DownloadJobSchema';
+  completedDate?: Maybe<Datetime>;
+  downloadLink?: Maybe<Scalars['String']>;
+  id: Scalars['ObjectIdType'];
+  jobType?: Maybe<Scalars['String']>;
+  status?: Maybe<Scalars['String']>;
+  submittedDate?: Maybe<Datetime>;
+};
+
+export type DownloadUnderPerformingProducts = {
+  __typename?: 'DownloadUnderPerformingProducts';
+  errorMessage?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
+};
+
+export type DownloadUnderPerformingProductsInput = {
+  fileType?: InputMaybe<FileType>;
+};
+
 export type EprMutations = {
   __typename?: 'EPRMutations';
   acceptTos?: Maybe<AcceptTos>;
@@ -4710,6 +4779,14 @@ export type FactoryUserMutationsConvertFactoryToMerchantArgs = {
 
 export type FactoryUserMutationsConvertMerchantToFactoryArgs = {
   input: FactoryMerchantConversionInput;
+};
+
+export type FeePolicyConfigSchema = {
+  __typename?: 'FeePolicyConfigSchema';
+  excessItemUnitPrice: CurrencyValue;
+  freeThreshold: Scalars['Int'];
+  wssTierLevel: Scalars['Int'];
+  wssTierName: Scalars['String'];
 };
 
 export type FeedProcessingWorkflowSchema = {
@@ -5878,6 +5955,11 @@ export type LateDeliverySchema = {
   threshhold?: Maybe<Scalars['Float']>;
 };
 
+export type LatestListingFeeDetailsSchema = {
+  __typename?: 'LatestListingFeeDetailsSchema';
+  latestItems: Scalars['Int'];
+};
+
 export type LedgerAccountBalance = {
   __typename?: 'LedgerAccountBalance';
   amount: Scalars['Float'];
@@ -5938,6 +6020,8 @@ export type LedgerItem = {
   debitAmount?: Maybe<CurrencyValue>;
   description: LedgerItemDescriptionDetails;
   documentId: Scalars['String'];
+  feeNote?: Maybe<Scalars['String']>;
+  feeType?: Maybe<LedgerLineItemFeeType>;
   id?: Maybe<Scalars['String']>;
   merchantId: Scalars['String'];
   merchantPayableId: Scalars['String'];
@@ -5961,6 +6045,62 @@ export type LedgerItemInfo = {
   nextCutoffId?: Maybe<Scalars['String']>;
   nextCutoffTime?: Maybe<Datetime>;
 };
+
+export type LedgerLineItemFeeType =
+  | 'B2B_SALE_FEE'
+  | 'CN_ORDER_NOT_SHIP_WITH_WISHPOST'
+  | 'CN_PROHIBITED_PRODUCTS'
+  | 'COLLECTIONS_BOOST_CAMPAIGN_FEE'
+  | 'CONSOLIDATE_MP_FINE'
+  | 'DECEPTIVE_FULFILLMENT'
+  | 'DEP_INFRACTION'
+  | 'EARLY_PAYMENT_DEDUCTION'
+  | 'EXTERNAL_BOOST_CPA_FEE'
+  | 'EXTERNAL_BOOST_FEE'
+  | 'FAKE_RATING'
+  | 'FAKE_TRACKING'
+  | 'FBW_FEE'
+  | 'INVALID_EU_RESPONSIBLE_PERSON'
+  | 'IP_INFRINGEMENT'
+  | 'LATE_CONFIRMED_FULFILLMENT'
+  | 'LCL_FBW_FEE'
+  | 'LEGAL_SETTLEMENT'
+  | 'LEGAL_SETTLEMENT_PAID'
+  | 'LEGAL_SETTLEMENT_RESERVED'
+  | 'LOGISTIC_FEE'
+  | 'MERCHANT_CANCELLATION'
+  | 'MERCHANT_HARASSMENT'
+  | 'MERCHANT_INCENTIVE'
+  | 'MISLEADING_LISTING'
+  | 'MISLEADING_LISTING_AUTHENTIC_BRAND'
+  | 'MISLEADING_VARIATION'
+  | 'ONEOFF'
+  | 'ONEOFF_FEE'
+  | 'PAID_PLACEMENT_ENROLLMENT_FEE'
+  | 'PAID_PLACEMENT_IMPRESSION_FEE'
+  | 'POLICY_VIOLATION'
+  | 'PRODUCT_LISTING_FEE'
+  | 'PRODUCT_SWAPPED'
+  | 'PROHIBITED_PRODUCT_FINE'
+  | 'PROMOTED_PRODUCT_DISABLE_FINE'
+  | 'PROMOTION_FEE'
+  | 'QUALITY_REFUND_FINE'
+  | 'REPEAT_IP_INFRINGEMENT'
+  | 'RETURN_LABEL_FEE'
+  | 'SE_CASH_BACK'
+  | 'STORE_PAYMENT_CANCELLATION'
+  | 'STORE_PAYMENT_DEDUCTION'
+  | 'UNCONFIRMED_CARRIER'
+  | 'UNFULFILLED_ORDER'
+  | 'UNREASONABLE_PRICE_GAUGE'
+  | 'WISHPOST_ADJUSTMENT_DEDUCTION'
+  | 'WISHPOST_FULFILLMENT_FEE'
+  | 'WISHPOST_LOGISTICS_FEE'
+  | 'WISH_EXPRESS_VIOLATION'
+  | 'WISH_EXPRESS_WITHHELD_ORDER'
+  | 'WISH_PARCEL_SERVICE_ADJUST_FEE'
+  | 'WISH_PARCEL_SERVICE_FEE'
+  | 'WITHHOLD_FUND';
 
 export type LedgerLineItemType =
   | 'CONSOLIDATION'
@@ -6547,7 +6687,9 @@ export type MfpCampaignSchema = {
   genericUnqualifiedProductVariations?: Maybe<Scalars['GenericScalar']>;
   id: Scalars['ObjectIdType'];
   isNewVersion: Scalars['Boolean'];
+  merchantId: Scalars['ObjectIdType'];
   name: Scalars['String'];
+  products?: Maybe<Array<Scalars['GenericScalar']>>;
   promotionType: MfpCampaignPromotionType;
   skipShipping: Scalars['Boolean'];
   startTime: Datetime;
@@ -6633,8 +6775,17 @@ export type MfpProductSearchType =
 
 export type MfpServiceAdminMutations = {
   __typename?: 'MFPServiceAdminMutations';
+  cancelMfpCampaign: AdminCancelMfpCampaign;
   createWhitelistProducts: CreateWhitelistProductsMutation;
   expireWhitelistProducts: ExpireWhitelistProductsMutation;
+  refreshCampaignQuantity: AdminRefreshCampaignQuantity;
+  removeCountries: AdminRemoveCountriesMutation;
+  removeProducts: AdminRemoveProductsMutation;
+};
+
+
+export type MfpServiceAdminMutationsCancelMfpCampaignArgs = {
+  input: CancelMfpCampaignInput;
 };
 
 
@@ -6645,6 +6796,21 @@ export type MfpServiceAdminMutationsCreateWhitelistProductsArgs = {
 
 export type MfpServiceAdminMutationsExpireWhitelistProductsArgs = {
   input: ExpireWhitelistProductsInput;
+};
+
+
+export type MfpServiceAdminMutationsRefreshCampaignQuantityArgs = {
+  input: AdminRefreshCampaignQuantityInput;
+};
+
+
+export type MfpServiceAdminMutationsRemoveCountriesArgs = {
+  input: AdminRemoveCountriesInput;
+};
+
+
+export type MfpServiceAdminMutationsRemoveProductsArgs = {
+  input: RemoveProductsInput;
 };
 
 export type MfpServiceMutations = {
@@ -6735,6 +6901,7 @@ export type MfpServiceSchemaCampaignsArgs = {
   eventConfig?: InputMaybe<MfpCampaignEventConfig>;
   eventIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
   limit?: InputMaybe<Scalars['Int']>;
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
   offset?: InputMaybe<Scalars['Int']>;
   promotionTypes?: InputMaybe<Array<MfpCampaignPromotionType>>;
   searchQuery?: InputMaybe<Scalars['String']>;
@@ -6750,6 +6917,7 @@ export type MfpServiceSchemaCampaignsCountArgs = {
   endAtMin?: InputMaybe<DatetimeInput>;
   eventConfig?: InputMaybe<MfpCampaignEventConfig>;
   eventIds?: InputMaybe<Array<Scalars['ObjectIdType']>>;
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
   promotionTypes?: InputMaybe<Array<MfpCampaignPromotionType>>;
   searchQuery?: InputMaybe<Scalars['String']>;
   searchType?: InputMaybe<MfpCampaignSearchType>;
@@ -7702,6 +7870,14 @@ export type MerchantLeadYearlyRevenue = {
   start: CurrencyInput;
 };
 
+export type MerchantListingFeeHub = {
+  __typename?: 'MerchantListingFeeHub';
+  currentCycleListingFeeDetails: CurrentCycleListingFeeDetailsSchema;
+  feePolicyConfig: Array<FeePolicyConfigSchema>;
+  latestListingFeeDetails: LatestListingFeeDetailsSchema;
+  predictedListingFeeDetails: PredictedListingFeeDetailSchema;
+};
+
 export type MerchantMobile = {
   __typename?: 'MerchantMobile';
   minimumAppVersion: Scalars['String'];
@@ -8302,6 +8478,7 @@ export type MerchantSchema = {
   lead: UserSchema;
   marketing: MarketingMerchantPropertySchema;
   maxDeliveryDays: Scalars['Int'];
+  merchantListingFee?: Maybe<MerchantListingFeeHub>;
   merchantPolicyTier?: Maybe<MerchantPolicyTierSchema>;
   merchantTermsAgreed?: Maybe<MerchantTermsAgreedSchema>;
   onVacationMode: Scalars['Boolean'];
@@ -8764,6 +8941,7 @@ export type MerchantTodoItemType =
   | 'REJECTED_VIDEOS'
   | 'RESELLER_AGREEMENT'
   | 'REVIEW_CURRENCY'
+  | 'REVIEW_REMOVAL_PRODUCTS'
   | 'SETUP_TAX_INFO'
   | 'TAX_VERIFICATION_FAILED'
   | 'UK_VAT_OBLIGATION_NOTICE'
@@ -10487,6 +10665,16 @@ export type PenaltySchema = {
   reason: FineReason;
 };
 
+export type PerformanceProductSort = {
+  field: PerformanceProductSortFiled;
+  order: SortOrderType;
+};
+
+export type PerformanceProductSortFiled =
+  | 'GMV'
+  | 'IMPRESSION'
+  | 'ORDER';
+
 export type PermissionSchema = {
   __typename?: 'PermissionSchema';
   description?: Maybe<Scalars['String']>;
@@ -10545,6 +10733,7 @@ export type PermissionType =
   | 'CAN_ACCESS_UPDATE_TRACKING'
   | 'CAN_ACCESS_V2_HOMEPAGE'
   | 'CAN_ACCESS_WISHPOST_EXTERNAL_V3_API'
+  | 'CAN_ACCESS_WISH_CORE_TAIL'
   | 'CAN_ACT_ON_ASIAN_MERCHANT'
   | 'CAN_ACT_ON_BR_MERCHANT'
   | 'CAN_ACT_ON_CN_MERCHANT'
@@ -10613,6 +10802,7 @@ export type PermissionType =
   | 'CAN_PERFORM_CHARGEBACK_REVIEW_AUDIT'
   | 'CAN_PROVIDE_MERCHANT_CHAT_SUPPORT'
   | 'CAN_RECEIVE_SMS_ON_QA_ENV'
+  | 'CAN_REQUEST_DATA_SYNTHESIS'
   | 'CAN_RESUBMIT_PAYMENT'
   | 'CAN_REVERSE_FINE'
   | 'CAN_REVIEW_BANK_ACCOUNT_DOCUMENT'
@@ -11365,6 +11555,14 @@ export type PolicyType =
   | 'PREPAID_RETURN_ACCEPTED'
   | 'WISH_AUTO_REVIEW';
 
+export type PredictedListingFeeDetailSchema = {
+  __typename?: 'PredictedListingFeeDetailSchema';
+  latestWssTierLevel: Scalars['Int'];
+  latestWssTierName: Scalars['String'];
+  nextUpdateDate: Datetime;
+  predictedFreeThreshold: Scalars['Int'];
+};
+
 export type ProductAnalyticsDimension =
   | 'COUNTRY'
   | 'GENDER';
@@ -11664,6 +11862,7 @@ export type ProductCatalogMutations = {
   __typename?: 'ProductCatalogMutations';
   downloadAllProducts?: Maybe<DownloadAllProducts>;
   downloadAllProductsCsv?: Maybe<DownloadAllProductsCsv>;
+  downloadUnderPerformingProducts?: Maybe<DownloadUnderPerformingProducts>;
   forceApproveProduct?: Maybe<ForceApproveProduct>;
   removeProduct?: Maybe<RemoveProduct>;
   removeVideo?: Maybe<RemoveVideo>;
@@ -11683,6 +11882,11 @@ export type ProductCatalogMutationsDownloadAllProductsArgs = {
 
 export type ProductCatalogMutationsDownloadAllProductsCsvArgs = {
   input: DownloadAllProductsCsvInput;
+};
+
+
+export type ProductCatalogMutationsDownloadUnderPerformingProductsArgs = {
+  input: DownloadUnderPerformingProductsInput;
 };
 
 
@@ -11743,13 +11947,17 @@ export type ProductCatalogSchema = {
   csvProductTemplateWithTaxonomyColumnNames?: Maybe<Array<Scalars['String']>>;
   csvShippingHeaderNames: Array<Scalars['String']>;
   csvTitleImagesDescriptionHeaderNames: Array<Scalars['String']>;
+  downloadJobs?: Maybe<Array<DownloadJobSchema>>;
+  downloadJobsCount?: Maybe<Scalars['Int']>;
   gtinProductService: GtinProductServiceSchema;
   product?: Maybe<ProductSchema>;
   productCategoryTaxonomyTreeJson: Scalars['JSONString'];
   productCount: Scalars['Int'];
   productCountV2: Scalars['Int'];
+  productCountV3: Scalars['Int'];
   products: Array<ProductSchema>;
   productsV2: Array<ProductSchema>;
+  productsV3: Array<ProductSchema>;
   upcProductService: UpcProductServiceSchema;
   variation?: Maybe<VariationSchema>;
   variationCount?: Maybe<Scalars['Int']>;
@@ -11786,6 +11994,20 @@ export type ProductCatalogSchemaCsvProductTemplateWithTaxonomyColumnNamesArgs = 
 };
 
 
+export type ProductCatalogSchemaDownloadJobsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  query?: InputMaybe<Scalars['String']>;
+};
+
+
+export type ProductCatalogSchemaDownloadJobsCountArgs = {
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+  query?: InputMaybe<Scalars['String']>;
+};
+
+
 export type ProductCatalogSchemaProductArgs = {
   id?: InputMaybe<Scalars['String']>;
   sku?: InputMaybe<Scalars['String']>;
@@ -11816,6 +12038,14 @@ export type ProductCatalogSchemaProductCountV2Args = {
   query?: InputMaybe<Scalars['String']>;
   searchType?: InputMaybe<ProductSearchType>;
   state?: InputMaybe<ProductListingState>;
+};
+
+
+export type ProductCatalogSchemaProductCountV3Args = {
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+  query?: InputMaybe<Scalars['String']>;
+  searchType?: InputMaybe<ProductSearchType>;
+  withPerformance?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -11850,6 +12080,18 @@ export type ProductCatalogSchemaProductsV2Args = {
   searchType?: InputMaybe<ProductSearchType>;
   sort?: InputMaybe<ProductSort>;
   state?: InputMaybe<ProductListingState>;
+};
+
+
+export type ProductCatalogSchemaProductsV3Args = {
+  days?: InputMaybe<Scalars['Int']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  merchantId?: InputMaybe<Scalars['ObjectIdType']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  query?: InputMaybe<Scalars['String']>;
+  searchType?: InputMaybe<ProductSearchType>;
+  sort?: InputMaybe<PerformanceProductSort>;
+  withPerformance?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -12277,6 +12519,7 @@ export type ProductPostErrorCode =
   | 'INVALID_RULES'
   | 'INVALID_VIDEO'
   | 'INVALID_VIDEO_ID'
+  | 'INVALID_VIDEO_STATE'
   | 'LIMIT_IS_ZERO'
   | 'MISSING_PARAMETER'
   | 'NO_ERROR'
@@ -12881,6 +13124,7 @@ export type ProductVideoState =
   | 'PENDING_REVIEW'
   | 'PENDING_TRANSCODE'
   | 'REJECTED'
+  | 'SUSPENDED_REVIEW'
   | 'UNKNOWN_STATE';
 
 export type ProductVideoTaggerJobSchema = {
@@ -12912,7 +13156,8 @@ export type ProductsCsvTemplateType =
   | 'DEFAULT'
   | 'ENABLED'
   | 'PRICE_AND_INVENTORY'
-  | 'SHIPPING';
+  | 'SHIPPING'
+  | 'UNDER_PERFORMING';
 
 export type PromotableProduct = {
   __typename?: 'PromotableProduct';
@@ -13370,6 +13615,12 @@ export type RemoveProduct = {
 
 export type RemoveProductInput = {
   productId: Scalars['ObjectIdType'];
+};
+
+export type RemoveProductsInput = {
+  campaignId: Scalars['ObjectIdType'];
+  comment: Scalars['String'];
+  productIds: Array<Scalars['ObjectIdType']>;
 };
 
 export type RemoveShippingProfile = {
@@ -15505,7 +15756,8 @@ export type TaggingViolationSubReasonCode =
   | 'VHS_TAPE'
   | 'VIDEO_GAME'
   | 'VIRTUAL_MONEY'
-  | 'VITAMINS_AND_SUPPLEMENTS';
+  | 'VITAMINS_AND_SUPPLEMENTS'
+  | 'WATER_BEADS';
 
 export type TaggingViolationSubcategory = {
   __typename?: 'TaggingViolationSubcategory';
