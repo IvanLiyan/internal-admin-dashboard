@@ -171,6 +171,7 @@ type HazardousMaterialsSubreasons = ExtractStrict<
   | "GLYPHOSATE"
   | "BENZENE"
   | "STANDALONE_LITHIUM_BATTERY"
+  | "WATER_BEADS"
 >;
 
 type ConsumptionMaterialsSubreasons = ExtractStrict<
@@ -660,6 +661,10 @@ export const CounterfeitSubreasonsDictionary: {
   STANDALONE_LITHIUM_BATTERY: {
     categoryCode: "HAZARDOUS_MATERIALS",
     text: "Standalone Lithium or Litium-Ion batteries",
+  },
+  WATER_BEADS: {
+    categoryCode: "HAZARDOUS_MATERIALS",
+    text: "Water Beads marketed to children",
   },
 
   FOOD: { categoryCode: "CONSUMPTION_MATERIALS", text: "Food" },
