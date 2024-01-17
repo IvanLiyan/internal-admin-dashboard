@@ -1805,6 +1805,22 @@ export type CsvExportFilterType =
   | 'SHIPPED'
   | 'UNCONFIRMED_TRACKING';
 
+export type CsvProductImportJobDetailSchema = {
+  __typename?: 'CSVProductImportJobDetailSchema';
+  aliveCount: Scalars['Int'];
+  completedTime?: Maybe<Datetime>;
+  errorsCount: Scalars['Int'];
+  feedType: ProductCsvJobType;
+  fileName?: Maybe<Scalars['String']>;
+  id: Scalars['ObjectIdType'];
+  noChangesCount: Scalars['Int'];
+  processingCount: Scalars['Int'];
+  startTime: Datetime;
+  status: Scalars['String'];
+  totalCount: Scalars['Int'];
+  underReviewCount: Scalars['Int'];
+};
+
 export type CsvProductImportJobSchema = {
   __typename?: 'CSVProductImportJobSchema';
   addedCount: Scalars['Int'];
@@ -1820,6 +1836,17 @@ export type CsvProductImportJobSchema = {
   status: MerchantFeedJobStatus;
   totalRows: Scalars['Int'];
   updatedCount: Scalars['Int'];
+};
+
+export type CsvProductImportJobSchemaV2 = {
+  __typename?: 'CSVProductImportJobSchemaV2';
+  completedTime?: Maybe<Datetime>;
+  feedType: ProductCsvJobType;
+  fileName?: Maybe<Scalars['String']>;
+  id: Scalars['ObjectIdType'];
+  startTime: Datetime;
+  status?: Maybe<Scalars['String']>;
+  version?: Maybe<Scalars['Int']>;
 };
 
 export type CsvValidationSchema = {
@@ -4186,6 +4213,22 @@ export type DownloadAllProductsInput = {
   includeRejected?: InputMaybe<Scalars['Boolean']>;
   templateType?: InputMaybe<ProductsCsvTemplateType>;
   warehouseId?: InputMaybe<Scalars['ObjectIdType']>;
+};
+
+export type DownloadBulkCsvFileType =
+  | 'ERROR'
+  | 'LIVE';
+
+export type DownloadBulkCsvProductsInput = {
+  bulkCsvJobId: Scalars['String'];
+  fileType: DownloadBulkCsvFileType;
+};
+
+export type DownloadCsvJobRowsDetail = {
+  __typename?: 'DownloadCsvJobRowsDetail';
+  downloadUrl?: Maybe<Scalars['String']>;
+  errorMessage?: Maybe<Scalars['String']>;
+  ok: Scalars['Boolean'];
 };
 
 export type DownloadEuComplianceProductLinks = {
@@ -6773,6 +6816,33 @@ export type MfpProductSearchType =
   | 'NAME'
   | 'SKU';
 
+export type MfpPromotionSchema = {
+  __typename?: 'MFPPromotionSchema';
+  availableQuantity: Scalars['Int'];
+  campaignId: Scalars['ObjectIdType'];
+  cancelAt?: Maybe<Datetime>;
+  countries: Array<Country>;
+  discountData: PromotionDiscountData;
+  endTime: Datetime;
+  eventId?: Maybe<Scalars['ObjectIdType']>;
+  id: Scalars['ObjectIdType'];
+  maxQuantity: Scalars['Int'];
+  merchantId: Scalars['Boolean'];
+  productVariationData: ProductVariationData;
+  promotionType: MfpCampaignPromotionType;
+  startTime: Datetime;
+  state: MfpPromotionStateType;
+};
+
+export type MfpPromotionSearchType =
+  | 'CAMPAIGN_ID'
+  | 'PRODUCT_ID'
+  | 'PROMOTION_ID';
+
+export type MfpPromotionStateType =
+  | 'APPROVED'
+  | 'CANCELLED';
+
 export type MfpServiceAdminMutations = {
   __typename?: 'MFPServiceAdminMutations';
   cancelMfpCampaign: AdminCancelMfpCampaign;
@@ -6856,6 +6926,7 @@ export type MfpServiceSchema = {
   eligibleProductsCount?: Maybe<Scalars['Int']>;
   genericCampaigns?: Maybe<Array<Scalars['GenericScalar']>>;
   genericEligibleProducts?: Maybe<Scalars['GenericScalar']>;
+  promotions?: Maybe<Array<MfpPromotionSchema>>;
 };
 
 
@@ -6979,6 +7050,14 @@ export type MfpServiceSchemaGenericEligibleProductsArgs = {
   searchQuery?: InputMaybe<Scalars['String']>;
   searchType?: InputMaybe<MfpProductSearchType>;
   sort?: InputMaybe<ProductSort>;
+};
+
+
+export type MfpServiceSchemaPromotionsArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  searchQuery?: InputMaybe<Scalars['String']>;
+  searchType?: InputMaybe<MfpPromotionSearchType>;
 };
 
 export type MfpUnqualifiedVariationData = {
@@ -11180,6 +11259,7 @@ export type PermissionType =
   | 'VIEW_PENDING_SANCTION_SCREENING_HOLD'
   | 'VIEW_POLICY_VIOLATION_FINE'
   | 'VIEW_PRODUCTS'
+  | 'VIEW_PRODUCT_LISTING_FEE'
   | 'VIEW_PRODUCT_PROFILE_PAGE'
   | 'VIEW_RESPOND_TO_ADMIN_HOLD'
   | 'VIEW_RESTRICTED_PRODUCT_REQUEST'
@@ -11862,6 +11942,7 @@ export type ProductCatalogMutations = {
   __typename?: 'ProductCatalogMutations';
   downloadAllProducts?: Maybe<DownloadAllProducts>;
   downloadAllProductsCsv?: Maybe<DownloadAllProductsCsv>;
+  downloadBulkCsvProducts?: Maybe<DownloadCsvJobRowsDetail>;
   downloadUnderPerformingProducts?: Maybe<DownloadUnderPerformingProducts>;
   forceApproveProduct?: Maybe<ForceApproveProduct>;
   removeProduct?: Maybe<RemoveProduct>;
@@ -11882,6 +11963,11 @@ export type ProductCatalogMutationsDownloadAllProductsArgs = {
 
 export type ProductCatalogMutationsDownloadAllProductsCsvArgs = {
   input: DownloadAllProductsCsvInput;
+};
+
+
+export type ProductCatalogMutationsDownloadBulkCsvProductsArgs = {
+  input: DownloadBulkCsvProductsInput;
 };
 
 
@@ -11950,6 +12036,9 @@ export type ProductCatalogSchema = {
   downloadJobs?: Maybe<Array<DownloadJobSchema>>;
   downloadJobsCount?: Maybe<Scalars['Int']>;
   gtinProductService: GtinProductServiceSchema;
+  newBulkCsvJobDetail?: Maybe<CsvProductImportJobDetailSchema>;
+  newBulkCsvJobs: Array<CsvProductImportJobSchemaV2>;
+  newBulkCsvJobsCount: Scalars['Int'];
   product?: Maybe<ProductSchema>;
   productCategoryTaxonomyTreeJson: Scalars['JSONString'];
   productCount: Scalars['Int'];
@@ -12005,6 +12094,23 @@ export type ProductCatalogSchemaDownloadJobsArgs = {
 export type ProductCatalogSchemaDownloadJobsCountArgs = {
   merchantId?: InputMaybe<Scalars['ObjectIdType']>;
   query?: InputMaybe<Scalars['String']>;
+};
+
+
+export type ProductCatalogSchemaNewBulkCsvJobDetailArgs = {
+  bulkCsvJobId: Scalars['String'];
+};
+
+
+export type ProductCatalogSchemaNewBulkCsvJobsArgs = {
+  feedType?: InputMaybe<ProductCsvJobType>;
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
+};
+
+
+export type ProductCatalogSchemaNewBulkCsvJobsCountArgs = {
+  feedType?: InputMaybe<ProductCsvJobType>;
 };
 
 
@@ -12923,6 +13029,12 @@ export type ProductUpsertInput = {
   warningType?: InputMaybe<ContestWarningType>;
 };
 
+export type ProductVariationData = {
+  __typename?: 'ProductVariationData';
+  productId: Scalars['ObjectIdType'];
+  variationId: Scalars['ObjectIdType'];
+};
+
 export type ProductVideo = {
   __typename?: 'ProductVideo';
   audio?: Maybe<ProductVideoAudio>;
@@ -13163,6 +13275,13 @@ export type PromotableProduct = {
   __typename?: 'PromotableProduct';
   isInTrendingCategory: Scalars['Boolean'];
   product: ProductSchema;
+};
+
+export type PromotionDiscountData = {
+  __typename?: 'PromotionDiscountData';
+  discountAmount?: Maybe<CurrencyValue>;
+  discountPercentage?: Maybe<Scalars['Float']>;
+  localizedDiscountAmount?: Maybe<CurrencyValue>;
 };
 
 export type PublicDsaMutations = {
@@ -15591,6 +15710,7 @@ export type TaggingViolationSubReasonCode =
   | 'ANIME_PRODUCTS'
   | 'ANTI_GAY'
   | 'ASSAULT_WEAPON_CONVERSION_PIECES'
+  | 'BABY_HOODED_SLEEP_PRODUCTS'
   | 'BENZENE'
   | 'BEVERAGES'
   | 'BLOOD_COLLECTION_TUBES'
