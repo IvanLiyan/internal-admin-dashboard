@@ -20,7 +20,7 @@ const CounterfeitSubreasonFilter: React.FC = () => {
       options={CounterfeitSubreasonOptions.slice().sort((a, b) => {
         const categoryA = CounterfeitSubreasonsDictionary[a].categoryCode;
         const categoryB = CounterfeitSubreasonsDictionary[b].categoryCode;
-        return CounterfeitReasonsDictionary[categoryA].text.localeCompare(
+        return CounterfeitReasonsDictionary[categoryA]?.text.localeCompare(
           CounterfeitReasonsDictionary[categoryB].text
         );
       })}
