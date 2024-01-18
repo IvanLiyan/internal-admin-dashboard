@@ -283,7 +283,7 @@ export const useTableData = (
         parentCategory: i.counterfeitReasonText ?? "N/A",
         subCategory:
           subcategory != null
-            ? CounterfeitSubreasonsDictionary[subcategory].text
+            ? CounterfeitSubreasonsDictionary[subcategory]?.text
             : "N/A",
         ban: i.banned == null ? "N/A" : i.banned ? "Yes" : "No",
         gmv7Day: i.merchant?.storeStats.sevenDayTotals.gmv.display ?? "N/A",
