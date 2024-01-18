@@ -208,6 +208,7 @@ type RecalledToysSubreasons = ExtractStrict<
   | "CPSC_VIOLATION"
   | "SELF_FEEDING_BABY_PILLOWS"
   | "SELF_FEEDING_BABY_BOTTLE_CLIPS"
+  | "BABY_HOODED_SLEEP_PRODUCTS"
 >;
 
 type VirtualGoodsSubreasons = ExtractStrict<
@@ -732,6 +733,10 @@ export const CounterfeitSubreasonsDictionary: {
   SELF_FEEDING_BABY_BOTTLE_CLIPS: {
     categoryCode: "RECALLED_TOYS",
     text: "Self Feeding Baby Bottle Clips",
+  },
+  BABY_HOODED_SLEEP_PRODUCTS: {
+    categoryCode: "RECALLED_TOYS",
+    text: "Baby Hooded Sleep Products",
   },
 
   GIFT_CARDS_OR_ACCESS_CODES: {
