@@ -6,7 +6,7 @@ const merchantEnvs = [
   "fe_prod",
   "sandbox",
 ] as const;
-type MerchantEnv = typeof merchantEnvs[number];
+type MerchantEnv = (typeof merchantEnvs)[number];
 
 const _env = process.env.ENV || process.env.NEXT_PUBLIC_ENV;
 
