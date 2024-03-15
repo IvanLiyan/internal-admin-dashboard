@@ -57,6 +57,10 @@ export const MenuData: MenuItemProps[] = [
         text: "Bank Account Verification",
         href: "/seller-identity/bank-verifications",
       },
+      {
+        text: "Tax Account Verification",
+        href: "/seller-identity/tax-verifications",
+      },
     ],
   },
   {
