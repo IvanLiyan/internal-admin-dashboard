@@ -39,6 +39,7 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
   const [SPVReauthenticationLink, setSPVReauthenticationLink] =
     useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
+  const [open2, setOpen2] = useState<boolean>(false);
 
   const { data: ReauthenticationListData } = useRequest<
     ReauthenticationListResponse,
@@ -151,15 +152,13 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                         View2
                       </Button>
                       <Modal
-                        open={open}
+                        open={open2}
                         title="PDF Review"
-                        onClose={() => setOpen(false)}
+                        onClose={() => setOpen2(false)}
                       >
                         <Container sx={{ mt: 2, mb: 2 }}>
                           <PdfPreviewer
-                            pdfFile={
-                              "https://ivanli.oss-cn-shanghai.aliyuncs.com/file/fw8bene.pdf"
-                            }
+                            pdfFile={"/merchant-file/65f7b4774f82cde28d614e22"}
                           />
                         </Container>
                       </Modal>
