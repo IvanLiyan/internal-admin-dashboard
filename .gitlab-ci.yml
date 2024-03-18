@@ -57,8 +57,7 @@ deploy staging:
     - sh scripts/deploy.sh -s=internal-admin-tools-staging
   environment:
     name: staging
-  when: manual
-    rules:
+  rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
     - when: manual
@@ -80,4 +79,3 @@ deploy production:
   tags: ["internal-admin-dashboard"]
   dependencies:
     - build prod
-
