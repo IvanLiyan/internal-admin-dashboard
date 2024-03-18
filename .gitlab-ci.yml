@@ -58,9 +58,11 @@ deploy staging:
   environment:
     name: staging
   when: manual
-  rules:
+    rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
+    - when: manual
+      allow_failure: true
   tags: ["internal-admin-dashboard-staging"]
   dependencies:
     - build staging
