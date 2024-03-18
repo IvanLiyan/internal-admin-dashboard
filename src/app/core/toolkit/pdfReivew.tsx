@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Button } from "@mui/material";
-// // 设置 PDF.js worker 的 URL
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+// Set the URL of PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 interface PdfPreviewerProps {
   pdfFile: string | File;

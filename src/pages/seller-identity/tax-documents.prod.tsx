@@ -133,14 +133,33 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       </Button>
                       <Modal
                         open={open}
-                        title="Submit Review"
+                        title="PDF Review"
                         onClose={() => setOpen(false)}
-                        buttonText="Submit"
-                        onClick={() => setOpen(false)}
                       >
                         <Container sx={{ mt: 2, mb: 2 }}>
                           <PdfPreviewer
-                            pdfFile={"/merchant-file/65f7b4774f82cde28d614e22"}
+                            pdfFile={
+                              "https://staging.merchant.wish.com/merchant-file/65f7b4774f82cde28d614e22"
+                            }
+                          />
+                        </Container>
+                      </Modal>
+                      <Button
+                        // onClick={() => window.open(row.documentUrl, "_blank")}
+                        onClick={() => setOpen(true)}
+                      >
+                        View2
+                      </Button>
+                      <Modal
+                        open={open}
+                        title="PDF Review"
+                        onClose={() => setOpen(false)}
+                      >
+                        <Container sx={{ mt: 2, mb: 2 }}>
+                          <PdfPreviewer
+                            pdfFile={
+                              "https://ivanli.oss-cn-shanghai.aliyuncs.com/file/fw8bene.pdf"
+                            }
                           />
                         </Container>
                       </Modal>
