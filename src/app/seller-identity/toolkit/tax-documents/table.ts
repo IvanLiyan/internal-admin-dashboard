@@ -88,7 +88,6 @@ export const useTableData = (
   return (
     data?.merchants?.merchant?.merchantIdentityVerification?.merchantIdentityDocuments?.map(
       (doc) => {
-        console.log("doc", doc);
         return {
           userId: data.merchants?.mainUser?.id,
           mid: data.merchants?.merchant?.id,
