@@ -21,6 +21,8 @@ import {
   TableHead,
   TableRow,
   Link,
+  Typography,
+  Container,
 } from "@mui/material";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -28,12 +30,15 @@ import { useQuery } from "urql";
 import { useRequest } from "@app/core/toolkit/restApi";
 import { merchFeUrl } from "@app/core/toolkit/router";
 import { useEffect } from "react";
+import Modal from "@app/core/components/Modal";
+import PdfPreviewer from "@app/core/toolkit/pdfReivew";
 
 const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
   const { query } = useRouter();
   const mid = query.mid as string;
   const [SPVReauthenticationLink, setSPVReauthenticationLink] =
     useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
 
   const { data: ReauthenticationListData } = useRequest<
     ReauthenticationListResponse,
@@ -121,10 +126,24 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                     </TableCell>
                     <TableCell>
                       <Button
-                        onClick={() => window.open(row.documentUrl, "_blank")}
+                        // onClick={() => window.open(row.documentUrl, "_blank")}
+                        onClick={() => setOpen(true)}
                       >
                         View
                       </Button>
+                      <Modal
+                        open={open}
+                        title="Submit Review"
+                        onClose={() => setOpen(false)}
+                        buttonText="Submit"
+                        onClick={() => setOpen(false)}
+                      >
+                        <Container sx={{ mt: 2, mb: 2 }}>
+                          <PdfPreviewer
+                            pdfFile={"/merchant-file/65f7b4774f82cde28d614e22"}
+                          />
+                        </Container>
+                      </Modal>
                       {row.documentState == "SUBMITTED" && (
                         <>
                           <CommentButton

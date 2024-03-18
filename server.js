@@ -6,7 +6,7 @@ const fs = require("fs");
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "leopard-internal.corp.contextlogic.com";
-const port = 443;
+const port = 444;
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
@@ -19,6 +19,8 @@ app.prepare().then(() => {
   createServer(options, (req, res) => handle(req, res)).listen(port, (err) => {
     if (err) throw err;
     console.log(`> Ready on https://${hostname}:${port}/internal-admin`);
-    console.log(`> Log in through https://${hostname}/internal-admin/dev-login`);
+    console.log(
+      `> Log in through https://${hostname}/internal-admin/dev-login`
+    );
   });
 });
