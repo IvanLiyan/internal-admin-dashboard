@@ -14,6 +14,7 @@ export type TableData = {
   readonly documentState: MerchantIdentityVerificationStatus;
   readonly documentType: MerchantIdentityDocumentType;
   readonly documentUrl?: string;
+  readonly documentUrlId?: string;
   readonly uploadedAt: string;
   readonly reviewedAt: string;
   readonly reviewer: string;
@@ -95,6 +96,7 @@ export const useTableData = (
           documentState: doc.state,
           documentType: doc.documentType,
           documentUrl: doc.documentFile?.fileUrl,
+          documentUrlId: doc.documentFile?.id,
           uploadedAt:
             doc.uploadedAt?.unix != null
               ? dayjs.unix(doc?.uploadedAt.unix).format("YYYY-MM-DD HH:MM")

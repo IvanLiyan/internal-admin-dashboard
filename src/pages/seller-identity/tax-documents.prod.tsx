@@ -126,12 +126,7 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        // onClick={() => window.open(row.documentUrl, "_blank")}
-                        onClick={() => setOpen(true)}
-                      >
-                        View
-                      </Button>
+                      <Button onClick={() => setOpen(true)}>View</Button>
                       <Modal
                         open={open}
                         title="PDF Review"
@@ -140,25 +135,10 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                         <Container sx={{ mt: 2, mb: 2 }}>
                           <PdfPreviewer
                             pdfFile={
-                              "https://staging.merchant.wish.com/merchant-file/65f7b4774f82cde28d614e22"
+                              row.documentUrlId
+                                ? `/merchant-file/${row.documentUrl}`
+                                : "/merchant-file/65f7b4774f82cde28d614e22"
                             }
-                          />
-                        </Container>
-                      </Modal>
-                      <Button
-                        // onClick={() => window.open(row.documentUrl, "_blank")}
-                        onClick={() => setOpen(true)}
-                      >
-                        View2
-                      </Button>
-                      <Modal
-                        open={open2}
-                        title="PDF Review"
-                        onClose={() => setOpen2(false)}
-                      >
-                        <Container sx={{ mt: 2, mb: 2 }}>
-                          <PdfPreviewer
-                            pdfFile={"/merchant-file/65f7b4774f82cde28d614e22"}
                           />
                         </Container>
                       </Modal>

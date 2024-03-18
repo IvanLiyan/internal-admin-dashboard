@@ -29,7 +29,7 @@ const PdfPreviewer: React.FC<PdfPreviewerProps> = ({ pdfFile }) => {
           cMapPacked: true,
         }}
       >
-        <Page pageNumber={pageNumber} />
+        <Page pageNumber={pageNumber} width={800} height={1200} />
       </Document>
       <div>
         <p>
