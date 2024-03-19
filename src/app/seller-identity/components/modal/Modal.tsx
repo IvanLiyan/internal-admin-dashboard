@@ -37,15 +37,15 @@ const Modal: React.FC<ModalProps> = (props: ModalProps) => {
   } = props;
 
   return (
-    <Modal_ open={open}>
+    <Modal_ open={open} style={{ height: "100%" }}>
       <Box
         sx={{
           position: "absolute",
           width: width,
           height: "auto",
-          top: "30%",
-          left: "50%",
           maxHeight: maxHeight,
+          left: "50%",
+          top: "50%",
           transform: "translate(-50%, -50%)",
           borderRadius: 3,
           overflow: "hidden",

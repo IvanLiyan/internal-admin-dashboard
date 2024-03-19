@@ -30,7 +30,7 @@ import { useQuery } from "urql";
 import { useRequest } from "@app/core/toolkit/restApi";
 import { merchFeUrl } from "@app/core/toolkit/router";
 import { useEffect } from "react";
-import Modal from "@app/core/components/Modal";
+import Modal from "@app/seller-identity/components/modal/Modal";
 import PdfPreviewer from "@app/core/toolkit/pdfReivew";
 
 const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
@@ -132,17 +132,26 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                         title="PDF Review"
                         onClose={() => setOpen(false)}
                         onClick={() => setOpen(false)}
-                        width={1500}
-                        maxHeight={1800}
+                        width={1200}
+                        maxHeight={1200}
                       >
-                        <Container sx={{ mt: 2, mb: 2 }}>
-                          <PdfPreviewer
-                            pdfFile={
-                              row.documentUrlId
-                                ? `/merchant-file/${row.documentUrl}`
-                                : "/merchant-file/65f7b4774f82cde28d614e22"
-                            }
-                          />
+                        <Container
+                          sx={{
+                            mt: 2,
+                            mb: 2,
+                            maxHeight: "1000px",
+                            overflow: "auto",
+                          }}
+                        >
+                          {row.documentUrlId ? (
+                            <PdfPreviewer
+                              pdfFile={`/merchant-file/${row.documentUrlId}`}
+                            />
+                          ) : (
+                            <PdfPreviewer
+                              pdfFile={`/merchant-file/65f7b4774f82cde28d614e22`}
+                            />
+                          )}
                         </Container>
                       </Modal>
                       {row.documentState == "SUBMITTED" && (

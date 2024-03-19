@@ -28,9 +28,9 @@ const PdfPreviewer: React.FC<PdfPreviewerProps> = ({ pdfFile }) => {
           cMapPacked: true,
         }}
       >
-        <Page pageNumber={pageNumber} width={800} height={1200} />
+        <Page pageNumber={pageNumber} />
       </Document>
-      <div>
+      {/* <div>
         <p>
           Page {pageNumber} of {numPages}
         </p>
@@ -40,7 +40,7 @@ const PdfPreviewer: React.FC<PdfPreviewerProps> = ({ pdfFile }) => {
         <Button onClick={goToNextPage} disabled={pageNumber >= numPages}>
           Next
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };
