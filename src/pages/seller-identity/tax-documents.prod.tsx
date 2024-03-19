@@ -131,6 +131,9 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                         open={open}
                         title="PDF Review"
                         onClose={() => setOpen(false)}
+                        onClick={() => setOpen(false)}
+                        width={1500}
+                        maxHeight={1800}
                       >
                         <Container sx={{ mt: 2, mb: 2 }}>
                           <PdfPreviewer

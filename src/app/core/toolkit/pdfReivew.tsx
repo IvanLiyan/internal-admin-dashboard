@@ -18,7 +18,6 @@ const PdfPreviewer: React.FC<PdfPreviewerProps> = ({ pdfFile }) => {
 
   const goToNextPage = () => setPageNumber(pageNumber + 1);
   const goToPreviousPage = () => setPageNumber(pageNumber - 1);
-
   return (
     <div>
       <Document

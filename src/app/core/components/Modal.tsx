@@ -43,7 +43,7 @@ const Modal: React.FC<ModalProps> = (props: ModalProps) => {
           position: "absolute",
           width: width,
           height: "auto",
-          top: "30%",
+          top: "50%",
           left: "50%",
           maxHeight: maxHeight,
           transform: "translate(-50%, -50%)",

@@ -122,6 +122,10 @@ module.exports = (phase, { defaultConfig }) => {
     images: {
       unoptimized: true,
     },
+    webpack: (config) => {
+      config.resolve.alias.canvas = false;
+      return config;
+    },
   };
 
   return withBundleAnalyzer(nextConfig);
