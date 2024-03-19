@@ -127,6 +127,9 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                     </TableCell>
                     <TableCell>
                       <Button onClick={() => setOpen(true)}>View</Button>
+                      <Link href="/internal-admin/seller-identity/review-pdf">
+                        View2
+                      </Link>
                       <Modal
                         open={open}
                         title="PDF Review"
