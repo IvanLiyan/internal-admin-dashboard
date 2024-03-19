@@ -120,14 +120,13 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Button disabled={row.documentUrlId == null}>
-                        <Link
-                          target="_blank"
-                          underline="none"
-                          href={`/internal-admin/seller-identity/review-pdf?documentUrlId=${row.documentUrlId}`}
-                        >
-                          View
-                        </Link>
+                      <Button
+                        disabled={row.documentState == "PENDING"}
+                        component="a"
+                        href={`/internal-admin/seller-identity/review-pdf?documentUrlId=${row.documentUrlId}`}
+                        target="_blank"
+                      >
+                        View
                       </Button>
                       {row.documentState == "SUBMITTED" && (
                         <>

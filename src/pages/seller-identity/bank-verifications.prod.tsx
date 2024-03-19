@@ -115,11 +115,9 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
                       ))}
                       <TableCell>
                         <Button
-                          onClick={() =>
-                            router.push(
-                              `/seller-identity/bank-documents?mid=${row.id}`
-                            )
-                          }
+                          component="a"
+                          href={`/internal-admin//seller-identity/bank-documents?mid=${row.id}`}
+                          target="_blank"
                         >
                           View
                         </Button>

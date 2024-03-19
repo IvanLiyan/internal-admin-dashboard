@@ -116,11 +116,9 @@ const TaxVerificationsPage: NextPage<Record<string, never>> = () => {
                       ))}
                       <TableCell>
                         <Button
-                          onClick={() =>
-                            router.push(
-                              `/seller-identity/tax-documents?mid=${row.id}`
-                            )
-                          }
+                          component="a"
+                          href={`/internal-admin//seller-identity/tax-documents?mid=${row.id}`}
+                          target="_blank"
                         >
                           View
                         </Button>
