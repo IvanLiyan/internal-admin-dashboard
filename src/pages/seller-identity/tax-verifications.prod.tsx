@@ -117,7 +117,7 @@ const TaxVerificationsPage: NextPage<Record<string, never>> = () => {
                       <TableCell>
                         <Button
                           component="a"
-                          href={`/internal-admin//seller-identity/tax-documents?mid=${row.id}`}
+                          href={`/internal-admin/seller-identity/tax-documents?mid=${row.id}`}
                           target="_blank"
                         >
                           View

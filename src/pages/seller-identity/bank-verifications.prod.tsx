@@ -116,7 +116,7 @@ const BankVerificationsPage: NextPage<Record<string, never>> = () => {
                       <TableCell>
                         <Button
                           component="a"
-                          href={`/internal-admin//seller-identity/bank-documents?mid=${row.id}`}
+                          href={`/internal-admin/seller-identity/bank-documents?mid=${row.id}`}
                           target="_blank"
                         >
                           View
