@@ -21,8 +21,6 @@ import {
   TableHead,
   TableRow,
   Link,
-  Typography,
-  Container,
 } from "@mui/material";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -30,16 +28,12 @@ import { useQuery } from "urql";
 import { useRequest } from "@app/core/toolkit/restApi";
 import { merchFeUrl } from "@app/core/toolkit/router";
 import { useEffect } from "react";
-import Modal from "@app/seller-identity/components/modal/Modal";
-import PdfPreviewer from "@app/core/toolkit/pdfReivew";
 
 const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
   const { query } = useRouter();
   const mid = query.mid as string;
   const [SPVReauthenticationLink, setSPVReauthenticationLink] =
     useState<string>("");
-  const [open, setOpen] = useState<boolean>(false);
-  const [open2, setOpen2] = useState<boolean>(false);
 
   const { data: ReauthenticationListData } = useRequest<
     ReauthenticationListResponse,
@@ -126,37 +120,15 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Button onClick={() => setOpen(true)}>View</Button>
-                      <Link href="/internal-admin/seller-identity/review-pdf">
-                        View2
-                      </Link>
-                      <Modal
-                        open={open}
-                        title="PDF Review"
-                        onClose={() => setOpen(false)}
-                        onClick={() => setOpen(false)}
-                        width={1200}
-                        maxHeight={1200}
-                      >
-                        <Container
-                          sx={{
-                            mt: 2,
-                            mb: 2,
-                            maxHeight: "1000px",
-                            overflow: "auto",
-                          }}
+                      <Button disabled={row.documentUrlId == null}>
+                        <Link
+                          target="_blank"
+                          underline="none"
+                          href={`/internal-admin/seller-identity/review-pdf?documentUrlId=${row.documentUrlId}`}
                         >
-                          {row.documentUrlId ? (
-                            <PdfPreviewer
-                              pdfFile={`/merchant-file/${row.documentUrlId}`}
-                            />
-                          ) : (
-                            <PdfPreviewer
-                              pdfFile={`/merchant-file/65f7b4774f82cde28d614e22`}
-                            />
-                          )}
-                        </Container>
-                      </Modal>
+                          View
+                        </Link>
+                      </Button>
                       {row.documentState == "SUBMITTED" && (
                         <>
                           <CommentButton

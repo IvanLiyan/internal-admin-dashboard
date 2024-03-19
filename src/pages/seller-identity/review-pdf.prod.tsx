@@ -1,19 +1,17 @@
-import LoadingIndicator from "@app/core/components/LoadingIndicator";
 import PageRoot from "@app/core/components/PageRoot";
-import { Button, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { NextPage } from "next";
-import { useQuery } from "urql";
-import ReviewPdf from "@app/seller-identity/components/reivew-pdf/ReviewPDF";
-// import PreviewPDF from "@app/core/toolkit/pdfReivew";
+import { useRouter } from "next/router";
+import ReviewPdf from "@app/seller-identity/components/review-pdf/ReviewPDF";
 
 const ReviewPdfPage: NextPage<Record<string, never>> = () => {
-  const pdfFile = "/files/fw8ben.pdf"; // 这里替换成你的 PDF 文件路径
+  const { query } = useRouter();
+  const fileId = query.documentUrlId as string;
 
   return (
-    <PageRoot title="Bank Account Verification">
+    <PageRoot title="Preview pdf file">
       <Paper>
-        {/* <PdfPreviewer pdfFile={`/merchant-file/65f7b4774f82cde28d614e22`} /> */}
-        <ReviewPdf fileUrl="/merchant-file/65f7b4774f82cde28d614e22" />
+        {fileId && <ReviewPdf fileUrl={`/merchant-file/${fileId}`} />}
       </Paper>
     </PageRoot>
   );
