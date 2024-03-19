@@ -122,8 +122,14 @@ module.exports = (phase, { defaultConfig }) => {
     images: {
       unoptimized: true,
     },
-    webpack: (config) => {
-      config.resolve.alias.canvas = false;
+    webpack: (config, { isServer }) => {
+      // Fixes npm packages that depend on `fs` module
+      if (!isServer) {
+        config.resolve.fallback = { fs: false };
+      }
+      // Enable the top-level-await experiment
+      config.experiments = { topLevelAwait: true };
+
       return config;
     },
   };
