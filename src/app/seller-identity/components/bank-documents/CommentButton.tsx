@@ -71,12 +71,12 @@ const CommentButton: React.FC<Props> = ({
       },
     }).then((result) => {
       if (
-        !result.data?.merchantIdentity?.bankAccountVerification.reviewDocument
+        !result.data?.merchantIdentity?.bankAccountVerification?.reviewDocument
           ?.ok
       ) {
         toast.alert(
           "error",
-          result.data?.merchantIdentity?.bankAccountVerification.reviewDocument
+          result.data?.merchantIdentity?.bankAccountVerification?.reviewDocument
             ?.message || result.error?.message
         );
       } else {

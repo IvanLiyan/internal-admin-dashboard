@@ -800,6 +800,7 @@ type BankAccountVerificationSchema {
   lastReviewedAt: Datetime
   lastUploadedAt: Datetime
   bankAccountDocuments: [BankAccountDocumentSchema!]
+  dueDate: Datetime
 }
 
 enum BankAccountVerificationStatus {
@@ -1304,12 +1305,15 @@ enum BusinessDocTypes {
   CERTIFICATE_OF_INCORPORATION
   TAX_FORM
   CREDIT_CARD_STATEMENT
+  TAX_FORM_W9
   UTILITY_BILL_STATEMENT
   GOVERNMENT_ISSUED_BUSINESS_LICENSE
   ENTITY_TRADING_NAME
   ARTICLES_OF_INCORPORATION
   TAX_FORM_W_8
+  TAX_FORM_W8_BEN_E
   PRODUCT_LICENSING
+  TAX_FORM_W8_BEN
 }
 
 enum BuyerFraudReasonCategory {
@@ -1377,6 +1381,7 @@ type CSVProductImportJobDetailSchema {
   startTime: Datetime!
   completedTime: Datetime
   fileName: String
+  fileLink: String
   feedType: ProductCSVJobType!
   status: String!
   totalCount: Int!
@@ -1700,6 +1705,7 @@ input ChangeVacationSettingsInput {
   startDate: DatetimeInput
   endDate: DatetimeInput
   primaryWarehouseOnly: Boolean!
+  vacationMode: Int
 }
 
 type ChangeVacationSettingsMutation {
@@ -3453,8 +3459,8 @@ input DownloadAllProductsInput {
 }
 
 enum DownloadBulkCsvFileType {
-  LIVE
   ERROR
+  LIVE
 }
 
 input DownloadBulkCsvProductsInput {
@@ -6046,11 +6052,13 @@ enum MerchantFacingPayoutState {
 enum MerchantFeedJobStatus {
   EXCEPTION
   NEW_AND_EMAILED
-  FINISHED
   RUNNING
+  FINISHED
+  FAILURE
   FINISHED_AND_EMAILED
   CANCELLED
   NEW
+  FINISHED_WITH_ERRORS
   PENDING
 }
 
@@ -6216,13 +6224,81 @@ input MerchantGamingReviewUpdateInput {
   infractionIds: String
 }
 
+type MerchantIdentityDocumentSchema {
+  id: ObjectIdType!
+  state: MerchantIdentityVerificationStatus!
+  stateReason: [TaxVerificationStatusReason]
+  comment: String
+  documentFile: MerchantFileSchema
+  documentType: MerchantIdentityDocumentType!
+  uploadedAt: Datetime
+  reviewedAt: Datetime
+  reviewer: UserSchema
+}
+
+enum MerchantIdentityDocumentType {
+  TAX_FORM_W_9
+  OFFICIAL_BANK_STATEMENT
+  RECENT_BUSINESS_RETURNS
+  SHARE_ALLOCATION_CERTIFICATE
+  CERTIFICATE_OF_INCORPORATION
+  TAX_FORM
+  CREDIT_CARD_STATEMENT
+  TAX_FORM_W9
+  UTILITY_BILL_STATEMENT
+  GOVERNMENT_ISSUED_BUSINESS_LICENSE
+  ENTITY_TRADING_NAME
+  ARTICLES_OF_INCORPORATION
+  TAX_FORM_W_8
+  TAX_FORM_W8_BEN_E
+  PRODUCT_LICENSING
+  TAX_FORM_W8_BEN
+}
+
 type MerchantIdentityMutations {
-  bankAccountVerification: BankAccountVerificationReviewerMutations!
+  bankAccountVerification: BankAccountVerificationReviewerMutations
+  merchantIdentityVerification: MerchantIdentityVerificationReviewerMutations
 }
 
 type MerchantIdentityServiceSchema {
   bankAccountVerificationsCount(merchantId: ObjectIdType, state: BankAccountVerificationStatus): Int
   bankAccountVerifications(offset: Int = 0, limit: Int = 50, merchantId: ObjectIdType, state: BankAccountVerificationStatus): [BankAccountVerificationSchema!]
+  merchantIdentityVerificationsCount(merchantId: ObjectIdType, state: MerchantIdentityVerificationStatus, verificationType: MerchantIdentityVerificationType): Int
+  merchantIdentityVerifications(offset: Int = 0, limit: Int = 50, merchantId: ObjectIdType, state: MerchantIdentityVerificationStatus, verificationType: MerchantIdentityVerificationType): [MerchantIdentityVerificationSchema!]
+}
+
+type MerchantIdentityVerificationMutations {
+  uploadDocument(input: UploadMerchantIdentityDocumentInput!): UploadMerchantIdentityDocument!
+}
+
+type MerchantIdentityVerificationReviewerMutations {
+  reviewIdentityVerificationDocument(input: ReviewMerchantIdentityDocumentInput!): ReviewMerchantIdentityDocument
+}
+
+type MerchantIdentityVerificationSchema {
+  id: ObjectIdType!
+  merchantId: ObjectIdType!
+  state: MerchantIdentityVerificationStatus!
+  stateReason: [TaxVerificationStatusReason]!
+  verificationType: MerchantIdentityVerificationType!
+  lastUploadedAt: Datetime
+  lastReviewedAt: Datetime
+  latestMerchantIdentityDocument: MerchantIdentityDocumentSchema
+  bankAccountDocuments: [MerchantIdentityDocumentSchema!]
+  merchantIdentityDocuments: [MerchantIdentityDocumentSchema!]
+  dueDate: Datetime
+}
+
+enum MerchantIdentityVerificationStatus {
+  SUBMITTED
+  REJECTED
+  APPROVED
+  PENDING
+}
+
+enum MerchantIdentityVerificationType {
+  TAX_FORM
+  BANK_ACCOUNT
 }
 
 type MerchantInviteInfo {
@@ -6320,6 +6396,7 @@ type MerchantMutation {
   sellerIdentityVerification: SellerIdentityVerificationMutations!
   sellerIdentityCnVerification: SellerIdentityCNVerificationMutations!
   bankAccountVerification: BankAccountVerificationMerchantMutations!
+  merchantIdentityVerification: MerchantIdentityVerificationMutations!
   returnSettings: MerchantReturnSettingsMutations!
   returnWarehouseSettings: MerchantReturnWarehouseMutations
   mftOptOut(input: ChangeMFTOptOutInput!): ChangeMFTOptOutMutation
@@ -6669,6 +6746,7 @@ type MerchantSchema {
   displayName: String!
   onVacationMode: Boolean!
   vacationSettings: VacationSettingsSchema
+  vacationPause: VacationPauseSchema
   signupTime: Datetime!
   revShare: Float!
   canManageShipping: Boolean!
@@ -6751,6 +6829,7 @@ type MerchantSchema {
   canAccessCalculatedShippingAccountConfig: Boolean
   isMerchantFulfillmentTimeOptOut: Boolean
   isConsignmentMode: Boolean
+  merchantIdentityVerification(verificationType: MerchantIdentityVerificationType): MerchantIdentityVerificationSchema
 }
 
 type MerchantSenderAddressMutations {
@@ -7055,6 +7134,7 @@ enum MerchantTodoItemType {
   REVIEW_REMOVAL_PRODUCTS
   BRL_CURRENCY_CODE_MIGRATION
   CURRENCY_CODE_MIGRATION
+  TAX_FORM_VERIFICATION
   REAUTHENTICATION_SELLER_PROFILE
   NON_CN_UPLOAD_NEW_PRODUCTS
   REAUTHENTICATION_KYC_PROFILE
@@ -8717,6 +8797,7 @@ enum PermissionType {
   MANAGE_PRODUCT_GEOBLOCK
   SHOW_MERCHANT_PROFILE
   VIEW_DISBURSEMENT_INFO
+  CAN_TRIGGER_TAX_FORM_VERIFICATION
   CAN_VIEW_GS_MERCHANT_INFO
   PRODUCT_CATEGORY_DISPUTE_EDIT
   VIEW_JP_MERCHANTS
@@ -8753,6 +8834,7 @@ enum PermissionType {
   EDIT_FRAUD_TEAM_PERMISSIONS
   VIEW_CUSTOMER_PROFILE_PAGE
   CREATE_TERM_OF_SERVICE_EPC_BILL_HOLD
+  CAN_ACCESS_LISTING_WHITE_LIST
   VIEW_WARNING_MANUAL_HOLD
   CAN_UNENROLL_WHITE_GLOVE
   SEND_SYSTEM_UPDATE_TO_BD
@@ -8931,6 +9013,7 @@ enum PermissionType {
   CAN_ACCESS_UPDATE_CONFIRMED
   CAN_REVERSE_FINE
   VIEW_RESTRICTED_PRODUCT_REQUEST
+  CAN_REVIEW_TAX_FORM
   IP_VIOLATION_AUDIT_TAG
   GENDER_AUDIT_TAG
   CAN_ISSUE_PB_CREDITS
@@ -8984,6 +9067,7 @@ enum PermissionType {
   EDIT_PRODUCT_LOGISTIC_METADATA
   GENDER_TAG_MANUAL
   EDIT_LOGICAL_TICKET_QUEUE_LIMITED
+  REVIEW_ONEOFF_REQ_ENABLE_EXTERNALBOOST
   REVIEW_ONEOFF_REQ_ENROLL_PB_KICKSTART
   LISTING_REVIEW_AUDIT_TAG
   SEND_BD_ANNOUNCEMENTS
@@ -9564,6 +9648,7 @@ type ProductCatalogSchema {
   productCategoryTaxonomyTreeJson: JSONString!
   gtinProductService: GtinProductServiceSchema!
   csvEnableDisableHeaderNames: [String!]!
+  csvConsignmentHeaderNames: [String!]!
   videoService: ProductVideoServiceSchema!
   csvProductTemplateWithTaxonomyColumnNames(categoryId: Int!, treeVersion: String!): [String!]
 }
@@ -10004,6 +10089,7 @@ type ProductSchema {
   warningType: ContestWarningType
   isConsignmentEligible: Boolean
   consignmentOriginalPid: ObjectIdType
+  consignmentReferenceLink: String
   chemicalNames: [String!]
   performance(startDate: DatetimeInput!, endDate: DatetimeInput!): ProductPerformanceSchema
   taxonomyCategory: TaxonomyCategorySchema
@@ -10147,6 +10233,7 @@ input ProductUpsertInput {
   warningType: ContestWarningType
   isConsignmentEligible: Boolean
   consignmentOriginalPid: ObjectIdType
+  consignmentReferenceLink: String
   chemicalNames: [String!]
   subcategoryId: Int
 }
@@ -10178,6 +10265,9 @@ type ProductVideo {
   audioStartTime: Float
   videoSource: ProductVideoSource
   lastUpdated: Datetime
+  viewCountV2: Int
+  addToCartV2: Int
+  ordersV2: Int
 }
 
 type ProductVideoAudio {
@@ -10224,6 +10314,7 @@ type ProductVideoContentTagMutations {
 type ProductVideoDailyStats {
   date: Datetime!
   views: Int
+  viewsV2: Int
   likes: Int
   watchTime: Float
   gmv: Float
@@ -10231,7 +10322,9 @@ type ProductVideoDailyStats {
   engagedViews: Int!
   buyerIntent: Float!
   addToCart: Int!
+  addToCartV2: Int
   conversions: Float!
+  ordersV2: Int
 }
 
 type ProductVideoIPTagMutations {
@@ -10252,7 +10345,7 @@ enum ProductVideoIPViolationReason {
 
 type ProductVideoServiceSchema {
   videoCount(query: String, videoStates: [ProductVideoState!], merchantId: ObjectIdType, searchType: VideoSearchType): Int!
-  videos(query: String, searchType: VideoSearchType, merchantId: ObjectIdType, offset: Int = 0, limit: Int = 20, sort: VideoSort, videoStates: [ProductVideoState!]): [ProductVideo!]!
+  videos(query: String, searchType: VideoSearchType, merchantId: ObjectIdType, offset: Int = 0, limit: Int = 20, sort: VideoSort, videoStates: [ProductVideoState!], startDate: DatetimeInput, endDate: DatetimeInput): [ProductVideo!]!
   leaderboard(category: VideoCategory = all, offset: Int = 0, limit: Int = 20): VideoLeaderboard
   performance(startDate: DatetimeInput, endDate: DatetimeInput, videoId: ObjectIdType): VideoPerformance
   audioCount(trackTitle: String, moodEmotion: AudioMoodEmotion, productCategory: AudioProductCategory, genre: AudioGenre): Int!
@@ -10308,6 +10401,7 @@ enum ProductsCSVTemplateType {
   ENABLED
   SHIPPING
   CONTENT
+  CONSIGNMENT
   UNDER_PERFORMING
   ALL_COLUMNS
   PRICE_AND_INVENTORY
@@ -11271,6 +11365,21 @@ input ReviewBankAccountDocumentInput {
   documentType: BankAccountDocumentType!
   state: BankAccountVerificationStatus!
   stateReason: BankAccountVerificationStatusReason!
+  comment: String
+}
+
+type ReviewMerchantIdentityDocument {
+  ok: Boolean!
+  message: String
+}
+
+input ReviewMerchantIdentityDocumentInput {
+  merchantId: ObjectIdType!
+  documentId: ObjectIdType!
+  documentType: BusinessDocTypes!
+  verificationType: MerchantIdentityVerificationType!
+  state: MerchantIdentityVerificationStatus!
+  stateReason: [TaxVerificationStatusReason!]!
   comment: String
 }
 
@@ -12928,6 +13037,21 @@ enum TaxType {
   INTERNATIONAL_MA
 }
 
+enum TaxVerificationStatusReason {
+  MISSING_OR_INCORRECT_SIGNATURE
+  MISSING_OR_OUTDATED_SIGNING_DATE
+  INCORRECT_NAME
+  W9_ITEM_3
+  W8_BEN_E_ITEM_5
+  W8_BEN_E_ITEM_4
+  UNCLEAR_TAX_FORM
+  INCORRECT_SSN_TIN_FTIN
+  INCORRECT_TAX_FORM_TYPE
+  OTHERS
+  CERTIFICATION_UNCHECKED
+  APPROVE
+}
+
 type TaxonomyAttributeSchema {
   id: Int!
   name: String!
@@ -13711,6 +13835,17 @@ type UploadEUVATTaxQuestionnaire {
   errorMessage: String
 }
 
+type UploadMerchantIdentityDocument {
+  ok: Boolean!
+  message: String
+}
+
+input UploadMerchantIdentityDocumentInput {
+  merchantIdentityDocFile: FileInput!
+  verificationType: MerchantIdentityVerificationType!
+  proofOfBizDocType: BusinessDocTypes!
+}
+
 type UploadMutations {
   initiateUpload(input: InitiateUploadInput!): InitiateUploadMutation
 }
@@ -14257,6 +14392,12 @@ enum UsersSortFieldType {
   EMAIL
 }
 
+type VacationPauseSchema {
+  primaryWarehouseOnly: Boolean!
+  vacationStartDate: Datetime
+  vacationEndDate: Datetime
+}
+
 type VacationSettings {
   changeVacationSettings(input: ChangeVacationSettingsInput!): ChangeVacationSettingsMutation!
   clearVacationSettings: ClearVacationSettingsMutation!
@@ -14424,6 +14565,7 @@ type VideoMutations {
 
 type VideoPerformance {
   totalViewsPercentChange: Float!
+  totalViewsV2PercentChange: Float!
   totalLikesPercentChange: Float!
   totalWatchTimePercentChange: Float!
   totalGmvPercentChange: Float!
@@ -14431,7 +14573,9 @@ type VideoPerformance {
   engagedViewsPercentChange: Float!
   buyerIntentPercentChange: Float!
   addToCartPercentChange: Float!
+  addToCartV2PercentChange: Float!
   conversionsPercentChange: Float!
+  ordersV2PercentChange: Float!
   dailyStats: [ProductVideoDailyStats!]!
 }
 
