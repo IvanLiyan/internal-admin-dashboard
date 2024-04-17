@@ -12,6 +12,7 @@ const ReviewPdfPage: NextPage<Record<string, never>> = () => {
     <PageRoot title="Preview pdf file">
       <Paper>
         {fileId && <ReviewPdf fileUrl={`/merchant-file/${fileId}`} />}
+        {/* {fileId && <ReviewPdf fileUrl={`/internal-admin/pdfs/pdf.pdf`} />} */}
       </Paper>
     </PageRoot>
   );

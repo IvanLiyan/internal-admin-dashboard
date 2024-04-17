@@ -79,6 +79,14 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
     return <LoadingIndicator />;
   }
 
+  const handleDownloadAndOpenPdf = (fileId: any) => {
+    // 这里的 URL 应该指向你的 PDF 文件
+    const pdfUrl = `/merchant-file/${fileId}`;
+
+    // 使用 window.open() 在新标签页中打开 PDF
+    window.open(pdfUrl, "_blank");
+  };
+
   return (
     <PageRoot title="Tax Account Documents">
       <Paper>
@@ -123,7 +131,10 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       <Button
                         disabled={row.documentState == "PENDING"}
                         component="a"
-                        href={`/internal-admin/seller-identity/review-pdf?documentUrlId=${row.documentUrlId}`}
+                        // href={`/internal-admin/seller-identity/review-pdf?documentUrlId=${row.documentUrlId}`}
+                        onClick={() => {
+                          handleDownloadAndOpenPdf(row.documentUrlId);
+                        }}
                         target="_blank"
                       >
                         View
