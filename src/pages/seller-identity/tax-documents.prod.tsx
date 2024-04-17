@@ -123,8 +123,7 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       <Button
                         disabled={row.documentState == "PENDING"}
                         component="a"
-                        href={`/internal-admin/seller-identity/review-pdf?documentUrlId=${row.documentUrlId}`}
-                        target="_blank"
+                        href={merchFeUrl(`/merchant-file/${row.documentUrlId}`)}
                       >
                         View
                       </Button>
