@@ -123,7 +123,7 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                       <Button
                         disabled={row.documentState == "PENDING"}
                         onClick={() => {
-                          merchFeUrl(`/merchant-file/${row.documentUrlId}`);
+                          window.open(`/merchant-file/${row.documentUrlId}`);
                         }}
                       >
                         View
