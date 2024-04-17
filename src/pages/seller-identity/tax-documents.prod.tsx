@@ -122,9 +122,8 @@ const TaxDocumentsPage: NextPage<Record<string, never>> = () => {
                     <TableCell>
                       <Button
                         disabled={row.documentState == "PENDING"}
-                        onClick={() => {
-                          window.open(`/merchant-file/${row.documentUrlId}`);
-                        }}
+                        component="a"
+                        href={merchFeUrl(`/merchant-file/${row.documentUrlId}`)}
                       >
                         View
                       </Button>
