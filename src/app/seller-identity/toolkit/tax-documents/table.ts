@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import {
   MerchantIdentityDocumentType,
   MerchantIdentityVerificationStatus,
-  TaxVerificationStatusReason,
+  MerchantVerificationStatusReason,
 } from "@schema";
 
 export type TableData = {
@@ -19,7 +19,7 @@ export type TableData = {
   readonly reviewedAt: string;
   readonly reviewer: string;
   readonly comment: string;
-  readonly stateReason?: Maybe<Array<Maybe<TaxVerificationStatusReason>>>;
+  readonly stateReason?: Maybe<Array<Maybe<MerchantVerificationStatusReason>>>;
 };
 
 export const ColumnLabel = {
@@ -82,6 +82,20 @@ export const TaxAccountDocumentsQuery = graphql(`
     }
   }
 `);
+
+export const GetSellerIdentityRejectReasonQuery = graphql(`
+  query getSellerIdentityRejectReasons(
+    $verificationType: MerchantIdentityVerificationType
+  ) {
+    merchantIdentity {
+      rejectReasons(verificationType: $verificationType)
+    }
+  }
+`);
+
+export type TaxRejectReasonObj = {
+  [key in MerchantVerificationStatusReason]: string;
+};
 
 export const useTableData = (
   data: ResultOf<typeof TaxAccountDocumentsQuery> | undefined

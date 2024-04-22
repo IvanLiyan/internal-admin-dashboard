@@ -20,7 +20,7 @@ app.prepare().then(() => {
     if (err) throw err;
     console.log(`> Ready on https://${hostname}:${port}/internal-admin`);
     console.log(
-      `> Log in through https://${hostname}/internal-admin/dev-login`
+      `> Log in through https://${hostname}:${port}/internal-admin/dev-login`
     );
   });
 });

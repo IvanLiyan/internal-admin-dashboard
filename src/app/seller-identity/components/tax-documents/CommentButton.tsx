@@ -1,7 +1,13 @@
+import { useEffect } from "react";
+import { useQuery } from "urql";
 import { useToast } from "@app/core/toast/ToastProvider";
 import { ReviewTaxDocumentMutation } from "@app/seller-identity/toolkit/tax-documents/action";
 import { useTaxDocumentsTableContext } from "@app/seller-identity/toolkit/tax-documents/context";
-import { TableData } from "@app/seller-identity/toolkit/tax-documents/table";
+import {
+  TableData,
+  GetSellerIdentityRejectReasonQuery,
+  TaxRejectReasonObj,
+} from "@app/seller-identity/toolkit/tax-documents/table";
 import {
   Button,
   ButtonProps,
@@ -19,7 +25,7 @@ import {
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import {
-  TaxVerificationStatusReason,
+  MerchantVerificationStatusReason,
   BankAccountVerificationStatus,
 } from "@schema";
 import { useState } from "react";
@@ -45,8 +51,31 @@ const CommentButton: React.FC<Props> = ({
   const [, review] = useMutation(ReviewTaxDocumentMutation);
   const [comment, setComment] = useState<string>("");
   const [stateReason, setStateReason] = useState<
-    Array<TaxVerificationStatusReason>
+    Array<MerchantVerificationStatusReason>
   >([]);
+  const [sellerIdentityRejectReasons, setSellerIdentityRejectReasons] =
+    useState<Array<string>>();
+
+  const [{ data: rejectReasonData }] = useQuery({
+    query: GetSellerIdentityRejectReasonQuery,
+    variables: {
+      verificationType: "TAX_FORM",
+    },
+    requestPolicy: "cache-and-network",
+  });
+
+  useEffect(() => {
+    const rejectReasonStringify =
+      rejectReasonData?.merchantIdentity?.rejectReasons;
+    const res: TaxRejectReasonObj =
+      rejectReasonStringify && JSON.parse(rejectReasonStringify);
+    if (res != null) {
+      setSellerIdentityRejectReasons(
+        Object.keys(res).filter((reason) => reason !== "APPROVE")
+      );
+    }
+  }, [rejectReasonData]);
+
   const toast = useToast();
 
   const { reexecuteQuery } = useTaxDocumentsTableContext();
@@ -135,34 +164,22 @@ const CommentButton: React.FC<Props> = ({
                         variant="outlined"
                         onChange={(
                           event: SelectChangeEvent<
-                            TaxVerificationStatusReason[]
+                            MerchantVerificationStatusReason[]
                           >
                         ) => {
-                          const reasonsArray: TaxVerificationStatusReason[] =
-                            event.target.value as TaxVerificationStatusReason[];
+                          const reasonsArray: MerchantVerificationStatusReason[] =
+                            event.target
+                              .value as MerchantVerificationStatusReason[];
 
                           setStateReason(reasonsArray);
                         }}
                       >
-                        {(
-                          [
-                            "CERTIFICATION_UNCHECKED",
-                            "INCORRECT_NAME",
-                            "INCORRECT_SSN_TIN_FTIN",
-                            "INCORRECT_TAX_FORM_TYPE",
-                            "MISSING_OR_INCORRECT_SIGNATURE",
-                            "MISSING_OR_OUTDATED_SIGNING_DATE",
-                            "OTHERS",
-                            "UNCLEAR_TAX_FORM",
-                            "W8_BEN_E_ITEM_4",
-                            "W8_BEN_E_ITEM_5",
-                            "W9_ITEM_3",
-                          ] as const
-                        ).map((stateReason) => (
-                          <MenuItem key={stateReason} value={stateReason}>
-                            {stateReason}
-                          </MenuItem>
-                        ))}
+                        {sellerIdentityRejectReasons &&
+                          sellerIdentityRejectReasons.map((stateReason) => (
+                            <MenuItem key={stateReason} value={stateReason}>
+                              {stateReason}
+                            </MenuItem>
+                          ))}
                       </Select>
                     </FormControl>
                     {stateReason.includes("OTHERS") && (

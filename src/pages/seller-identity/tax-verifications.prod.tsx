@@ -26,7 +26,6 @@ import {
   TableRow,
 } from "@mui/material";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useReducer } from "react";
 import { useQuery } from "urql";
 
@@ -36,7 +35,6 @@ const TaxVerificationsPage: NextPage<Record<string, never>> = () => {
     {},
     initQueryState
   );
-  const router = useRouter();
 
   const [{ fetching, data }] = useQuery({
     query: TaxAccountVerificationsQuery,
