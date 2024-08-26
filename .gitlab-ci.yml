@@ -22,7 +22,6 @@ lint:
   image: gitlab.i.wish.com:443/dependency-proxy/dependency_proxy/containers/node:18-alpine3.17
   before_script:
     - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - yarn lint
   dependencies:
