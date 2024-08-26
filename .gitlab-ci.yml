@@ -5,7 +5,10 @@ stages:
 
 install dependencies:
   stage: install
-  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  image: gitlab.i.wish.com:443/dependency-proxy/dependency_proxy/containers/node:18-alpine3.17
+  before_script:
+    - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - yarn install --frozen-lockfile
   artifacts:
@@ -16,7 +19,10 @@ install dependencies:
 
 lint:
   stage: test
-  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  image: gitlab.i.wish.com:443/dependency-proxy/dependency_proxy/containers/node:18-alpine3.17
+  before_script:
+    - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - yarn lint
   dependencies:
@@ -24,7 +30,10 @@ lint:
 
 build staging:
   stage: test
-  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  image: gitlab.i.wish.com:443/dependency-proxy/dependency_proxy/containers/node:18-alpine3.17
+  before_script:
+    - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     # we want the `development` configs on staging, even though we are optimizing the build for prod
     - cp .env.development .env.production
@@ -38,7 +47,10 @@ build staging:
 
 build prod:
   stage: test
-  image: harbor.s.wish.site/dockerhub/node:18-alpine3.17
+  image: gitlab.i.wish.com:443/dependency-proxy/dependency_proxy/containers/node:18-alpine3.17
+  before_script:
+    - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - yarn build
   artifacts:
@@ -53,6 +65,9 @@ build prod:
 deploy staging:
   stage: deploy
   image: registry-gitlab.i.wish.com/contextlogic/internal-admin-dashboard/aws-base-with-brotli:latest
+  before_script:
+    - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-staging
   environment:
@@ -69,6 +84,9 @@ deploy staging:
 deploy production:
   stage: deploy
   image: registry-gitlab.i.wish.com/contextlogic/internal-admin-dashboard/aws-base-with-brotli:latest
+  before_script:
+    - docker login -u $CI_DEPENDENCY_PROXY_USER -p $CI_DEPENDENCY_PROXY_PASSWORD $CI_DEPENDENCY_PROXY_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - sh scripts/deploy.sh -s=internal-admin-tools-production
   environment:
